@@ -1,0 +1,33 @@
+{
+  "generated": "2026-09-12T17:38:32.710Z",
+  "voices": {
+    "en": "EXAVITQu4vr4xnSDxMaL",
+    "ar": "EXAVITQu4vr4xnSDxMaL (fallback)"
+  },
+  "lines": {
+    "en": {
+      "welcome": "audio/en/welcome.mp3",
+      "who": "audio/en/who.mp3",
+      "footprint": "audio/en/footprint.mp3",
+      "projects": "audio/en/projects.mp3",
+      "solutions": "audio/en/solutions.mp3",
+      "history": "audio/en/history.mp3",
+      "riyadh": "audio/en/riyadh.mp3",
+      "close": "audio/en/close.mp3",
+      "ui-greetShort": "audio/en/ui-greetShort.mp3",
+      "ui-resume": "audio/en/ui-resume.mp3"
+    },
+    "ar": {
+      "welcome": "audio/ar/welcome.mp3",
+      "who": "audio/ar/who.mp3",
+      "footprint": "audio/ar/footprint.mp3",
+      "projects": "audio/ar/projects.mp3",
+      "solutions": "audio/ar/solutions.mp3",
+      "history": "audio/ar/history.mp3",
+      "riyadh": "audio/ar/riyadh.mp3",
+      "close": "audio/ar/close.mp3",
+      "ui-greetShort": "audio/ar/ui-greetShort.mp3",
+      "ui-resume": "audio/ar/ui-resume.mp3"
+    }
+  }
+}

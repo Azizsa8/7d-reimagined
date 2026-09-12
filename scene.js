@@ -116,53 +116,143 @@ function makeComposer(renderer,scene,cam,stage,{strength=.3,radius=.4,threshold=
    FOOTPRINT GLOBE
    ===================================================================== */
 let globe=null;
+
+/* TopoJSON is a delta-encoded, quantised format; this is the whole decoder we need.
+   Land outlines ship with the site (data/land-110m.json) so the globe never waits
+   on a third party. */
+function topoToRings(topo,name){
+  const {scale:[sx,sy],translate:[tx,ty]}=topo.transform;
+  const arc=i=>{const rev=i<0;const a=topo.arcs[rev?~i:i];let x=0,y=0;const out=[];
+    for(const [dx,dy] of a){x+=dx;y+=dy;out.push([x*sx+tx,y*sy+ty]);}
+    return rev?out.reverse():out;};
+  const ring=idx=>{const pts=[];for(const i of idx){const seg=arc(i);pts.push(...(pts.length?seg.slice(1):seg));}return pts;};
+  const rings=[];
+  const walk=g=>{
+    if(g.type==='GeometryCollection'){g.geometries.forEach(walk);return;}
+    if(g.type==='Polygon')g.arcs.forEach(r=>rings.push(ring(r)));
+    if(g.type==='MultiPolygon')g.arcs.forEach(poly=>poly.forEach(r=>rings.push(ring(r))));
+  };
+  walk(topo.objects[name]);
+  return rings;
+}
+/* Paint the land as an equirectangular mask we can sample per-pixel. */
+function landMask(rings,W=1024){
+  const H=W/2;const c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d',{willReadFrequently:true});
+  x.fillStyle='#000';x.fillRect(0,0,W,H);
+  x.fillStyle='#fff';x.beginPath();
+  for(const r of rings){r.forEach(([lon,lat],i)=>{const px=(lon+180)/360*W,py=(90-lat)/180*H;i?x.lineTo(px,py):x.moveTo(px,py);});x.closePath();}
+  x.fill('nonzero');
+  const d=x.getImageData(0,0,W,H).data;
+  return {W,H,at:(lon,lat)=>{
+    let px=Math.floor((lon+180)/360*W),py=Math.floor((90-lat)/180*H);
+    px=(px%W+W)%W;py=Math.max(0,Math.min(H-1,py));
+    return d[(py*W+px)*4]>127;}};
+}
+
 export function initGlobe(){
   const stage=document.querySelector('#globeStage'); if(!stage)return;
   const HUBS=window.HUBS||[];
   const renderer=makeRenderer(stage,{shadows:false});
   const scene=new THREE.Scene(); scene.environment=duskEnvironment(renderer,{warm:.8});
-  const cam=new THREE.PerspectiveCamera(38,stage.clientWidth/stage.clientHeight,.1,100); cam.position.set(0,0,4.2);
+  const cam=new THREE.PerspectiveCamera(34,stage.clientWidth/stage.clientHeight,.1,100); cam.position.set(0,0,4.6);
   const g=new THREE.Group(); scene.add(g);
   const Rr=1.35;
-  g.add(mesh(new THREE.SphereGeometry(Rr,64,64),new THREE.MeshStandardMaterial({color:0x0B0F14,roughness:.55,metalness:.35,envMapIntensity:.9}),0,0,0,false,false));
-  g.add(new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(Rr*1.003,3)),new THREE.LineBasicMaterial({color:C.brass,transparent:true,opacity:.10})));
-  for(let i=-60;i<=60;i+=30){const rr=Rr*Math.cos(i*Math.PI/180),y=Rr*Math.sin(i*Math.PI/180);const pts=[];
-    for(let a=0;a<=96;a++){const t=a/96*Math.PI*2;pts.push(new THREE.Vector3(rr*Math.cos(t),y,rr*Math.sin(t)));}
-    g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:C.brass,transparent:true,opacity:.09})));}
-  // atmosphere shell
-  g.add(mesh(new THREE.SphereGeometry(Rr*1.12,48,48),new THREE.MeshBasicMaterial({color:0x3E6E8C,transparent:true,opacity:.055,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false}),0,0,0,false,false));
-  const N=1400,pos=new Float32Array(N*3);
-  for(let i=0;i<N;i++){const ph=Math.acos(2*rnd()-1),th=rnd()*Math.PI*2,r=Rr*1.015;pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.cos(ph);pos[i*3+2]=r*Math.sin(ph)*Math.sin(th);}
-  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  g.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0xBFC6C2,size:.011,transparent:true,opacity:.5})));
-  const toV=(lat,lon,r=Rr)=>{const p=(90-lat)*Math.PI/180,t=(lon+180)*Math.PI/180;return new THREE.Vector3(-r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));};
+  const toV=(lat,lon,r=Rr)=>{const p=(90-lat)*Math.PI/180,t=(lon+180)*Math.PI/180;
+    return new THREE.Vector3(-r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));};
+
+  /* ocean: a dark polished sphere, so the dusk environment reads as a sheen on water */
+  g.add(mesh(new THREE.SphereGeometry(Rr,96,96),new THREE.MeshStandardMaterial({color:0x080D12,roughness:.42,metalness:.55,envMapIntensity:.85}),0,0,0,false,false));
+
+  /* graticule, kept faint: it says "survey", not "sci-fi HUD" */
+  {const lines=[];
+    for(let lat=-60;lat<=60;lat+=30){const pts=[];for(let a=0;a<=128;a++)pts.push(toV(lat,-180+a/128*360,Rr*1.002));lines.push(pts);}
+    for(let lon=-180;lon<180;lon+=30){const pts=[];for(let a=0;a<=64;a++)pts.push(toV(-90+a/64*180,lon,Rr*1.002));lines.push(pts);}
+    const geo=[];lines.forEach(p=>{for(let i=0;i<p.length-1;i++)geo.push(p[i],p[i+1]);});
+    g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(geo),new THREE.LineBasicMaterial({color:0xE0A94A,transparent:true,opacity:.07})));}
+
+  /* atmosphere: a fresnel shell, brighter at the limb, as a real rim light would be */
+  const atmo=new THREE.Mesh(new THREE.SphereGeometry(Rr*1.13,64,64),new THREE.ShaderMaterial({
+    transparent:true,side:THREE.BackSide,depthWrite:false,blending:THREE.AdditiveBlending,
+    uniforms:{uCol:{value:new THREE.Color(0x8FA6BE)},uInt:{value:.3}},
+    vertexShader:'varying vec3 vN;varying vec3 vP;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vP=mv.xyz;gl_Position=projectionMatrix*mv;}',
+    fragmentShader:'uniform vec3 uCol;uniform float uInt;varying vec3 vN;varying vec3 vP;void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(-vP))),2.4);gl_FragColor=vec4(uCol,f*uInt);}'
+  }));g.add(atmo);
+
+  /* hubs: a surface disc, a rising beam and a ring that pulses when the hub lights */
   const marks=[];
-  HUBS.forEach(h=>{const v=toV(h.lat,h.lon,Rr*1.01);
-    const m=mesh(new THREE.SphereGeometry(.026,14,14),MAT.emis(C.brass,4),v.x,v.y,v.z,false,false);m.visible=false;g.add(m);
-    const ring=mesh(new THREE.RingGeometry(.05,.068,28),new THREE.MeshBasicMaterial({color:C.brass,transparent:true,opacity:.65,side:THREE.DoubleSide}),v.x,v.y,v.z,false,false);ring.lookAt(0,0,0);ring.visible=false;g.add(ring);
-    const gl=halo(C.horizon,.34,.85);gl.position.copy(v);gl.visible=false;g.add(gl);
-    marks.push({m,ring,gl});});
+  HUBS.forEach(h=>{
+    const v=toV(h.lat,h.lon,Rr*1.004);const grp=new THREE.Group();grp.visible=false;g.add(grp);
+    const disc=mesh(new THREE.CircleGeometry(.028,20),MAT.emis(0xF2C777,2.2),v.x,v.y,v.z,false,false);disc.lookAt(v.clone().multiplyScalar(2));grp.add(disc);
+    const ring=mesh(new THREE.RingGeometry(.045,.055,32),new THREE.MeshBasicMaterial({color:0xE0A94A,transparent:true,opacity:.8,side:THREE.DoubleSide}),v.x,v.y,v.z,false,false);
+    ring.lookAt(v.clone().multiplyScalar(2));grp.add(ring);
+    const beam=mesh(new THREE.CylinderGeometry(.006,.006,.3,6),new THREE.MeshBasicMaterial({color:0xF2C777,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}),0,0,0,false,false);
+    beam.position.copy(v.clone().multiplyScalar(1.11));beam.lookAt(0,0,0);beam.rotateX(Math.PI/2);grp.add(beam);
+    const gl=halo(0xF2C777,.28,.9);gl.position.copy(v);grp.add(gl);
+    marks.push({grp,ring,gl,v});});
+
+  /* routes: a drawn great-circle plus a pulse that runs the finished line */
   const arcs=[];const order=[0,1,2,3,4];
-  for(let i=0;i<order.length-1;i++){const a=toV(HUBS[order[i]].lat,HUBS[order[i]].lon),b=toV(HUBS[order[i+1]].lat,HUBS[order[i+1]].lon);
-    const mid=a.clone().add(b).multiplyScalar(.5).normalize().multiplyScalar(Rr*1.5);
-    const curve=new THREE.QuadraticBezierCurve3(a,mid,b);const pts=curve.getPoints(96);
+  for(let i=0;i<order.length-1;i++){
+    const a=toV(HUBS[order[i]].lat,HUBS[order[i]].lon),b=toV(HUBS[order[i+1]].lat,HUBS[order[i+1]].lon);
+    const mid=a.clone().add(b).multiplyScalar(.5).normalize().multiplyScalar(Rr*(1.14+a.distanceTo(b)*.12));
+    const curve=new THREE.QuadraticBezierCurve3(a,mid,b);const pts=curve.getPoints(128);
     const geo=new THREE.BufferGeometry().setFromPoints(pts);geo.setDrawRange(0,0);
-    g.add(new THREE.Line(geo,new THREE.LineBasicMaterial({color:C.brass,transparent:true,opacity:.95})));
-    arcs.push({line:g.children[g.children.length-1],n:pts.length,curve});}
-  g.rotation.y=-.6;
-  const {composer}=makeComposer(renderer,scene,cam,stage,{strength:.5,radius:.45,threshold:.75});
-  globe={renderer,composer,scene,cam,g,marks,arcs,stage,lit:-1};
+    const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xE0A94A,transparent:true,opacity:.9}));g.add(line);
+    const pulse=halo(0xFFE2AC,.16,0);g.add(pulse);
+    arcs.push({line,n:pts.length,curve,pulse});}
+
+  g.rotation.y=-.14;
+  const {composer}=makeComposer(renderer,scene,cam,stage,{strength:.45,radius:.5,threshold:.78});
+  globe={renderer,composer,scene,cam,g,marks,arcs,atmo,stage,lit:-1,t0:performance.now()};
   window.globe=globe;
   addEventListener('resize',()=>{const W=stage.clientWidth,H=stage.clientHeight;renderer.setSize(W,H);composer.setSize(W,H);cam.aspect=W/H;cam.updateProjectionMatrix();});
+
+  /* the land itself, as a dense point cloud sampled off the mask. Loaded after the
+     first paint so the section is never blocked on it; the globe stands up without it. */
+  fetch('data/land-110m.json').then(r=>r.json()).then(topo=>{
+    const mask=landMask(topoToRings(topo,'land'),1024);
+    const N=60000,pos=[],col=[];const c1=new THREE.Color(0xE7C98D),c2=new THREE.Color(0x8FA89B);
+    const golden=Math.PI*(3-Math.sqrt(5));
+    for(let i=0;i<N;i++){
+      const y=1-(i/(N-1))*2, r=Math.sqrt(Math.max(0,1-y*y)), th=golden*i;
+      const x=Math.cos(th)*r, z=Math.sin(th)*r;
+      const lat=Math.asin(y)*180/Math.PI;
+      let lon=Math.atan2(z,-x)*180/Math.PI-180; if(lon<-180)lon+=360;
+      if(!mask.at(lon,lat))continue;
+      const v=new THREE.Vector3(x,y,z).multiplyScalar(Rr*1.006);
+      pos.push(v.x,v.y,v.z);
+      const c=c1.clone().lerp(c2,Math.random()*.5);col.push(c.r,c.g,c.b);}
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+    geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+    const land=new THREE.Points(geo,new THREE.PointsMaterial({size:.016,vertexColors:true,transparent:true,opacity:.95,sizeAttenuation:true}));
+    g.add(land);globe.land=land;
+    // a coastline drawn over the dots sharpens the read at small sizes
+    const seg=[];
+    for(const ring of topoToRings(topo,'land')){
+      for(let i=0;i<ring.length-1;i++){
+        const [lo1,la1]=ring[i],[lo2,la2]=ring[i+1];
+        if(Math.abs(lo1-lo2)>90)continue;
+        seg.push(toV(la1,lo1,Rr*1.012),toV(la2,lo2,Rr*1.012));}}
+    g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg),new THREE.LineBasicMaterial({color:0xF4E3C0,transparent:true,opacity:.28})));
+  }).catch(()=>{/* no land data: the ocean sphere, graticule and routes still read */});
 }
 const counted=new Set();
 export function updateGlobe(p){
-  if(!globe)return; const {g,marks,arcs,composer,scene,cam}=globe;
-  g.rotation.y=-.6+p*1.1; g.rotation.x=.15-p*.25;
+  if(!globe)return; const {g,marks,arcs,atmo,composer}=globe;
+  const t=(performance.now()-globe.t0)/1000;
+  g.rotation.y=-.14-p*3.9+(REDUCED?0:t*.01);
+  g.rotation.x=.2-p*.34;
+  atmo.material.uniforms.uInt.value=.26+Math.sin(t*.7)*.04;
   const seg=clamp(p*1.15,0,1)*(arcs.length+1);
-  marks.forEach((m,i)=>{const on=seg>=i;m.m.visible=on;m.ring.visible=on;m.gl.visible=on;
+  marks.forEach((m,i)=>{const on=seg>=i;m.grp.visible=on;
+    if(on){const k=clamp(seg-i,0,1);m.ring.scale.setScalar(1+Math.sin(t*1.8+i)*.12);m.gl.material.opacity=.5+k*.4;}
     const cl=document.querySelector(`.clock[data-i="${i}"]`);cl&&cl.classList.toggle('lit',on);});
-  arcs.forEach((a,i)=>{const t=clamp(seg-(i+1)+1,0,1);a.line.geometry.setDrawRange(0,Math.floor(t*a.n));});
+  arcs.forEach((a,i)=>{const k=clamp(seg-(i+1)+1,0,1);
+    a.line.geometry.setDrawRange(0,Math.floor(k*a.n));
+    if(k>=1){a.pulse.material.opacity=.85;a.pulse.position.copy(a.curve.getPointAt(((t*.22)+i*.17)%1));}
+    else a.pulse.material.opacity=0;});
   const cnt=[...document.querySelectorAll('.stat b')];const stage=Math.floor(seg);
   const tick=el=>{const i=cnt.indexOf(el);if(counted.has(i))return;counted.add(i);
     const to=+el.dataset.count,suf=el.dataset.suffix||'';

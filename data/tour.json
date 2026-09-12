@@ -1,0 +1,79 @@
+{
+  "persona": {
+    "name": { "en": "Noorah", "ar": "نورة" },
+    "role": { "en": "7D guide", "ar": "مرشدة 7D" },
+    "voice": {
+      "ar": { "id": "ckaeRWMtCV0u0pUT3wX1", "label": "Noorah — Saudi female (shared library, needs a paid plan)", "fallback": "EXAVITQu4vr4xnSDxMaL" },
+      "en": { "id": "EXAVITQu4vr4xnSDxMaL", "label": "Sarah — mature, reassuring (premade, free tier)", "fallback": "EXAVITQu4vr4xnSDxMaL" }
+    },
+    "model": "eleven_multilingual_v2"
+  },
+  "chapters": [
+    {
+      "id": "welcome",
+      "target": "#hero",
+      "hold": 1.2,
+      "en": "Welcome to 7D International. I am Noorah, and if you have two minutes I will show you the firm myself.",
+      "ar": "هلا وغلا فيك في سفن دي إنترناشونال. أنا نورة، وإذا عندك دقيقتين بأعرّفك على الشركة بنفسي."
+    },
+    {
+      "id": "who",
+      "target": "#hero",
+      "hold": 0.6,
+      "en": "7D began in the Czech Republic in nineteen ninety three, and is headquartered in Florida. Contracting and consulting, across five continents.",
+      "ar": "بدأت سفن دي في جمهورية التشيك سنة ألف وتسعمئة وثلاثة وتسعين، ومقرها الرئيسي في فلوريدا. مقاولات واستشارات في خمس قارات."
+    },
+    {
+      "id": "footprint",
+      "target": "#footprint",
+      "scroll": 0.72,
+      "en": "Five hubs carry the work. Tampa, Ostrava, Sydney, Seoul, and now Riyadh. Watch the network light up.",
+      "ar": "خمسة مراكز تحمل العمل: تامبا، وأوسترافا، وسيدني، وسيول، والآن الرياض. شوف الشبكة وهي تضيء."
+    },
+    {
+      "id": "projects",
+      "target": "#projects",
+      "scroll": 0.55,
+      "en": "In the Kingdom the record is on the ground. The King Abdullah Park Fountain. The International Gardens. The Riyadh Eye. The twenty twenty urban study for the capital.",
+      "ar": "في المملكة، السجل موجود على أرض الواقع: نافورة حديقة الملك عبدالله، والحديقة العالمية، وعين الرياض، ودراسة الرياض العمرانية لعام ألفين وعشرين."
+    },
+    {
+      "id": "solutions",
+      "target": "#solutions",
+      "scroll": 0.35,
+      "en": "The practice is organised into seven disciplines, from architecture and waterscape design to defence, energy, and the environment.",
+      "ar": "تنقسم أعمال الشركة إلى سبعة تخصصات، من العمارة وتصميم المسطحات المائية إلى الدفاع والطاقة والبيئة."
+    },
+    {
+      "id": "history",
+      "target": "#history",
+      "scroll": 0.4,
+      "en": "Three decades of it. An eighty million dollar operations contract in Saudi Arabia. More than fifteen hundred base stations built across continents.",
+      "ar": "ثلاثة عقود من العمل: عقد تشغيل وصيانة بثمانين مليون دولار في السعودية، وأكثر من ألف وخمسمئة محطة اتصالات حول العالم."
+    },
+    {
+      "id": "riyadh",
+      "target": "#news",
+      "scroll": 0.4,
+      "en": "In December twenty twenty five, 7D partnered with Takween Alrajhi and opened its Middle East headquarters here in Riyadh.",
+      "ar": "في ديسمبر ألفين وخمسة وعشرين، عقدت سفن دي شراكة مع تكوين الراجحي وافتتحت مقرها للشرق الأوسط هنا في الرياض."
+    },
+    {
+      "id": "close",
+      "target": "#cta",
+      "scroll": 0.5,
+      "en": "That is the firm. Tell us the sector, the country and the scale, and the Riyadh team will answer within one business day.",
+      "ar": "هذي هي الشركة. أخبرنا بالقطاع والدولة وحجم المشروع، وفريق الرياض يرد عليك خلال يوم عمل واحد."
+    }
+  ],
+  "ui": {
+    "greetShort": {
+      "en": "Welcome to 7D International.",
+      "ar": "هلا وغلا فيك في سفن دي إنترناشونال."
+    },
+    "resume": {
+      "en": "Shall I carry on?",
+      "ar": "أكمل؟"
+    }
+  }
+}
