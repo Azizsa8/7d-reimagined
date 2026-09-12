@@ -1,5 +1,5 @@
 // Minimal offline shell: caches the page so the "capabilities" experience opens without network.
-const C = '7d-v3';
+const C = '7d-v4';
 const CORE = ['/', '/index.html', '/manifest.json', '/icon.svg'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(C).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
