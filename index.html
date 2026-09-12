@@ -307,9 +307,7 @@ section.blk{border-top:none}
 
 /* ================= arrival ================= */
 body.gated{overflow:hidden}
-.gate{position:fixed;inset:0;z-index:900;display:grid;place-items:center;padding:28px;
-  background:var(--bg);opacity:0;transition:opacity .6s var(--ease)}
-.gate.on{opacity:1}
+.gate{position:fixed;inset:0;z-index:900;display:grid;place-items:center;padding:28px;background:var(--bg)}
 .gate.out{opacity:0;clip-path:inset(0 0 100% 0);transition:opacity .8s var(--ease),clip-path .9s var(--ease)}
 .gate-bg{position:absolute;inset:0;
   background:radial-gradient(70% 55% at 50% 42%,rgba(233,178,122,.16),transparent 62%),
