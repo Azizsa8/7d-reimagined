@@ -810,7 +810,9 @@ addEventListener('resize',()=>onScroll(true));
 {const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}}),{threshold:.2,rootMargin:'0px 0px -12% 0px'});
  $$('.seam, .sec-h').forEach(el=>io.observe(el));}
 // keep the 3D scenes animating while pinned even without scroll
-(function raf(){if(visF&&flight)updateFlight(pinProgress($('#flight')));if(visG&&globe)updateGlobe(pinProgress($('#globeWrap')));requestAnimationFrame(raf);})();
+// window.flight / window.globe are set by scene.js once each scene exists; reading bare
+// identifiers here threw before that and killed this loop on its first frame.
+(function raf(){if(visF&&window.flight)updateFlight(pinProgress($('#flight')));if(visG&&window.globe)updateGlobe(pinProgress($('#globeWrap')));requestAnimationFrame(raf);})();
 
 /* gyroscope parallax (mobile) */
 function enableGyro(){

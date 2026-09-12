@@ -89,3 +89,11 @@ Company site: https://7dint.net. Colours: near-black `#0B0E0D` ground, brass acc
 mint/teal `#7DE3B4` as the 7D mark colour. The current mark in `icon.svg` and the nav is a
 placeholder diamond; the real 7D logo has not been added yet. Do not present the
 diamond as the company logo.
+
+## Paid generation (Magnific, ElevenLabs, any credit-billed service)
+
+Never start a paid generation without first telling the owner, in one message, exactly
+what will be generated, with which model and settings, and the credit or money cost, and
+then waiting for an explicit yes. This applies to every image, video, 3D model, texture,
+PBR map, upscale, and voice line. Simulating cost is free and always allowed. The owner's
+Magnific unlimited tier covers Kling 2.5 at 720p for 5 s only; everything else bills credits.

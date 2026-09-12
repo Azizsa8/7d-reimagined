@@ -27,9 +27,39 @@ const C={
 
 /* ---------- shared factories ---------- */
 let R=null;                                        // active renderer, for anisotropy
+
+/* Scanned materials. Files live in assets/tex/<name>-{basecolor,normal,roughness}.png and are
+   optional: when a set is missing the flat colour below stands in, so the scene never breaks.
+   Every stone or sand material made through MAT registers itself and is dressed when the
+   maps arrive. Colours keep multiplying the map, so the tints written into each site survive. */
+const TEX_SETS={stone:{repeat:1.6},sand:{repeat:2.4},paving:{repeat:1.2}};
+const TEX={}; const dressed={stone:[],sand:[],paving:[]};
+function loadTextureSet(name){
+  if(TEX[name]!==undefined)return;
+  TEX[name]=null;
+  const L=new THREE.TextureLoader();
+  const one=(map,srgb)=>new Promise(res=>L.load(`assets/tex/${name}-${map}.png`,t=>{
+    t.wrapS=t.wrapT=THREE.MirroredRepeatWrapping;           // hides the seam a generated tile still has
+    t.repeat.set(TEX_SETS[name].repeat,TEX_SETS[name].repeat);
+    if(srgb)t.colorSpace=THREE.SRGBColorSpace;
+    if(R)t.anisotropy=R.capabilities.getMaxAnisotropy();
+    res(t);},undefined,()=>res(null)));
+  Promise.all([one('basecolor',true),one('normal',false),one('roughness',false)]).then(([map,normalMap,roughnessMap])=>{
+    if(!map)return;                                          // no set on disk: keep the flat colour
+    TEX[name]={map,normalMap,roughnessMap};
+    dressed[name].forEach(m=>dress(m,TEX[name]));
+  });
+}
+function dress(m,t){
+  m.map=t.map; if(t.normalMap){m.normalMap=t.normalMap;m.normalScale.set(.6,.6);} if(t.roughnessMap)m.roughnessMap=t.roughnessMap;
+  m.needsUpdate=true;
+}
+const register=(name,m)=>{dressed[name].push(m);if(TEX[name])dress(m,TEX[name]);else loadTextureSet(name);return m;};
+
 const MAT={
-  stone:(c=C.stone,rough=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:.04,envMapIntensity:.8}),
-  sand:(c=C.sand)=>new THREE.MeshStandardMaterial({color:c,roughness:.95,metalness:0,envMapIntensity:.5}),
+  stone:(c=C.stone,rough=.82)=>register('stone',new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:.04,envMapIntensity:.8})),
+  sand:(c=C.sand)=>register('sand',new THREE.MeshStandardMaterial({color:c,roughness:.95,metalness:0,envMapIntensity:.5})),
+  paving:(c=0x8A8680)=>register('paving',new THREE.MeshStandardMaterial({color:c,roughness:.7,metalness:.02,envMapIntensity:.7})),
   metal:(c=C.steel,rough=.24)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:.95,envMapIntensity:1.5}),
   paint:(c=0xF4F6F4)=>new THREE.MeshStandardMaterial({color:c,roughness:.42,metalness:.06,envMapIntensity:1}),
   glass:(c=0x9FC4D8,op=.42)=>new THREE.MeshPhysicalMaterial({color:c,roughness:.06,metalness:.1,transmission:.9,ior:1.5,thickness:.6,clearcoat:1,clearcoatRoughness:.04,transparent:true,opacity:op,envMapIntensity:2.4,side:THREE.DoubleSide}),
@@ -301,7 +331,10 @@ export function initFlight(){
   const bounce=new THREE.PointLight(C.horizon,18,30,2); scene.add(bounce);
 
   /* ground: dark desert plain with a faint survey grid that fades out */
-  const ground=mesh(new THREE.PlaneGeometry(700,700),new THREE.MeshStandardMaterial({color:0x0B0E12,roughness:.95,metalness:.05,envMapIntensity:.35}),0,0,0,false,true);
+  const groundMat=new THREE.MeshStandardMaterial({color:0x141210,roughness:.95,metalness:.05,envMapIntensity:.35});
+  const ground=mesh(new THREE.PlaneGeometry(700,700),groundMat,0,0,0,false,true);
+  loadTextureSet('sand');dressed.sand.push(groundMat);         // registered by hand: the plain wants a far denser tile
+  {const big=()=>{const t=TEX.sand;if(!t){setTimeout(big,400);return;}const cl=k=>{const c=t[k]?.clone();if(c){c.repeat.set(140,140);c.needsUpdate=true;}return c;};dress(groundMat,{map:cl('map'),normalMap:cl('normalMap'),roughnessMap:cl('roughnessMap')});};setTimeout(big,400);}
   ground.rotation.x=-Math.PI/2; scene.add(ground);
   {const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
     x.strokeStyle='rgba(224,169,74,.20)';x.lineWidth=1.5;x.strokeRect(.75,.75,510.5,510.5);
