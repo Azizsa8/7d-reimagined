@@ -648,7 +648,9 @@ export function initFlight(){
     const dust=new THREE.Points(bg,new THREE.PointsMaterial({color:0xE8C79A,size:.07,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,map:sprTex}));
     scene.add(dust);anims.push(t=>{dust.position.y=Math.sin(t*.22)*.4;});}
 
-  /* camera: one long approach per site, lifted so the tall scenes fit */
+  /* camera: one long approach per site, lifted so the tall scenes fit.
+     Waypoints alternate site, lift, site, so sampling the curve by segment (getPoint) puts
+     the camera on EYE[i] exactly when the flight progress selects project i. */
   const EYE=[[-3,7.5,20],[-6,13,30],[-3,12,26],[-4,14,32],[-5,13,34],[-6,19,44]];
   const LOOK=[[0,1.6,0],[0,5.0,0],[0,7.5,0],[0,4.6,0],[0,4.0,0],[0,9.0,0]];
   const wps=[];
@@ -666,7 +668,7 @@ export function updateFlight(p){
   if(!flight)return;
   const {cam,curve,X,LOOK,anims,composer,key,bounce}=flight;
   flight.t=REDUCED?p:lerp(flight.t,p,.11);
-  cam.position.copy(curve.getPointAt(clamp(flight.t,0,1)));
+  cam.position.copy(curve.getPoint(clamp(flight.t,0,1)));   // by segment, not arc length: site i sits at t=i/(n-1), the same t that picks its card
   const fi=clamp(flight.t,0,1)*(X.length-1),i0=Math.floor(fi),i1=Math.min(X.length-1,i0+1),f=fi-i0;
   const lx=lerp(X[i0],X[i1],f);
   cam.lookAt(new THREE.Vector3(lx+lerp(LOOK[i0][0],LOOK[i1][0],f),lerp(LOOK[i0][1],LOOK[i1][1],f),lerp(LOOK[i0][2],LOOK[i1][2],f)));

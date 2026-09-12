@@ -44,6 +44,11 @@ directly by the browser.
 - The tour computes its scroll target from a chapter's `target` selector and `scroll`
   fraction in `tour.json`, so "scroll: 0.55 of #projects" means 55% through the flight.
   Chapter audio ids match `tour.json` chapter ids and the MP3 filenames.
+- A chapter that names several things in one clip carries `beats`: each beat has a `cue`
+  (a phrase from the narration, per language) and a destination (`project` index into the
+  flight, or `target` + `scroll`). `tour.js` turns the cue's character position into a time
+  within the clip, so the page moves as the words are spoken. `"end"` fires when the clip
+  ends. If you edit narration text, keep the cue phrases verbatim inside it.
 
 ## Rules for changing this repo
 

@@ -20,7 +20,7 @@ const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 let TOUR = null, manifest = null;
 const state = {
   lang: 'en', running: false, paused: false, i: 0,
-  audio: null, raf: 0, scrollFrom: 0, scrollTo: 0, scrollT0: 0, scrollDur: 0, waiting: null
+  audio: null, raf: 0, beatRaf: 0, scrollFrom: 0, scrollTo: 0, scrollT0: 0, scrollDur: 0, waiting: null
 };
 
 /* ---------- markup ---------- */
@@ -66,21 +66,29 @@ function mount() {
 }
 
 /* ---------- speech ---------- */
+/* Resolves when the line has finished. `ready` resolves earlier, with the clip length
+   in ms once the browser knows it (0 when it never will: synthesis or a missing file). */
 function speak(id, text) {
-  return new Promise(resolve => {
+  let readyResolve; const ready = new Promise(r => { readyResolve = r; });
+  const done = new Promise(resolve => {
     const src = manifest?.lines?.[state.lang]?.[id];
-    const done = () => { state.audio = null; resolve(); };
+    const finish = () => { state.audio = null; resolve(); };
+    const fallback = () => { state.audio = null; readyResolve(0); synth(text).then(resolve); };
     if (src) {
       const a = new Audio(src);
       a.preload = 'auto';
       state.audio = a;
-      a.addEventListener('ended', done, {once: true});
-      a.addEventListener('error', () => { state.audio = null; synth(text).then(resolve); }, {once: true});
-      a.play().catch(() => { state.audio = null; synth(text).then(resolve); });
+      const report = () => readyResolve(isFinite(a.duration) && a.duration ? a.duration * 1000 : 0);
+      a.addEventListener('loadedmetadata', report, {once: true});
+      a.addEventListener('ended', finish, {once: true});
+      a.addEventListener('error', fallback, {once: true});
+      a.play().catch(fallback);
+      setTimeout(report, 1500);                      // never wait forever on metadata
       return;
     }
-    synth(text).then(resolve);
+    fallback();
   });
+  return {done, ready};
 }
 function synth(text) {
   return new Promise(resolve => {
@@ -99,13 +107,14 @@ function synth(text) {
     state.audio = {pause: () => speechSynthesis.pause(), play: () => speechSynthesis.resume(), _synth: true};
   });
 }
-function audioDuration() {
-  const a = state.audio;
-  return (a && !a._synth && isFinite(a.duration) && a.duration) ? a.duration * 1000 : 0;
-}
-
 /* ---------- scrolling the document as if it were footage ---------- */
 function targetY(ch) {
+  if (ch.project != null) {
+    const f = $('#flight'); if (!f) return scrollY;
+    const n = (window.PROJECTS || []).length || 6;
+    const top = f.getBoundingClientRect().top + scrollY;
+    return top + (f.offsetHeight - innerHeight) * clamp(ch.project / (n - 1), 0, 1) + 2;
+  }
   const el = $(ch.target); if (!el) return scrollY;
   const top = el.getBoundingClientRect().top + scrollY;
   const range = el.offsetHeight - innerHeight;
@@ -131,6 +140,45 @@ function setCaption(ch) {
   $('#tourStep').textContent = `${state.i + 1} / ${TOUR.chapters.length}`;
   $('#tourFill').style.width = ((state.i) / TOUR.chapters.length * 100) + '%';
 }
+/* A chapter may name several things in one breath. Its `beats` say where the page
+   should be when each one is said: a `cue` is a phrase from the narration, and its
+   position in the text, as a fraction of the clip length, is when it is spoken.
+   `"end"` fires as the line finishes, so the hold can carry the visitor further. */
+const BEAT_LEAD = 550, BEAT_MOVE = 1100;
+function planBeats(ch, dur) {
+  const text = ch[state.lang] || '';
+  return ch.beats.map(b => {
+    let at;
+    if (b.cue === 'end') at = dur;
+    else {
+      const cue = typeof b.cue === 'string' ? b.cue : b.cue?.[state.lang];
+      const i = cue ? text.indexOf(cue) : -1;
+      at = i < 0 ? 0 : (i / text.length) * dur;
+    }
+    return {at: Math.max(0, at - BEAT_LEAD), y: targetY(b)};
+  }).sort((a, b) => a.at - b.at);
+}
+function runBeats(plan, dur) {
+  const started = performance.now();
+  let next = 0;
+  cancelAnimationFrame(state.beatRaf);
+  const elapsed = () => {
+    const a = state.audio;
+    return (a && !a._synth && isFinite(a.currentTime)) ? a.currentTime * 1000 : performance.now() - started;
+  };
+  const step = () => {
+    if (!state.running) return;
+    if (!state.paused) {
+      const e = elapsed();
+      while (next < plan.length && e >= plan[next].at) {
+        if (REDUCED) scrollTo(0, plan[next].y); else driveScroll(plan[next].y, BEAT_MOVE);
+        next++;
+      }
+    }
+    if (next < plan.length) state.beatRaf = requestAnimationFrame(step);
+  };
+  state.beatRaf = requestAnimationFrame(step);
+}
 async function runChapter() {
   if (!state.running) return;
   const ch = TOUR.chapters[state.i];
@@ -138,18 +186,19 @@ async function runChapter() {
   setCaption(ch);
   $('#tourOrb').classList.add('talking');
 
-  const spoken = speak(ch.id, ch[state.lang]);
-  // the audio element needs a tick before duration is known; scroll for that long
-  await new Promise(r => setTimeout(r, 120));
-  const dur = audioDuration();
-  if (!REDUCED) driveScroll(targetY(ch), (dur || 5200) * .92);
+  const {done, ready} = speak(ch.id, ch[state.lang]);
+  const dur = await ready;
+  if (!state.running) return;
+  if (ch.beats?.length) runBeats(planBeats(ch, dur || 5200 * 2), dur);
+  else if (!REDUCED) driveScroll(targetY(ch), (dur || 5200) * .92);
   else scrollTo(0, targetY(ch));
 
-  await spoken;
+  await done;
   $('#tourOrb').classList.remove('talking');
   if (!state.running) return;
   await wait((ch.hold ?? .45) * 1000);
   if (!state.running) return;
+  cancelAnimationFrame(state.beatRaf);
   state.i++;
   runChapter();
 }
@@ -195,7 +244,7 @@ function resumeTour() {
 export function endTour(finished) {
   if (!state.running) return;
   state.running = false; state.paused = false;
-  cancelAnimationFrame(state.raf);
+  cancelAnimationFrame(state.raf); cancelAnimationFrame(state.beatRaf);
   state._clearWait?.();
   if (state.audio) { try { state.audio.pause(); } catch {} }
   if ('speechSynthesis' in window) speechSynthesis.cancel();
@@ -241,7 +290,7 @@ function offerTour() {
     </div>`;
   document.body.appendChild(box);
   requestAnimationFrame(() => box.classList.add('on'));
-  speak('ui-greetShort', TOUR.ui.greetShort[state.lang]);
+  speak('ui-greetShort', TOUR.ui.greetShort[state.lang]).done.catch(() => {});
   const close = () => { box.classList.remove('on'); setTimeout(() => box.remove(), 500); };
   $('#offerYes').addEventListener('click', () => { close(); startTour(); });
   $('#offerNo').addEventListener('click', () => { close(); if (state.audio) try { state.audio.pause(); } catch {} });
