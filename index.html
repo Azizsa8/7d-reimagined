@@ -146,6 +146,78 @@ html[dir="rtl"] .stat b{font-family:var(--body);font-weight:800}
 .card h3{font-size:clamp(1.2rem,3.6vw,2rem);max-width:22ch}
 .card p{color:var(--dim);margin-top:12px;max-width:56ch;font-size:15.5px}
 .card .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+/* ---- discipline illustrations ---- */
+.card{display:grid;grid-template-columns:1fr;gap:18px;align-items:center}
+@media(min-width:760px){.card{grid-template-columns:1.25fr minmax(220px,.75fr)}.card .viz{grid-column:2;grid-row:1/span 4}}
+.card .viz{position:relative;aspect-ratio:4/3;border-radius:12px;background:radial-gradient(ellipse at 50% 40%,rgba(125,227,180,.08),transparent 70%),linear-gradient(180deg,rgba(238,243,240,.03),rgba(238,243,240,.01));border:1px solid rgba(238,243,240,.07);overflow:hidden}
+.card .viz svg{position:absolute;inset:0;width:100%;height:100%}
+.card .viz::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(11,14,13,.5));pointer-events:none}
+/* everything is paused until the card is in view */
+.card .viz *{animation-play-state:paused}
+.card.live .viz *{animation-play-state:running}
+/* 01 masterplan */
+.v-draw path{stroke-dasharray:420;stroke-dashoffset:420;animation:v-stroke 2.2s cubic-bezier(.2,.7,.2,1) forwards}
+.v-draw .d2{animation-delay:.3s}.v-draw .d3{animation-delay:.6s}.v-draw .d4{animation-delay:.9s}.v-draw .d5{animation-delay:1.4s}
+.v-road .rd{stroke-dasharray:4 5;animation:v-dash 1.2s linear infinite}
+.v-water circle{opacity:0;transform-origin:164px 66px;animation:v-ripple 3s ease-out infinite}
+.v-water .r2{animation-delay:1s}.v-water .r3{animation-delay:2s}
+.v-tree circle{opacity:0;animation:v-pop .5s ease-out forwards}
+.v-tree circle:nth-child(2){animation-delay:1.7s}.v-tree circle:nth-child(3){animation-delay:1.8s}.v-tree circle:nth-child(4){animation-delay:1.9s}.v-tree circle:nth-child(5){animation-delay:2s}.v-tree circle:nth-child(6){animation-delay:2.1s}.v-tree circle:nth-child(7){animation-delay:2.2s}.v-tree circle:nth-child(1){animation-delay:1.6s}
+/* 02 radar */
+.v-sw{transform-origin:120px 92px;animation:v-spin 3.2s linear infinite}
+.bl{opacity:0;animation:v-blip 3.2s linear infinite}
+.bl.b1{animation-delay:.35s}.bl.b2{animation-delay:1.9s}.bl.b3{animation-delay:1.3s}.bl.b4{animation-delay:2.6s}
+.v-ac{offset-path:path("M40 150C80 120 130 40 214 26");offset-rotate:auto;animation:v-fly 6s linear infinite}
+.v-trk{stroke-dasharray:3 6;animation:v-dash 1s linear infinite}
+/* 03 finance */
+.v-bars rect{transform-origin:50% 150px;animation:v-rise 1.1s cubic-bezier(.2,.8,.2,1) forwards}
+.v-bars .k1{--h:26px;animation-delay:.1s}.v-bars .k2{--h:38px;animation-delay:.25s}.v-bars .k3{--h:52px;animation-delay:.4s}.v-bars .k4{--h:58px;animation-delay:.55s}.v-bars .k5{--h:86px;animation-delay:.7s}.v-bars .k6{--h:108px;animation-delay:.85s}
+.v-line{stroke-dasharray:260;stroke-dashoffset:260;animation:v-stroke 1.8s .5s cubic-bezier(.2,.7,.2,1) forwards}
+.v-dot{opacity:0;animation:v-pop .4s 2.2s ease-out forwards,v-throb 1.6s 2.6s ease-in-out infinite}
+.v-coin{animation:v-bob 2.4s ease-in-out infinite}
+/* 04 technology */
+.v-edges path{stroke-dasharray:160;stroke-dashoffset:160;animation:v-stroke 1.2s cubic-bezier(.2,.7,.2,1) forwards}
+.v-edges .e2{animation-delay:.2s}.v-edges .e3{animation-delay:.35s}.v-edges .e4{animation-delay:.5s}.v-edges .e5{animation-delay:.7s}.v-edges .e6{animation-delay:.85s}
+.v-nodes circle,.v-nodes .n0{opacity:0;transform-box:fill-box;transform-origin:center;animation:v-pop .5s ease-out forwards}
+.v-nodes .n1{animation-delay:.1s}.v-nodes .n2{animation-delay:.9s}.v-nodes .n3{animation-delay:1.1s}.v-nodes .n4{animation-delay:1.3s}
+.v-pulse{opacity:0;transform-origin:120px 90px;animation:v-ripple 2.4s 1.4s ease-out infinite}
+.v-ok{animation:v-blink 1.4s steps(1) infinite}
+/* 05 programme */
+.v-gantt path{stroke-dasharray:120;stroke-dashoffset:120;animation:v-stroke 1.4s cubic-bezier(.2,.7,.2,1) forwards}
+.v-gantt .g2{animation-delay:.4s}.v-gantt .g3{animation-delay:.8s}.v-gantt .g4{animation-delay:1.2s}
+.v-ms path{opacity:0;transform-box:fill-box;transform-origin:center;animation:v-pop .5s ease-out forwards}
+.v-ms .m1{animation-delay:1.3s}.v-ms .m2{animation-delay:1.7s}.v-ms .m3{animation-delay:2.1s}.v-ms .m4{animation-delay:2.5s}
+.v-now{animation:v-now 6s linear infinite}
+.v-crane .hook{animation:v-lift 3s ease-in-out infinite}
+/* 06 energy */
+.v-sun .rays{transform-origin:196px 36px;animation:v-spin 18s linear infinite}
+.v-beam path{stroke-dasharray:4 6;animation:v-dash 1.4s linear infinite}
+.v-panels path{opacity:0;animation:v-fade .6s ease-out forwards}
+.v-panels .p1{animation-delay:.1s}.v-panels .p2{animation-delay:.3s}.v-panels .p3{animation-delay:.5s}
+.v-wire{animation:v-dash .9s linear infinite}
+.v-batt .fill{animation:v-charge 4s ease-in-out infinite}
+/* 07 environment */
+.v-belt .dash{animation:v-dash .8s linear infinite}
+.v-belt circle{transform-box:fill-box;transform-origin:center;animation:v-spin 1.6s linear infinite}
+.v-sorter .arm{transform-origin:150px 93px;animation:v-arm 3.6s ease-in-out infinite}
+.v-loop{transform-origin:70px 142px;animation:v-spin 4s linear infinite}
+@keyframes v-stroke{to{stroke-dashoffset:0}}
+@keyframes v-dash{to{stroke-dashoffset:-22}}
+@keyframes v-ripple{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(5)}}
+@keyframes v-pop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes v-spin{to{transform:rotate(360deg)}}
+@keyframes v-blip{0%,8%{opacity:0}10%{opacity:1}60%,100%{opacity:0}}
+@keyframes v-fly{0%{offset-distance:0%;opacity:0}5%{opacity:1}95%{opacity:1}100%{offset-distance:100%;opacity:0}}
+@keyframes v-rise{from{height:0;y:150px}to{height:var(--h);y:calc(150px - var(--h))}}
+@keyframes v-throb{0%,100%{r:3.5}50%{r:5.5}}
+@keyframes v-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes v-blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes v-now{0%{transform:translateX(0)}100%{transform:translateX(170px)}}
+@keyframes v-lift{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+@keyframes v-fade{to{opacity:1}}
+@keyframes v-charge{0%{height:0;y:142px}70%{height:34px;y:108px}100%{height:34px;y:108px}}
+@keyframes v-arm{0%,30%{transform:rotate(0)}40%,60%{transform:rotate(60deg)}70%,100%{transform:rotate(0)}}
+@media(prefers-reduced-motion:reduce){.card .viz *{animation:none!important}.v-draw path,.v-line,.v-edges path,.v-gantt path{stroke-dashoffset:0}.v-bars rect{height:var(--h);y:calc(150px - var(--h))}.v-tree circle,.v-nodes circle,.v-nodes .n0,.v-ms path,.v-panels path,.v-dot{opacity:1}}
 .tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--dim)}
 @media(max-width:700px){
   .deck{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;-webkit-overflow-scrolling:touch}
@@ -540,14 +612,110 @@ function renderHero(){
   $('#h1').innerHTML = words.map((w,i)=>`<span class="w"><b class="${i===words.length-1?'mint':''}">${w}</b></span>`).join('');
   if(!REDUCED){ anime({targets:'#h1 .w b',translateY:['110%','0%'],duration:1100,delay:anime.stagger(110,{start:200}),easing:'easeOutExpo'}); }
 }
+/* ---------------- discipline illustrations (one animated SVG per card) ---------------- */
+const VIZ = {
+ // 01 — a masterplan drawing itself: building footprints, contour lines, a lake with ripples
+ '01':`<svg viewBox="0 0 240 180" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <g class="v-grid" stroke="rgba(238,243,240,.06)"><path d="M0 30H240M0 60H240M0 90H240M0 120H240M0 150H240M30 0V180M60 0V180M90 0V180M120 0V180M150 0V180M180 0V180M210 0V180"/></g>
+  <g class="v-draw" stroke="#7DE3B4" stroke-width="1.4">
+   <path class="d1" d="M22 40h48v30H22z"/><path class="d2" d="M84 26h34v44H84z"/><path class="d3" d="M22 84h40v22H22zM70 84h48v50H70z"/>
+   <path class="d4" d="M132 30c30-8 62 4 74 26 8 16-4 34-28 38-30 6-64-4-70-26-4-14 8-32 24-38z"/>
+   <path class="d5" d="M146 42c18-4 40 2 48 14M140 56c22-4 46 2 54 12" stroke="rgba(125,227,180,.45)"/>
+  </g>
+  <g class="v-water" stroke="#7DE3B4"><circle class="r1" cx="164" cy="66" r="4"/><circle class="r2" cx="164" cy="66" r="4"/><circle class="r3" cx="164" cy="66" r="4"/></g>
+  <g class="v-road" stroke="#EEF3F0" stroke-width="1.2" stroke-dasharray="4 5"><path class="rd" d="M10 150c60 4 120-10 220-18"/></g>
+  <g class="v-tree" fill="#7DE3B4"><circle cx="30" cy="132" r="3"/><circle cx="42" cy="140" r="2.5"/><circle cx="54" cy="130" r="3.2"/><circle cx="130" cy="112" r="2.6"/><circle cx="140" cy="122" r="3"/><circle cx="196" cy="112" r="2.8"/><circle cx="210" cy="102" r="3.4"/></g>
+ </svg>`,
+ // 02 — radar sweep with contacts, plus an aircraft tracing a flight vector
+ '02':`<svg viewBox="0 0 240 180" fill="none">
+  <defs><linearGradient id="v-sweep" x1="0" x2="1"><stop offset="0" stop-color="#7DE3B4" stop-opacity="0"/><stop offset="1" stop-color="#7DE3B4" stop-opacity=".55"/></linearGradient></defs>
+  <g stroke="rgba(125,227,180,.28)"><circle cx="120" cy="92" r="24"/><circle cx="120" cy="92" r="48"/><circle cx="120" cy="92" r="72"/><path d="M48 92h144M120 20v144"/><path d="M69 41l102 102M171 41L69 143" stroke="rgba(125,227,180,.14)"/></g>
+  <g class="v-sw"><path d="M120 92L192 92A72 72 0 0 0 171 41Z" fill="url(#v-sweep)"/><path d="M120 92L192 92" stroke="#7DE3B4" stroke-width="1.6"/></g>
+  <g fill="#7DE3B4"><circle class="bl b1" cx="150" cy="60" r="3"/><circle class="bl b2" cx="88" cy="112" r="3"/><circle class="bl b3" cx="134" cy="130" r="3"/><circle class="bl b4" cx="72" cy="66" r="2.4"/></g>
+  <g class="v-ac"><path d="M0 0l10 3-10 3 2-3z" fill="#EEF3F0"/></g>
+  <path class="v-trk" d="M40 150C80 120 130 40 214 26" stroke="#EEF3F0" stroke-width="1.2" stroke-dasharray="3 6" opacity=".55"/>
+  <g class="v-hud" font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(238,243,240,.55)"><text x="14" y="18">TRK 0451</text><text x="184" y="170">RNG 72NM</text></g>
+ </svg>`,
+ // 03 — capital growth: bars rising, an index line drawing, a ticker counter
+ '03':`<svg viewBox="0 0 240 180" fill="none" stroke-linecap="round">
+  <g stroke="rgba(238,243,240,.08)"><path d="M24 150H224M24 116H224M24 82H224M24 48H224"/></g>
+  <g class="v-bars" fill="rgba(125,227,180,.22)" stroke="rgba(125,227,180,.55)">
+   <rect class="k1" x="40" y="150" width="16" height="0"/><rect class="k2" x="70" y="150" width="16" height="0"/><rect class="k3" x="100" y="150" width="16" height="0"/><rect class="k4" x="130" y="150" width="16" height="0"/><rect class="k5" x="160" y="150" width="16" height="0"/><rect class="k6" x="190" y="150" width="16" height="0"/>
+  </g>
+  <path class="v-line" d="M48 128 78 118 108 100 138 96 168 66 198 40" stroke="#7DE3B4" stroke-width="2"/>
+  <circle class="v-dot" cx="198" cy="40" r="3.5" fill="#7DE3B4"/>
+  <g font-family="IBM Plex Mono,monospace" font-size="8" fill="rgba(238,243,240,.6)"><text x="24" y="28">PORTFOLIO</text><text class="v-pct" x="216" y="28" text-anchor="end" fill="#7DE3B4">+0%</text></g>
+  <g class="v-coin" fill="none" stroke="#EEF3F0" stroke-width="1.2"><ellipse cx="216" cy="150" rx="8" ry="3"/><path d="M208 150v-6c0-1.7 3.6-3 8-3s8 1.3 8 3v6"/></g>
+ </svg>`,
+ // 04 — a network of nodes linking up, with packets travelling along edges
+ '04':`<svg viewBox="0 0 240 180" fill="none">
+  <g class="v-edges" stroke="rgba(125,227,180,.45)" stroke-width="1.2">
+   <path class="e1" d="M48 50L120 90"/><path class="e2" d="M120 90L196 44"/><path class="e3" d="M120 90L72 138"/><path class="e4" d="M120 90L180 132"/><path class="e5" d="M48 50L72 138"/><path class="e6" d="M196 44L180 132"/>
+  </g>
+  <g class="v-pk" fill="#EEF3F0"><circle r="2.4"><animateMotion dur="2.4s" repeatCount="indefinite" path="M48 50L120 90L196 44"/></circle><circle r="2.4"><animateMotion dur="3.1s" begin=".6s" repeatCount="indefinite" path="M72 138L120 90L180 132"/></circle><circle r="2"><animateMotion dur="2.8s" begin="1.2s" repeatCount="indefinite" path="M196 44L180 132L72 138"/></circle></g>
+  <g class="v-nodes" stroke="#7DE3B4" stroke-width="1.4" fill="#0B0E0D">
+   <circle class="n1" cx="48" cy="50" r="7"/><circle class="n2" cx="196" cy="44" r="7"/><circle class="n3" cx="72" cy="138" r="7"/><circle class="n4" cx="180" cy="132" r="7"/>
+   <g class="n0"><circle cx="120" cy="90" r="11" fill="rgba(125,227,180,.15)"/><circle cx="120" cy="90" r="4" fill="#7DE3B4"/></g>
+  </g>
+  <circle class="v-pulse" cx="120" cy="90" r="11" stroke="#7DE3B4"/>
+  <g font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(238,243,240,.5)"><text x="14" y="170">SYSTEMS ONLINE</text><text class="v-ok" x="226" y="170" text-anchor="end" fill="#7DE3B4">●</text></g>
+ </svg>`,
+ // 05 — a programme Gantt filling in, milestones lighting, a crane lifting
+ '05':`<svg viewBox="0 0 240 180" fill="none" stroke-linecap="round">
+  <g stroke="rgba(238,243,240,.08)"><path d="M60 20V150M100 20V150M140 20V150M180 20V150"/></g>
+  <g class="v-gantt" stroke-width="8">
+   <path class="g1" d="M40 40H120" stroke="rgba(125,227,180,.7)"/><path class="g2" d="M80 62H170" stroke="rgba(125,227,180,.5)"/><path class="g3" d="M110 84H200" stroke="rgba(125,227,180,.35)"/><path class="g4" d="M150 106H210" stroke="rgba(125,227,180,.25)"/>
+  </g>
+  <g class="v-ms" fill="#EEF3F0"><path class="m1" d="M120 35l5 5-5 5-5-5z"/><path class="m2" d="M170 57l5 5-5 5-5-5z"/><path class="m3" d="M200 79l5 5-5 5-5-5z"/><path class="m4" d="M210 101l5 5-5 5-5-5z"/></g>
+  <g class="v-crane" stroke="#EEF3F0" stroke-width="1.4"><path d="M30 156V126h56"/><path d="M30 130l10-4M30 138l10-4M30 146l10-4" stroke="rgba(238,243,240,.5)"/><g class="hook"><path d="M78 126v14"/><rect x="72" y="140" width="12" height="8" fill="rgba(125,227,180,.35)" stroke="#7DE3B4"/></g></g>
+  <path class="v-now" d="M40 22V150" stroke="#7DE3B4" stroke-width="1.2" stroke-dasharray="3 4"/>
+  <g font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(238,243,240,.5)"><text x="14" y="44">PH1</text><text x="14" y="66">PH2</text><text x="14" y="88">PH3</text><text x="14" y="110">PH4</text></g>
+ </svg>`,
+ // 06 — sun rays onto a panel array, energy flowing down a line into a battery that fills
+ '06':`<svg viewBox="0 0 240 180" fill="none" stroke-linecap="round">
+  <g class="v-sun" stroke="#7DE3B4" stroke-width="1.6"><circle cx="196" cy="36" r="12" fill="rgba(125,227,180,.18)"/><g class="rays"><path d="M196 14v6M196 52v6M174 36h6M212 36h6M180 20l4 4M208 48l4 4M212 20l-4 4M184 48l-4 4"/></g></g>
+  <g class="v-beam" stroke="rgba(125,227,180,.35)" stroke-width="1"><path d="M186 48L120 92M190 54L134 96M180 44L106 88" stroke-dasharray="4 6"/></g>
+  <g class="v-panels" stroke="#EEF3F0" stroke-width="1.2" fill="rgba(125,227,180,.12)">
+   <path class="p1" d="M30 110l24-20h34l-24 20z"/><path class="p2" d="M64 110l24-20h34l-24 20z"/><path class="p3" d="M98 110l24-20h34l-24 20z"/>
+   <path d="M60 110v14M96 110v14M132 110v14" stroke="rgba(238,243,240,.5)"/>
+  </g>
+  <path class="v-wire" d="M96 124v16h96v-8" stroke="#7DE3B4" stroke-width="1.6" stroke-dasharray="5 6"/>
+  <g class="v-batt" stroke="#EEF3F0" stroke-width="1.4"><rect x="180" y="104" width="24" height="42" rx="3"/><path d="M188 100h8"/><rect class="fill" x="184" y="142" width="16" height="0" fill="#7DE3B4" stroke="none"/></g>
+  <g font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(238,243,240,.5)"><text x="14" y="168">PV ARRAY</text><text class="v-kw" x="226" y="168" text-anchor="end" fill="#7DE3B4">0 kW</text></g>
+ </svg>`,
+ // 07 — conveyor feeding a sorter that diverts items into three bins; recycling loop spinning
+ '07':`<svg viewBox="0 0 240 180" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <g class="v-belt" stroke="#EEF3F0" stroke-width="1.4"><path d="M20 90H150"/><path class="dash" d="M20 96H150" stroke="rgba(238,243,240,.4)" stroke-dasharray="6 6"/><circle cx="24" cy="93" r="5"/><circle cx="146" cy="93" r="5"/></g>
+  <g class="v-sorter" stroke="#7DE3B4" stroke-width="1.6"><path d="M150 84v18"/><path class="arm" d="M150 93l16-12"/></g>
+  <g class="v-bins" stroke="rgba(238,243,240,.6)" stroke-width="1.2" fill="rgba(125,227,180,.08)"><path d="M168 112h22v30h-22zM196 112h22v30h-22z"/><path d="M168 150h50" stroke="rgba(238,243,240,.3)"/><path d="M166 66h22v22h-22z"/></g>
+  <g class="v-items"><rect x="-4" y="-4" width="8" height="8" fill="#7DE3B4"><animateMotion dur="3.6s" repeatCount="indefinite" path="M24 84H150L179 108v20" keyPoints="0;.72;.86;1" keyTimes="0;.72;.86;1" calcMode="linear"/></rect><circle r="4" fill="#EEF3F0"><animateMotion dur="3.6s" begin="1.2s" repeatCount="indefinite" path="M24 84H150L207 108v20" keyPoints="0;.7;.86;1" keyTimes="0;.7;.86;1" calcMode="linear"/></circle><rect x="-4" y="-4" width="8" height="8" fill="rgba(125,227,180,.55)"><animateMotion dur="3.6s" begin="2.4s" repeatCount="indefinite" path="M24 84H150L177 72" /></rect></g>
+  <g class="v-loop" stroke="#7DE3B4" stroke-width="1.8" fill="none"><path d="M60 138a16 16 0 1 1 6 12"/><path d="M60 148l6 2 2-6" /></g>
+  <g font-family="IBM Plex Mono,monospace" font-size="7" fill="rgba(238,243,240,.5)"><text x="90" y="160">SORTED</text><text class="v-tph" x="150" y="160" fill="#7DE3B4">0 t/h</text></g>
+ </svg>`
+};
+/* item paths for 07 (conveyor → sorter → bins) reused by CSS offset-path */
 function renderCards(){
   const d = $('#deck'); $$('.card',d).forEach(c=>c.remove());
   SOLUTIONS.forEach((s,i)=>{
     const c=document.createElement('article'); c.className='card'; c.dataset.n=s.n; c.style.zIndex=i+1;
     const L=s[LANG];
-    c.innerHTML=`<div class="eyebrow">${s.n}</div><h3>${L.t}</h3><p>${L.d}</p><div class="tags">${L.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
+    c.innerHTML=`<div class="eyebrow">${s.n}</div><h3>${L.t}</h3><p>${L.d}</p><div class="tags">${L.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div><div class="viz" aria-hidden="true">${VIZ[s.n]||''}</div>`;
     d.appendChild(c);
   });
+  // play each illustration only while its card is on screen; restart the one-shot draws each time it re-enters
+  if(renderCards.io)renderCards.io.disconnect();
+  renderCards.io=new IntersectionObserver(es=>es.forEach(e=>{const c=e.target;const on=e.isIntersecting;
+    if(on&&!c.classList.contains('live')){const v=$('.viz',c);const html=v.innerHTML;v.innerHTML='';v.innerHTML=html;vizCounters(c);}
+    c.classList.toggle('live',on);}),{threshold:.35});
+  $$('.card',d).forEach(c=>renderCards.io.observe(c));
+}
+/* the little readouts inside the illustrations count up when the card appears */
+function vizCounters(card){
+  if(REDUCED)return;
+  const run=(sel,to,fmt,delay=0)=>{const el=$(sel,card);if(!el)return;const o={v:0};anime({targets:o,v:to,round:1,duration:1600,delay,easing:'easeOutExpo',update:()=>el.textContent=fmt(o.v)});};
+  run('.v-pct',148,v=>'+'+v+'%',600);
+  run('.v-kw',420,v=>v+' kW',400);
+  run('.v-tph',36,v=>v+' t/h',800);
 }
 function renderTimeline(){
   const it=$('#tlItems'); it.innerHTML='';
@@ -724,106 +892,205 @@ function initFlight(){
   /* deterministic random so the city never reshuffles between visits */
   let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
 
+  /* ---- shared bits for the six dioramas (built from reference research, 1 unit ≈ 10–50 m depending on scene) ---- */
+  const SAND =(c=0xd9c8a5)=>new THREE.MeshStandardMaterial({color:new THREE.Color(c).multiplyScalar(.7),roughness:.9,metalness:0,envMapIntensity:.4});
+  const GREEN=(c=0x2f8f62)=>new THREE.MeshStandardMaterial({color:c,roughness:.92,metalness:0,envMapIntensity:.3});
+  const GOLD =()=>new THREE.MeshStandardMaterial({color:0xe2b45a,roughness:.18,metalness:1,emissive:0x7a5a1a,emissiveIntensity:.5,envMapIntensity:1.8});
+  const WATER=(c=0x0f3f3a)=>new THREE.MeshPhysicalMaterial({color:c,roughness:.04,metalness:.1,clearcoat:1,clearcoatRoughness:.03,transparent:true,opacity:.96,envMapIntensity:2});
+  const GLASSB=(c=0x9ec7d8)=>new THREE.MeshPhysicalMaterial({color:new THREE.Color(c).multiplyScalar(.5),roughness:.12,metalness:.35,transmission:.2,ior:1.5,clearcoat:1,clearcoatRoughness:.06,transparent:true,opacity:.97,envMapIntensity:1.3});
+  const FLAG =()=>new THREE.MeshStandardMaterial({color:0x1f7a3e,roughness:.8,emissive:0x0f3d1f,emissiveIntensity:.35,side:THREE.DoubleSide});
+  const roundRect=(w,h,r)=>{const s=new THREE.Shape();s.moveTo(-w/2+r,-h/2);s.lineTo(w/2-r,-h/2);s.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r);s.lineTo(w/2,h/2-r);s.quadraticCurveTo(w/2,h/2,w/2-r,h/2);s.lineTo(-w/2+r,h/2);s.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r);s.lineTo(-w/2,-h/2+r);s.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2);return s;};
+  const flat=(shape,mat,y,depth=.08)=>{const m=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:false}),mat);m.rotation.x=-Math.PI/2;m.position.y=y;m.castShadow=true;m.receiveShadow=true;return m;};
+  const palm=(x,z,h=1.1,s=1)=>{const g=new THREE.Group();g.position.set(x,0,z);g.add(M(new THREE.CylinderGeometry(.035*s,.06*s,h,7),new THREE.MeshStandardMaterial({color:0x5a4a34,roughness:.95}),0,h/2,0));
+    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;const f=M(new THREE.ConeGeometry(.06*s,.5*s,5),GREEN(0x2b7a52),Math.cos(a)*.22*s,h+.05,Math.sin(a)*.22*s);f.rotation.z=-Math.cos(a)*1.25;f.rotation.x=Math.sin(a)*1.25;g.add(f);}
+    g.add(M(new THREE.SphereGeometry(.09*s,8,8),GREEN(0x3f9a68),0,h+.08,0));return g;};
+  const flagpole=(x,z,h=1.6,fw=.5)=>{const g=new THREE.Group();g.position.set(x,0,z);g.add(M(new THREE.CylinderGeometry(.018,.026,h,8),METAL(0xe3e9e5),0,h/2,0));
+    const fl=M(new THREE.PlaneGeometry(fw,fw*.62,10,4),FLAG(),fw/2+.02,h-fw*.34,0,true,false);g.add(fl);g.add(M(new THREE.SphereGeometry(.035,8,8),GOLD(),0,h+.03,0,false,false));
+    anims.push(t=>{const p=fl.geometry.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i);p.setZ(i,Math.sin(t*4+x*6)*.03*(x/fw+.5));}p.needsUpdate=true;});return g;};
+  const strip=(w,h,d,x,y,z)=>M(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:0x2b3a3f,roughness:.15,metalness:.6,envMapIntensity:1.2}),x,y,z,false,false);
+
   const anims=[];
   const X=[0,14,28,42,56,70];
 
-  /* 1 — King Abdullah Park Fountain: tiered basins, glassy water, lit jets */
+  /* 1 — King Abdullah Park Fountain (Al-Malaz): a 110 m spine of graduated jets in a long lake, amphitheatre, palm corridor, flag podium */
   {const g=new THREE.Group();g.position.set(X[0],0,0);
-    g.add(M(new THREE.CylinderGeometry(4.2,4.4,.35,64),DARK(0x161d1a),0,.17));
-    g.add(M(new THREE.CylinderGeometry(3.3,3.5,.32,64),STONE(0xcfd8d3),0,.5));
-    const water=M(new THREE.CylinderGeometry(3.15,3.15,.06,64),GLASS(0x5fd7a5,.85),0,.66,0,false,true);g.add(water);
-    g.add(M(new THREE.CylinderGeometry(1.4,1.6,.5,48),STONE(),0,.9));
-    g.add(M(new THREE.CylinderGeometry(.9,.9,.05,48),GLASS(0x5fd7a5,.85),0,1.17,0,false));
-    g.add(M(new THREE.CylinderGeometry(.22,.42,2.6,32),STONE(0xf2f6f3),0,2.4));
-    g.add(M(new THREE.SphereGeometry(.26,24,24),GLOW(),0,3.85));const gs=glow(3.2,.9);gs.position.y=3.85;g.add(gs);
-    const jets=new THREE.Group();const NJ=10;for(let i=0;i<NJ;i++){const a=i/NJ*Math.PI*2;const n=110;const pos=new Float32Array(n*3);for(let k=0;k<n;k++){const t=k/n;pos[k*3]=Math.cos(a)*(.5+t*2.4);pos[k*3+1]=.7+Math.sin(t*Math.PI)*3.4;pos[k*3+2]=Math.sin(a)*(.5+t*2.4);}
-      const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));jets.add(new THREE.Points(pg,new THREE.PointsMaterial({color:0xbaf5da,size:.075,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false})));}
-    g.add(jets);
-    for(let i=0;i<12;i++){const a=i/12*Math.PI*2;const l=M(new THREE.SphereGeometry(.07,10,10),GLOW(0x7de3b4,2.2),Math.cos(a)*3.1,.72,Math.sin(a)*3.1,false,false);g.add(l);}
-    floorGlow(g,7,.3);scene.add(g);anims.push(t=>{jets.rotation.y=t*.28;water.material.roughness=.06+Math.sin(t*3)*.02;});}
+    g.add(flat(roundRect(12.4,5.6,1.4),SAND(0xcfc1a2),0,.12));                         // plaza
+    g.add(flat(roundRect(10.6,3.4,1.2),STONE(0xd6ded9),.12,.14));                       // coping
+    g.add(flat(roundRect(10.2,3.0,1.1),WATER(),.2,.06));                                // lake
+    // amphitheatre on the far long side
+    [0,1,2,3].forEach(i=>g.add(M(new THREE.BoxGeometry(7-i*.3,.16,.36),SAND(0xd9c8a5),0,.2+i*.16,-2.15-i*.36)));
+    // jet spine: 21 jets graduated to tall central plumes, each a column of points that breathes
+    const jets=[];for(let i=-10;i<=10;i++){const hh=.9+Math.pow(1-Math.abs(i)/10,2.2)*4.6;const n=Math.round(hh*26);const pos=new Float32Array(n*3);
+      for(let k=0;k<n;k++){const t=k/n;const sp=t*t*.08;pos[k*3]=(rnd()-.5)*sp;pos[k*3+1]=t*hh;pos[k*3+2]=(rnd()-.5)*sp;}
+      const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+      const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:i%2?0xbaf5da:0xffffff,size:.05,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false}));pts.position.set(i*.46,.24,0);g.add(pts);jets.push({pts,hh,ph:rnd()*6});
+      const l=M(new THREE.SphereGeometry(.05,8,8),GLOW(i%3?0x7de3b4:0xfff1dc,2.4),i*.46,.25,0,false,false);g.add(l);}
+    // fan arcs at four points
+    [-3.7,-1.4,1.4,3.7].forEach(x=>{for(const s of [-1,1]){const n=70,pos=new Float32Array(n*3);for(let k=0;k<n;k++){const t=k/n;pos[k*3]=0;pos[k*3+1]=.25+Math.sin(t*Math.PI)*1.1;pos[k*3+2]=s*t*1.2;}
+      const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));const p=new THREE.Points(pg,new THREE.PointsMaterial({color:0xbaf5da,size:.045,transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));p.position.x=x;g.add(p);}});
+    // laser plane above the jets
+    const laser=M(new THREE.PlaneGeometry(9,1.6),new THREE.MeshBasicMaterial({color:0x7de3b4,transparent:true,opacity:.07,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}),0,2.2,0,false,false);g.add(laser);
+    // flag podium at the east end
+    g.add(M(new THREE.BoxGeometry(1.6,.5,1.6),SAND(0xd9c8a5),6.4,.37,0));g.add(M(new THREE.BoxGeometry(1.2,.3,1.2),SAND(0xe6dab8),6.4,.77,0));g.add(flagpole(6.4,0,3.2,1.2));
+    // palm corridor and lamp posts
+    for(let i=-5;i<=5;i++){g.add(palm(i*1.1,2.55,1+rnd()*.3));g.add(palm(i*1.1+.5,-3.3,1+rnd()*.3));if(i%2){g.add(M(new THREE.CylinderGeometry(.015,.02,.7,6),METAL(),i*1.1,.47,2.05));g.add(M(new THREE.SphereGeometry(.04,8,8),GLOW(0xfff1dc,2.6),i*1.1,.85,2.05,false,false));}}
+    floorGlow(g,8,.25);scene.add(g);
+    anims.push(t=>{jets.forEach((j,i)=>{const s=.72+Math.max(0,Math.sin(t*1.1+j.ph))*.28+Math.sin(t*7+i)*.03;j.pts.scale.y=s;});laser.material.opacity=.05+Math.sin(t*2.3)*.03;laser.rotation.y=Math.sin(t*.4)*.08;});}
 
-  /* 2 — King Abdullah International Garden: glass biodomes over planted terrain */
+  /* 2 — King Abdullah International Gardens: two interlocking crescent ETFE vaults on stone plinths around a wadi courtyard */
   {const g=new THREE.Group();g.position.set(X[1],0,0);
-    g.add(M(new THREE.CylinderGeometry(5.4,5.6,.28,72),DARK(0x141b18),0,.14));
-    [[-2.3,0,2.5],[2.1,0,2.0],[0,-2.7,1.5]].forEach(([x,z,r])=>{
-      g.add(M(new THREE.CylinderGeometry(r*1.06,r*1.1,.16,48),STONE(0xd6ded9),x,.36,z));
-      const soil=M(new THREE.SphereGeometry(r*.92,32,20,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:0x1f5a41,roughness:.95}),x,.42,z);soil.scale.y=.32;g.add(soil);
-      for(let i=0;i<9;i++){const a=rnd()*Math.PI*2,d=rnd()*r*.6;const tr=M(new THREE.ConeGeometry(.12+rnd()*.12,.45+rnd()*.5,8),new THREE.MeshStandardMaterial({color:0x2f8f62,roughness:.9}),x+Math.cos(a)*d,.42+.25,z+Math.sin(a)*d);g.add(tr);}
-      const dome=M(new THREE.SphereGeometry(r,48,28,0,Math.PI*2,0,Math.PI/2),GLASS(0xa9f0d0,.7),x,.44,z,false,false);g.add(dome);
-      const ribs=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.SphereGeometry(r*1.005,16,8,0,Math.PI*2,0,Math.PI/2)),new THREE.LineBasicMaterial({color:0xdfe7e2,transparent:true,opacity:.35}));ribs.position.set(x,.44,z);g.add(ribs);});
-    const walk=M(new THREE.TorusGeometry(4.4,.07,10,96),GLOW(0x7de3b4,1.2),0,.3,0,false,false);walk.rotation.x=Math.PI/2;g.add(walk);
-    for(let i=0;i<10;i++){const a=i/10*Math.PI*2;g.add(M(new THREE.CylinderGeometry(.03,.03,.9,6),METAL(),Math.cos(a)*4.9,.7,Math.sin(a)*4.9));const b=M(new THREE.SphereGeometry(.06,8,8),GLOW(0xfff1dc,2.5),Math.cos(a)*4.9,1.18,Math.sin(a)*4.9,false,false);g.add(b);}
-    floorGlow(g,8,.22);scene.add(g);}
+    g.add(flat(roundRect(13,9,2),SAND(0xcdb98f),0,.1));
+    const crescent=(rot,dx,dz)=>{const c=new THREE.Group();c.position.set(dx,0,dz);c.rotation.y=rot;
+      const arc=Math.PI*1.12;
+      const plinth=new THREE.Mesh(new THREE.TorusGeometry(3.0,1.62,10,64,arc),SAND(0xd9c8a5));plinth.rotation.x=Math.PI/2;plinth.scale.y=1;plinth.scale.set(1,1,.16);plinth.position.y=0;plinth.castShadow=true;plinth.receiveShadow=true;c.add(plinth);
+      const shell=new THREE.Mesh(new THREE.TorusGeometry(3.0,1.45,18,72,arc),new THREE.MeshPhysicalMaterial({color:0xf4fffa,roughness:.22,metalness:0,transmission:.55,ior:1.3,clearcoat:.6,clearcoatRoughness:.2,transparent:true,opacity:.82,envMapIntensity:1.8}));shell.castShadow=true;shell.rotation.x=Math.PI/2;shell.scale.set(1,1,.62);shell.position.y=.08;c.add(shell);
+      const ribs=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(3.0,1.46,9,30,arc)),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.5}));ribs.rotation.x=Math.PI/2;ribs.scale.set(1,1,.62);ribs.position.y=.08;c.add(ribs);
+      const inner=new THREE.Mesh(new THREE.TorusGeometry(3.0,1.2,10,48,arc),GREEN(0x1f5a41));inner.rotation.x=Math.PI/2;inner.scale.set(1,1,.26);inner.position.y=.1;c.add(inner);
+      for(let i=0;i<22;i++){const a=rnd()*arc;const r=3.0+(rnd()-.5)*1.4;c.add(M(new THREE.ConeGeometry(.07+rnd()*.06,.28+rnd()*.3,6),GREEN(0x2f8f62),Math.cos(a)*r,.9+rnd()*.4,Math.sin(a)*r));}
+      return c;};
+    g.add(crescent(0,-1.25,.5));g.add(crescent(Math.PI,1.25,-.5));
+    // wadi courtyard: rock outcrops, a water channel and planting between the crescents
+    for(let i=0;i<9;i++){const r=M(new THREE.DodecahedronGeometry(.18+rnd()*.22,0),SAND(0xb9a27a),(rnd()-.5)*2.2,.18,(rnd()-.5)*1.6);r.rotation.set(rnd()*3,rnd()*3,0);g.add(r);}
+    g.add(flat(roundRect(2.6,.5,.2),WATER(0x1a5a55),.12,.04));
+    for(let i=0;i<8;i++)g.add(palm((rnd()-.5)*2.4,(rnd()-.5)*1.8,.5+rnd()*.3,.7));
+    // lake gardens on the convex sides and lookout towers
+    g.add(flat(roundRect(3.2,2.2,.9),WATER(0x1a5a55),.1,.05).translateX(-4.6).translateZ(2.4));
+    g.add(flat(roundRect(3.2,2.2,.9),WATER(0x1a5a55),.1,.05).translateX(4.6).translateZ(-2.4));
+    [[-5.4,-3.2],[5.4,3.2]].forEach(([x,z])=>{g.add(M(new THREE.CylinderGeometry(.12,.16,1.4,8),STONE(0xe6dab8),x,.8,z));g.add(M(new THREE.CylinderGeometry(.3,.3,.14,8),STONE(),x,1.55,z));g.add(M(new THREE.SphereGeometry(.05,8,8),GLOW(0xfff1dc,2.4),x,1.7,z,false,false));});
+    // energy building + aviary mesh cage
+    g.add(M(new THREE.BoxGeometry(1.6,.5,1.1),STONE(0xd6ded9),-4.8,.35,-3.2));g.add(M(new THREE.BoxGeometry(1.5,.03,1),new THREE.MeshStandardMaterial({color:0x1b2a3a,roughness:.2,metalness:.7}),-4.8,.62,-3.2,false,false));
+    const cage=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.SphereGeometry(1,12,8,0,Math.PI*2,0,Math.PI/2)),new THREE.LineBasicMaterial({color:0xeef3f0,transparent:true,opacity:.35}));cage.position.set(4.9,.1,3.1);g.add(cage);
+    floorGlow(g,9,.18);scene.add(g);}
 
-  /* 3 — Riyadh Eye: steel rim, tension spokes, glass capsules, A-frame supports */
+  /* 3 — Riyadh's Eye (Boulevard World): 55 m white wheel on twin A-frames, 40 glass cabins, boarding deck, lagoon and low pavilions */
   {const g=new THREE.Group();g.position.set(X[2],0,0);
-    g.add(M(new THREE.BoxGeometry(6.5,.3,3.4),DARK(0x161d1a),0,.15));
-    g.add(M(new THREE.BoxGeometry(5.8,.14,2.8),STONE(0xcfd8d3),0,.37));
-    const wheel=new THREE.Group();
-    wheel.add(M(new THREE.TorusGeometry(3.4,.09,12,96),METAL(0xe3e9e5)));
-    wheel.add(M(new THREE.TorusGeometry(3.4,.09,12,96),METAL(0xe3e9e5),0,0,.5));
-    wheel.add(M(new THREE.CylinderGeometry(.35,.35,.9,24),METAL(0x9aa7a1),0,0,.25).rotateX(Math.PI/2));
-    for(let i=0;i<20;i++){const a=i/20*Math.PI*2;[0,.5].forEach(z=>{const sp=M(new THREE.CylinderGeometry(.022,.022,3.4,6),METAL(0xc9d2cd),Math.cos(a)*1.7,Math.sin(a)*1.7,z);sp.rotation.z=a+Math.PI/2;wheel.add(sp);});
-      const pod=M((THREE.CapsuleGeometry?new THREE.CapsuleGeometry(.16,.22,6,12):new THREE.SphereGeometry(.22,14,14)),GLASS(0xb8f4dd,.75),Math.cos(a)*3.4,Math.sin(a)*3.4,.25,false,false);wheel.add(pod);
-      const core=M(new THREE.SphereGeometry(.07,8,8),GLOW(0x7de3b4,2.4),Math.cos(a)*3.4,Math.sin(a)*3.4,.25,false,false);wheel.add(core);}
-    wheel.position.set(0,3.9,0);g.add(wheel);
-    [-1,1].forEach(s=>{[-.9,.9].forEach(z=>{const leg=M(new THREE.CylinderGeometry(.09,.16,4.6,10),METAL(0x9aa7a1),s*1.7,2.3,z*.6+.25);leg.rotation.z=-s*.36;leg.rotation.x=z*.06;g.add(leg);});});
-    g.add(M(new THREE.BoxGeometry(.5,.5,1.6),METAL(0x9aa7a1),0,3.9,.25));
-    const hub=glow(2.6,.6);hub.position.set(0,3.9,.25);g.add(hub);
-    floorGlow(g,6,.22);scene.add(g);anims.push(t=>{wheel.rotation.z=t*.1;});}
+    g.add(flat(roundRect(11,7,1.2),STONE(0xbfb8a8),0,.1));                             // plaza
+    g.add(flat(roundRect(7.5,3.2,1.4),WATER(0x1c6e7a),.1,.05).translateZ(-3.2));       // lagoon
+    const R=3.1,wheel=new THREE.Group();
+    [-.25,.25].forEach(z=>{wheel.add(M(new THREE.TorusGeometry(R,.06,10,96),METAL(0xf1f4f2),0,0,z));wheel.add(M(new THREE.TorusGeometry(R-.32,.035,8,96),METAL(0xdfe5e2),0,0,z));});
+    // zig-zag lacing between the two rings, radial spokes, LED rim outline
+    {const pts=[];for(let i=0;i<48;i++){const a=i/48*Math.PI*2,b=(i+1)/48*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*R,Math.sin(a)*R,-.25),new THREE.Vector3(Math.cos(b)*R,Math.sin(b)*R,.25));}
+      wheel.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xeef3f0,transparent:true,opacity:.7})));
+      const led=new THREE.Mesh(new THREE.TorusGeometry(R+.04,.03,6,96),GLOW(0xf3fbff,3));wheel.add(led);}
+    for(let i=0;i<40;i++){const a=i/40*Math.PI*2;[-.25,.25].forEach(z=>{const sp=M(new THREE.CylinderGeometry(.014,.014,R-.4,5),METAL(0xdfe5e2),Math.cos(a)*(R-.4)/2,Math.sin(a)*(R-.4)/2,z,false,false);sp.rotation.z=a+Math.PI/2;wheel.add(sp);});
+      const cab=new THREE.Group();cab.position.set(Math.cos(a)*(R+.22),Math.sin(a)*(R+.22),0);
+      cab.add(M(new THREE.BoxGeometry(.2,.2,.24),GLASS(0xd5f7ea,.7),0,-.12,0,false,false));cab.add(M(new THREE.BoxGeometry(.22,.04,.26),STONE(0xf4f7f5),0,0,0,false,false));cab.add(M(new THREE.BoxGeometry(.2,.03,.24),STONE(0xf4f7f5),0,-.24,0,false,false));
+      cab.add(M(new THREE.SphereGeometry(.035,6,6),GLOW(0xffffff,2.2),0,-.12,0,false,false));wheel.add(cab);wheel.userData.cabs=wheel.userData.cabs||[];wheel.userData.cabs.push(cab);}
+    wheel.add(M(new THREE.CylinderGeometry(.34,.34,.8,24),METAL(0xc9d2cd)).rotateX(Math.PI/2));
+    wheel.add(M(new THREE.CylinderGeometry(.44,.44,.06,32),GLOW(0x7de3b4,1.6),0,0,.43,false,false).rotateX(Math.PI/2));
+    wheel.position.set(0,R+.55,0);g.add(wheel);
+    // twin A-frames each side, tie beam, boarding deck
+    [-.6,.6].forEach(z=>{[-1,1].forEach(s=>{const leg=M(new THREE.CylinderGeometry(.07,.11,R+.9,10),METAL(0xf1f4f2),s*1.35,(R+.55)/2,z);leg.rotation.z=-s*.38;g.add(leg);});g.add(M(new THREE.BoxGeometry(2.9,.1,.12),METAL(0xf1f4f2),0,.16,z));});
+    g.add(M(new THREE.BoxGeometry(2.4,.22,1.3),STONE(0xd6ded9),0,.2,.9));g.add(M(new THREE.BoxGeometry(.5,.4,.5),STONE(0xeef3f0),1.4,.5,1.2));
+    // low themed pavilions with coloured roofs, palms, lagoon lamps
+    [[-4.2,1.6,0x7de3b4],[-3,2.6,0xd8a548],[3.4,2.2,0x5fa8d3],[4.4,.6,0xe0766b]].forEach(([x,z,c])=>{g.add(M(new THREE.BoxGeometry(1,.45,.8),STONE(0xe6dab8),x,.32,z));g.add(M(new THREE.BoxGeometry(1.1,.08,.9),new THREE.MeshStandardMaterial({color:c,roughness:.6,emissive:c,emissiveIntensity:.25}),x,.58,z));});
+    for(let i=-4;i<=4;i++){if(i%2)g.add(palm(i*1.1,2.9,.9+rnd()*.3,.8));g.add(M(new THREE.SphereGeometry(.035,6,6),GLOW(0xfff1dc,2.4),i*.9,.3,-1.55,false,false));}
+    floorGlow(g,7,.22);scene.add(g);anims.push(t=>{wheel.rotation.z=t*.08;wheel.userData.cabs.forEach(c=>{c.rotation.z=-wheel.rotation.z;});});}
 
-  /* 4 — Riyadh 2020 Urban Study: podium blocks, glass towers, street lighting */
+  /* 4 — Riyadh 2020 urban study: the capital's real skyline over its superblock grid — Kingdom Centre, Al Faisaliah, KAFD cluster, TV Tower */
   {const g=new THREE.Group();g.position.set(X[3],0,0);
-    g.add(M(new THREE.BoxGeometry(8.2,.22,8.2),DARK(0x141b18),0,.11));
-    for(let i=-3;i<=3;i++)for(let j=-3;j<=3;j++){
-      const r=rnd();if(r<.16)continue;
-      const h=.35+Math.pow(rnd(),2.2)*4.2, w=.62+rnd()*.14;
-      const tall=h>2.6;
-      const b=M(new THREE.BoxGeometry(w,h,w),tall?GLASS(0x9defc9,.85):(rnd()<.35?STONE(0xd8e0db):DARK(0x27332f)),i*1.05,.22+h/2,j*1.05,true,true);g.add(b);
-      if(tall){g.add(EDGE(new THREE.BoxGeometry(w*1.01,h*1.01,w*1.01),.35).translateX(i*1.05).translateY(.22+h/2).translateZ(j*1.05));
-        const cap=M(new THREE.BoxGeometry(w*.5,.08,w*.5),GLOW(0x7de3b4,2),i*1.05,.22+h+.04,j*1.05,false,false);g.add(cap);}
-      else{const pod=M(new THREE.BoxGeometry(w*1.15,.1,w*1.15),STONE(0xb8c2bc),i*1.05,.27,j*1.05);g.add(pod);}}
-    // roads
-    [-1.575,1.575].forEach(k=>{g.add(M(new THREE.BoxGeometry(8.2,.02,.26),GLOW(0x1e2a26,.4),0,.24,k,false,false));g.add(M(new THREE.BoxGeometry(.26,.02,8.2),GLOW(0x1e2a26,.4),k,.24,0,false,false));});
-    for(let i=0;i<14;i++){const a=i/14*Math.PI*2;const l=M(new THREE.SphereGeometry(.05,8,8),GLOW(0xfff1dc,2.6),Math.cos(a)*4.6,.55,Math.sin(a)*4.6,false,false);g.add(l);}
-    floorGlow(g,7,.2);scene.add(g);}
+    g.add(flat(roundRect(13,10,.6),SAND(0xd2bf98),0,.1));
+    // superblock road grid with King Fahd Road spine and a metro viaduct
+    const road=new THREE.MeshStandardMaterial({color:0x2a2c2a,roughness:.9});
+    for(let i=-2;i<=2;i++){g.add(M(new THREE.BoxGeometry(13,.02,.16),road,0,.11,i*2.2,false,false));g.add(M(new THREE.BoxGeometry(.16,.02,10),road,i*2.6,.11,0,false,false));}
+    g.add(M(new THREE.BoxGeometry(.36,.02,10),road,0,.115,0,false,false));g.add(M(new THREE.BoxGeometry(.12,.04,10),STONE(0xd6ded9),0,.42,0,false,false));
+    for(let i=-4;i<=4;i++){g.add(M(new THREE.CylinderGeometry(.03,.04,.32,6),STONE(0xd6ded9),0,.26,i*1.15));g.add(palm(.32,i*1.15+.5,.28,.45));g.add(palm(-.32,i*1.15-.5,.28,.45));}
+    // low beige fabric
+    for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++){const cx=i*2.6,cz=j*2.2;for(let k=0;k<7;k++){const w=.25+rnd()*.4,d=.25+rnd()*.4,h=.14+Math.pow(rnd(),3)*.6;const x=cx+(rnd()-.5)*1.9,z=cz+(rnd()-.5)*1.5;if(Math.abs(x)<.45)continue;g.add(M(new THREE.BoxGeometry(w,h,d),SAND(rnd()<.3?0xe6dab8:0xcdb98f),x,.1+h/2,z));}}
+    // Kingdom Centre — tapered elliptical shaft, parabolic void, sky bridge
+    {const k=new THREE.Group();k.position.set(-.9,.1,1.4);
+      const shaft=M(new THREE.CylinderGeometry(.62,.86,3.6,40),GLASSB(0xa9d3ec),0,1.8,0);shaft.scale.z=.46;k.add(shaft);
+      k.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(.622,.862,3.6,40),12),new THREE.LineBasicMaterial({color:0xeef3f0,transparent:true,opacity:.18})).translateY(1.8));
+      const s=new THREE.Shape();s.moveTo(-.62,0);s.lineTo(-.36,0);s.quadraticCurveTo(0,4.9,.36,0);s.lineTo(.62,0);s.lineTo(.5,2.85);s.lineTo(-.5,2.85);s.lineTo(-.62,0);
+      const crown=new THREE.Mesh(new THREE.ExtrudeGeometry(s,{depth:.5,bevelEnabled:false}),GLASSB(0xa9d3ec));crown.position.set(0,3.6,-.25);crown.castShadow=true;k.add(crown);
+      const arcL=new THREE.LineSegments(new THREE.EdgesGeometry(crown.geometry,20),new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.6}));arcL.position.copy(crown.position);k.add(arcL);
+      k.add(M(new THREE.BoxGeometry(.78,.1,.56),GLOW(0xffffff,1.6),0,6.4,0,false,false));
+      k.add(M(new THREE.BoxGeometry(3.2,.32,1.2),STONE(0xd6ded9),.9,.16,.9));g.add(k);}
+    // Al Faisaliah — pyramid with a golden sphere and spire
+    {const f=new THREE.Group();f.position.set(1.9,.1,-2.4);
+      const py=M(new THREE.ConeGeometry(.72,5.3,4),GLASSB(0xc9dde6),0,2.65,0);py.rotation.y=Math.PI/4;f.add(py);
+      f.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.ConeGeometry(.725,5.3,4)),new THREE.LineBasicMaterial({color:0xeef3f0,transparent:true,opacity:.5})).translateY(2.65).rotateY(Math.PI/4));
+      [-1,1].forEach(sx=>[-1,1].forEach(sz=>f.add(M(new THREE.CylinderGeometry(.05,.07,4.6,8),METAL(0xdfe5e2),sx*.5,2.3,sz*.5))));
+      f.add(M(new THREE.SphereGeometry(.24,24,24),GOLD(),0,4.5,0,false,false));const gs=glow(1.4,.6);gs.position.set(0,4.5,0);f.add(gs);
+      f.add(M(new THREE.CylinderGeometry(.015,.03,.7,6),METAL(),0,5.55,0,false,false));
+      f.add(M(new THREE.BoxGeometry(2.6,.3,1.4),STONE(0xd6ded9),.8,.15,.6));g.add(f);}
+    // KAFD cluster on the northern horizon — faceted prisms with sheared crowns
+    {const K=[[4.3,-3.4,5.8,6],[3.3,-3.9,4.6,5],[5.3,-2.8,3.4,6],[4.8,-4.2,3.9,5],[3.7,-2.7,2.6,6],[5.9,-3.7,2.9,5],[2.9,-3.2,2.1,6],[5.5,-4.5,2.3,5],[4.2,-2.3,1.9,6]];
+      K.forEach(([x,z,h,n],i)=>{const t=M(new THREE.CylinderGeometry(.24,.3,h,n),GLASSB(0xdde9ee),x,.1+h/2,z);t.rotation.y=rnd()*Math.PI;g.add(t);
+        g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(.242,.302,h,n)),new THREE.LineBasicMaterial({color:0xdfe5e2,transparent:true,opacity:.4})).translateX(x).translateY(.1+h/2).translateZ(z).rotateY(t.rotation.y));
+        const cap=M(new THREE.ConeGeometry(.25,.5,n),GLASSB(0xdde9ee),x,.1+h+.25,z,false,false);cap.rotation.y=t.rotation.y;cap.rotation.x=.25;g.add(cap);
+        if(i<3)g.add(M(new THREE.BoxGeometry(.3,.04,.3),GLOW(0x9fd9ff,2),x,.1+h+.5,z,false,false));});
+      g.add(M(new THREE.BoxGeometry(1.4,.04,.08),METAL(0xdfe5e2),4.3,1.9,-3.65,false,false));}
+    // Riyadh TV Tower — marble needle with a diamond pod; Water Tower mushroom
+    {g.add(M(new THREE.CylinderGeometry(.05,.11,3.1,10),STONE(0xf2f6f3),-4.6,.1+1.55,-2.4));g.add(M(new THREE.OctahedronGeometry(.26,0),GLASS(0x9fd9ff,.85),-4.6,2.55,-2.4,false,false));g.add(M(new THREE.CylinderGeometry(.01,.02,.9,5),METAL(),-4.6,3.9,-2.4,false,false));g.add(M(new THREE.SphereGeometry(.035,6,6),GLOW(0xff6b5a,3),-4.6,4.35,-2.4,false,false));
+      g.add(M(new THREE.CylinderGeometry(.08,.1,1.1,12),STONE(0xd6ded9),3.6,.65,2.8));g.add(M(new THREE.ConeGeometry(.5,.28,20),STONE(0xd6ded9),3.6,1.3,2.8));}
+    // street lighting
+    for(let i=-4;i<=4;i++)for(const x of [-2.6,2.6])g.add(M(new THREE.SphereGeometry(.028,6,6),GLOW(0xffc27a,2.2),x,.24,i*1.1,false,false));
+    floorGlow(g,8,.16);scene.add(g);}
 
-  /* 5 — Department of Social Services: stepped plinth, colonnade, glazed hall, cantilevered roof */
+  /* 5 — Department of Social Services (2016): a symmetrical beige limestone ministry block — portico, pilasters, mashrabiya strips, flags, walled forecourt */
   {const g=new THREE.Group();g.position.set(X[4],0,0);
-    g.add(M(new THREE.BoxGeometry(7.2,.22,5),DARK(0x161d1a),0,.11));
-    g.add(M(new THREE.BoxGeometry(6.4,.18,4.4),STONE(0xc9d2cd),0,.31));
-    g.add(M(new THREE.BoxGeometry(5.8,.18,3.9),STONE(0xd6ded9),0,.49));
-    g.add(M(new THREE.BoxGeometry(4.4,2.1,2.6),STONE(0xeef3f0),0,1.63,-.3));
-    g.add(M(new THREE.BoxGeometry(4.5,.9,2.7),GLASS(0x9defc9,.85),0,1.55,-.3,false,false));
-    g.add(M(new THREE.BoxGeometry(4.5,.06,2.7),METAL(0x9aa7a1),0,2.02,-.3,false,false));
-    g.add(M(new THREE.BoxGeometry(4.5,.06,2.7),METAL(0x9aa7a1),0,1.08,-.3,false,false));
-    for(let i=-3;i<=3;i++){g.add(M(new THREE.CylinderGeometry(.11,.13,2.2,20),STONE(0xf2f6f3),i*.78,1.68,1.35));g.add(M(new THREE.BoxGeometry(.3,.08,.3),STONE(0xdfe7e2),i*.78,2.82,1.35));g.add(M(new THREE.BoxGeometry(.3,.06,.3),STONE(0xdfe7e2),i*.78,.61,1.35));}
-    g.add(M(new THREE.BoxGeometry(5.6,.16,3.9),DARK(0x1b2320),0,2.95,.15));
-    g.add(M(new THREE.BoxGeometry(5.8,.08,4.1),GLOW(0x7de3b4,.9),0,3.07,.15,false,false));
-    g.add(M(new THREE.BoxGeometry(5.4,.35,.06),GLASS(0x9defc9,.6),0,2.68,2.1,false,false));
-    g.add(M(new THREE.CylinderGeometry(.03,.03,3.6,6),METAL(),3.1,2.2,2.2));const fg=M(new THREE.SphereGeometry(.09,8,8),GLOW(0xfff1dc,2.5),3.1,4.05,2.2,false,false);g.add(fg);
-    for(let i=-2;i<=2;i++){g.add(M(new THREE.SphereGeometry(.05,8,8),GLOW(0x7de3b4,2.2),i*1.2,.62,2.05,false,false));}
-    floorGlow(g,7,.22);scene.add(g);}
+    // compound: paved forecourt, low wall with railings, gatehouse, palms
+    g.add(flat(roundRect(12,8,.4),STONE(0x9aa39e),0,.08));
+    const wallM=SAND(0xd9c8a5);[[0,-3.9,12,.18],[0,3.9,12,.18]].forEach(([x,z,w,d])=>g.add(M(new THREE.BoxGeometry(w,.28,d),wallM,x,.22,z)));[[-5.9,0,.18,8],[5.9,0,.18,8]].forEach(([x,z,w,d])=>g.add(M(new THREE.BoxGeometry(w,.28,d),wallM,x,.22,z)));
+    for(let i=-11;i<=11;i++){g.add(M(new THREE.BoxGeometry(.02,.22,.02),new THREE.MeshStandardMaterial({color:0x2a2f2c,roughness:.4,metalness:.8}),i*.5,.47,3.9,false,false));}
+    g.add(M(new THREE.BoxGeometry(.9,.6,.7),SAND(0xe6dab8),3.6,.38,3.9));g.add(M(new THREE.BoxGeometry(1.1,.06,.9),SAND(0xd9c8a5),3.6,.7,3.9));
+    // plinth and main block: 90 m × 40 m, 6 storeys, projecting entrance bay one storey taller
+    g.add(M(new THREE.BoxGeometry(7.6,.22,3.8),SAND(0xd9c8a5),0,.19,-.6));
+    g.add(M(new THREE.BoxGeometry(6.6,2.4,3.0),SAND(0xe6dab8),0,1.5,-.8));
+    g.add(M(new THREE.BoxGeometry(6.7,.12,3.1),SAND(0xcdb98f),0,2.76,-.8));                           // parapet
+    g.add(M(new THREE.BoxGeometry(1.8,.36,1.4),new THREE.MeshStandardMaterial({color:0x7d7f74,roughness:.7,metalness:.3}),-1.6,2.98,-1.2));  // rooftop plant louvre box
+    g.add(M(new THREE.BoxGeometry(2.0,2.9,1.0),SAND(0xe6dab8),0,1.75,.65));                           // entrance bay
+    g.add(M(new THREE.BoxGeometry(2.1,.12,1.1),SAND(0xcdb98f),0,3.26,.65));
+    g.add(M(new THREE.BoxGeometry(1.2,.32,.06),GLOW(0x7de3b4,1.2),0,2.95,1.18,false,false));           // emblem sign
+    // portico: four square columns and deep canopy, double-height glazed doors, broad stair with ramps
+    [-.7,-.25,.25,.7].forEach(x=>g.add(M(new THREE.BoxGeometry(.16,1.2,.16),SAND(0xf0e6cc),x,.9,1.75)));
+    g.add(M(new THREE.BoxGeometry(2.3,.14,1.0),SAND(0xe6dab8),0,1.56,1.4));g.add(strip(1.5,1.0,.04,0,.85,1.17));
+    [0,1,2,3].forEach(i=>g.add(M(new THREE.BoxGeometry(2.4+i*.2,.08,.22),SAND(0xd9c8a5),0,.34-i*.08,2.3+i*.22)));
+    // recessed window strips with mashrabiya screens, stone pilasters every bay
+    const mesh=new THREE.LineBasicMaterial({color:0xf0e6cc,transparent:true,opacity:.55});
+    for(const side of [1,-1]){for(let i=-6;i<=6;i++){if(Math.abs(i)<=1&&side===1)continue;const x=i*.5;
+        g.add(strip(.28,2.0,.05,x,1.45,-.8+side*1.51));
+        const sc=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.PlaneGeometry(.28,2.0,4,24)),mesh);sc.position.set(x,1.45,-.8+side*1.53);g.add(sc);
+        g.add(M(new THREE.BoxGeometry(.08,2.4,.12),SAND(0xd9c8a5),x+.25,1.5,-.8+side*1.53));}}
+    for(let i=-2;i<=2;i++){g.add(strip(.28,2.0,.05,-3.31,1.45,-.8+i*.55));g.add(strip(.28,2.0,.05,3.31,1.45,-.8+i*.55));}
+    // flagpoles on the forecourt axis, palms in rows, uplights on the columns
+    g.add(flagpole(-.9,3.0,1.7,.5));g.add(flagpole(0,3.1,1.9,.55));g.add(flagpole(.9,3.0,1.7,.5));
+    for(let i=-5;i<=5;i++){if(Math.abs(i)<2)continue;g.add(palm(i*1.0,2.6,.9+rnd()*.3,.8));}
+    [-4.6,-3.4,3.4,4.6].forEach(x=>g.add(palm(x,-.4,1+rnd()*.3,.8)));
+    [-.7,-.25,.25,.7].forEach(x=>g.add(M(new THREE.SphereGeometry(.03,6,6),GLOW(0xffc27a,2.8),x,.32,1.95,false,false)));
+    // parking behind
+    for(let i=-4;i<=4;i++){g.add(M(new THREE.BoxGeometry(.22,.08,.42),new THREE.MeshStandardMaterial({color:[0xeef3f0,0x9aa7a1,0x2b2f2c][Math.floor(rnd()*3)],roughness:.4,metalness:.6}),i*.55,.13,-3.2));}
+    floorGlow(g,7,.18);scene.add(g);}
 
-  /* 6 — Middle East HQ: tapered glass tower, mullion grid, lit crown, podium */
+  /* 6 — Middle East HQ, Riyadh (2025): a KAFD-style faceted crystal tower — hexagonal plan, tilting glass facets, sheared crown, glazed podium, skywalk, 7D mint signage */
   {const g=new THREE.Group();g.position.set(X[5],0,0);
-    g.add(M(new THREE.CylinderGeometry(4.2,4.4,.3,64),DARK(0x141b18),0,.15));
-    g.add(M(new THREE.BoxGeometry(3.6,.5,3.6),STONE(0xc9d2cd),0,.55));
-    g.add(M(new THREE.BoxGeometry(3.2,.9,3.2),GLASS(0x9defc9,.8),0,1.25,0,false,false));
-    const shaft=new THREE.Group();g.add(shaft);
-    const tiers=[[2.1,1.7],[1.9,1.6],[1.7,1.5],[1.45,1.15]];let y=1.7;
-    tiers.forEach(([w,h],i)=>{const core=M(new THREE.BoxGeometry(w*.72,h,w*.72),new THREE.MeshStandardMaterial({color:0x0f1614,roughness:.35,metalness:.7}),0,y+h/2,0);shaft.add(core);
-      const skin=M(new THREE.BoxGeometry(w,h,w),GLASS(0x8fe8c2,.55),0,y+h/2,0,false,false);shaft.add(skin);
-      const mull=EDGE(new THREE.BoxGeometry(w*1.002,h*1.002,w*1.002),.55);mull.position.y=y+h/2;shaft.add(mull);
-      for(let k=1;k<Math.floor(h/.42);k++){const band=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w*1.003,.001,w*1.003)),new THREE.LineBasicMaterial({color:0x7de3b4,transparent:true,opacity:.28}));band.position.y=y+k*.42;shaft.add(band);}
-      shaft.add(M(new THREE.BoxGeometry(w*1.06,.1,w*1.06),METAL(0xdfe7e2),0,y+h,0));y+=h+.1;});
-    const crownY=y+.25;
-    const crown=M(new THREE.OctahedronGeometry(.5,0),GLOW(0x7de3b4,2.6),0,crownY+.4,0,false,false);g.add(crown);
-    const beacon=glow(4.5,.9);beacon.position.y=crownY+.4;g.add(beacon);
-    g.add(M(new THREE.CylinderGeometry(.03,.05,1.2,6),METAL(),0,crownY-.2,0));
-    for(let i=0;i<16;i++){const a=i/16*Math.PI*2;g.add(M(new THREE.SphereGeometry(.05,8,8),GLOW(0x7de3b4,2.2),Math.cos(a)*3.9,.33,Math.sin(a)*3.9,false,false));}
-    floorGlow(g,7,.3);scene.add(g);anims.push(t=>{crown.rotation.y=t*.8;crown.position.y=crownY+.4+Math.sin(t*1.5)*.12;beacon.position.y=crown.position.y;beacon.material.opacity=.7+Math.sin(t*2.2)*.25;});}
-
+    g.add(flat(roundRect(12,8,.8),STONE(0xbfb8a8),0,.1));
+    const road=new THREE.MeshStandardMaterial({color:0x2a2c2a,roughness:.9});g.add(M(new THREE.BoxGeometry(12,.02,.6),road,0,.11,3.1,false,false));
+    // podium: three-storey glazed hexagon with a stone base and drop-off loop
+    g.add(M(new THREE.CylinderGeometry(2.4,2.5,.3,6),STONE(0xd7c9ab),0,.25,0));
+    g.add(M(new THREE.CylinderGeometry(2.1,2.1,.9,6),GLASSB(0x6fcfae),0,.85,0,true,false));
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(2.11,2.11,.9,6)),new THREE.LineBasicMaterial({color:0xeef3f0,transparent:true,opacity:.35})).translateY(.85));
+    g.add(M(new THREE.CylinderGeometry(2.2,2.2,.08,6),METAL(0xdfe5e2),0,1.34,0));
+    g.add(M(new THREE.BoxGeometry(2.2,.06,.9),STONE(0xe6dab8),0,.62,2.5,false,false));[-.8,.8].forEach(x=>g.add(M(new THREE.CylinderGeometry(.03,.03,.5,6),METAL(),x,.4,2.5)));
+    // tower: stacked hexagonal facets, each tier rotated and tilted so the skin reads as cut crystal
+    const core=M(new THREE.CylinderGeometry(.95,1.05,4.6,6),new THREE.MeshStandardMaterial({color:0x0f1614,roughness:.35,metalness:.7}),0,1.38+2.3,0);g.add(core);
+    let y=1.38;const tiers=[[1.35,1.25,.95],[1.25,1.32,.95],[1.32,1.18,.95],[1.18,1.28,.9],[1.28,1.05,.85]];
+    tiers.forEach(([rb,rt,h],i)=>{const t=M(new THREE.CylinderGeometry(rt,rb,h,6),GLASSB(0x4fbf93),0,y+h/2,0,true,false);t.rotation.y=i%2?Math.PI/6:0;g.add(t);
+      const e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(rt*1.003,rb*1.003,h,6)),new THREE.LineBasicMaterial({color:0x7de3b4,transparent:true,opacity:.55}));e.position.y=y+h/2;e.rotation.y=t.rotation.y;g.add(e);
+      for(let k=1;k<Math.floor(h/.28);k++){const band=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(rt*1.004,rt*1.004,.001,6)),new THREE.LineBasicMaterial({color:0xeef3f0,transparent:true,opacity:.16}));band.position.y=y+k*.28;band.rotation.y=t.rotation.y;g.add(band);}
+      y+=h;});
+    // sheared crown and mint signage
+    const crown=M(new THREE.CylinderGeometry(.55,1.05,.6,6),GLASSB(0x4fbf93),0,y+.2,0,true,false);crown.rotation.x=.18;crown.rotation.y=Math.PI/6;g.add(crown);
+    g.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.CylinderGeometry(.55,1.05,.6,6)),new THREE.LineBasicMaterial({color:0x7de3b4,transparent:true,opacity:.7})).translateY(y+.2).rotateX(.18).rotateY(Math.PI/6));
+    const sign=M(new THREE.BoxGeometry(.9,.22,.06),GLOW(0x7de3b4,2.6),0,y-.35,1.12,false,false);g.add(sign);const sg=glow(2.6,.55);sg.position.copy(sign.position);g.add(sg);
+    const beacon=M(new THREE.SphereGeometry(.05,8,8),GLOW(0xffffff,3),0,y+.75,0,false,false);g.add(beacon);
+    // neighbouring angular towers with a skywalk, palms along the highway, drop-off lamps
+    [[3.6,-1.6,3.4,5],[-3.4,-1.8,2.6,6],[4.4,.6,2.1,5]].forEach(([x,z,h,n])=>{const t=M(new THREE.CylinderGeometry(.5,.62,h,n),GLASSB(0xdde9ee),x,.1+h/2,z);t.rotation.y=rnd()*Math.PI;g.add(t);g.add(M(new THREE.ConeGeometry(.52,.4,n),GLASSB(0xdde9ee),x,.1+h+.2,z,false,false).rotateX(.2));});
+    g.add(M(new THREE.BoxGeometry(2.2,.12,.28),GLASS(0xd9f3ea,.7),2.4,1.9,-.9,false,false));g.add(M(new THREE.BoxGeometry(2.2,.03,.3),METAL(0xdfe5e2),2.4,1.98,-.9,false,false));
+    for(let i=-5;i<=5;i++){g.add(palm(i*1.1,3.55,.9+rnd()*.3,.8));if(i%2)g.add(M(new THREE.SphereGeometry(.03,6,6),GLOW(0xfff1dc,2.4),i*1.1,.5,2.7,false,false));}
+    floorGlow(g,7,.25);scene.add(g);
+    anims.push(t=>{beacon.material.emissiveIntensity=2+Math.sin(t*3)*1.5;sg.material.opacity=.4+Math.sin(t*2)*.15;});}
   /* --- ambient dust for depth --- */
   {const N=700,pos=new Float32Array(N*3);for(let i=0;i<N;i++){pos[i*3]=-10+rnd()*95;pos[i*3+1]=.3+rnd()*9;pos[i*3+2]=-14+rnd()*30;}
     const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
@@ -841,7 +1108,8 @@ function updateFlight(p){
   flight.t=REDUCED?p:lerp(flight.t,p,.12);
   const pos=curve.getPointAt(clamp(flight.t,0,1)); cam.position.copy(pos);
   const lx=lerp(X[0],X[5],clamp(flight.t,0,1));
-  const look=new THREE.Vector3(lx,2.6,0); cam.lookAt(look);
+  const LOOKY=[1.3,1.4,2.6,2.9,1.6,2.9];const fi=clamp(flight.t,0,1)*5,i0=Math.floor(fi),i1=Math.min(5,i0+1);const ly=lerp(LOOKY[i0],LOOKY[i1],fi-i0);
+  const look=new THREE.Vector3(lx,ly,0); cam.lookAt(look);
   // the shadow-casting key light and the mint fill travel with the camera so every diorama gets crisp, high-resolution shadows
   key.position.set(lx+6,12,5); key.target.position.set(lx,0,0); key.target.updateMatrixWorld();
   mint.position.set(lx,5,3);
