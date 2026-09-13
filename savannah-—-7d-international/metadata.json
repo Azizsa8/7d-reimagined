@@ -1,0 +1,6 @@
+{
+  "name": "Savannah — 7D International",
+  "description": "Real-time, voice-only AI host and living presence for 7D International in English and Saudi Arabic.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
