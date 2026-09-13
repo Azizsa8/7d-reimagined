@@ -1,234 +1,166 @@
 import { bus } from '../state/bus';
+import { REDUCED } from '../config';
 import { soundDesign } from '../stage/audio/SoundDesign';
 
-export interface TiltState {
-  x: number; // smoothed -1 to +1 (corresponds to ±3°)
-  y: number; // smoothed -1 to +1 (corresponds to ±3°)
-  supported: boolean;
-}
-
+/**
+ * The body of the phone (Phase 4 §1): fullscreen, wake lock, tilt, haptics,
+ * headphones, noisy-room helper, install prompt.
+ */
 class DeviceManager {
   private wakeLock: any = null;
-  private isReducedMotion = false;
-  private tilt: TiltState = { x: 0, y: 0, supported: false };
-  private targetTilt = { x: 0, y: 0 };
-  private rafId: number | null = null;
-  private headphonesConnected = false;
-
-  // Noise detector
-  private highNoiseStartTime = 0;
-  private noisyHelperTriggered = false;
+  private tilt = { x: 0, y: 0 };
+  private target = { x: 0, y: 0 };
+  private tiltEnabled = false;
+  private onTilt?: (x: number, y: number) => void;
+  private headphones = false;
+  private noiseStart = 0;
+  private noiseHinted = false;
+  private installEvent: any = null;
+  private sessionActive = false;
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      this.isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
-        this.isReducedMotion = e.matches;
-      });
-
-      // Handle visibility changes for Wake Lock
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          this.reacquireWakeLock();
-        } else {
-          this.releaseWakeLock();
-        }
-      });
-
-      // Monitor headphones via devicechange
-      if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
-        navigator.mediaDevices.addEventListener('devicechange', () => {
-          this.checkAudioDevices();
-        });
-        this.checkAudioDevices();
+    if (typeof window === 'undefined') return;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && this.sessionActive) this.acquireWakeLock();
+    });
+    navigator.mediaDevices?.addEventListener?.('devicechange', () => this.checkHeadphones());
+    window.addEventListener('beforeinstallprompt', (e: any) => {
+      e.preventDefault();
+      this.installEvent = e;
+    });
+    bus.on('micLevel', (l) => this.noise(l));
+    bus.on('state', (s) => {
+      if (s === 'speaking') this.vibrate(8);
+    });
+    bus.on('worldActive', (w) => {
+      if (w !== 'presence') this.vibrate([12, 40, 12]);
+    });
+    bus.on('enquiryResult', (r) => {
+      if (r === 'sent') this.vibrate(20);
+    });
+    const loop = () => {
+      if (this.tiltEnabled && !REDUCED) {
+        this.tilt.x += (this.target.x - this.tilt.x) * 0.08;
+        this.tilt.y += (this.target.y - this.tilt.y) * 0.08;
+        this.onTilt?.(this.tilt.x, this.tilt.y);
       }
-
-      // Smooth tilt loop
-      this.startTiltLoop();
-
-      // Listen to audio levels for noise helper
-      bus.on('micLevel', (level) => {
-        this.checkNoiseLevel(level);
-      });
-
-      // Listen to bus events for haptics
-      bus.on('state', (st) => {
-        if (st === 'speaking') {
-          this.vibrate(8);
-        }
-      });
-
-      bus.on('show_world', () => {
-        this.vibrate([12, 40, 12]);
-      });
-    }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
   }
 
-  // Request fullscreen and device orientation permissions on first tap
-  public async handleFirstUserGesture() {
-    // 1. Fullscreen request (where supported)
+  /** Call from the first tap: fullscreen + iOS orientation permission. */
+  async onFirstGesture() {
+    const el = document.documentElement as any;
     try {
-      const docEl = document.documentElement as any;
-      if (
-        !document.fullscreenElement &&
-        !(document as any).webkitFullscreenElement &&
-        docEl.requestFullscreen
-      ) {
-        await docEl.requestFullscreen().catch(() => {});
-      } else if (docEl.webkitRequestFullscreen) {
-        await docEl.webkitRequestFullscreen().catch(() => {});
-      }
+      if (!document.fullscreenElement && el.requestFullscreen && /Android/i.test(navigator.userAgent)) await el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
     } catch {
-      // Fullscreen not allowed or supported; safe fallback
+      /* not supported */
     }
-
-    // 2. iOS DeviceOrientation permission
     try {
-      const DeviceOrientation = (window as any).DeviceOrientationEvent;
-      if (DeviceOrientation && typeof DeviceOrientation.requestPermission === 'function') {
-        const perm = await DeviceOrientation.requestPermission();
-        if (perm === 'granted') {
-          this.initOrientationListener();
-        }
-      } else {
-        this.initOrientationListener();
-      }
-    } catch (e) {
-      console.warn('DeviceOrientation error or not supported:', e);
+      const DOE = (window as any).DeviceOrientationEvent;
+      if (DOE && typeof DOE.requestPermission === 'function') {
+        const p = await DOE.requestPermission();
+        if (p === 'granted') this.listenOrientation();
+      } else this.listenOrientation();
+    } catch {
+      /* ignore */
     }
   }
 
-  // Tilt listener
-  private initOrientationListener() {
-    if (typeof window === 'undefined' || this.isReducedMotion) return;
-
+  private listenOrientation() {
+    if (REDUCED) return;
     window.addEventListener(
       'deviceorientation',
       (e) => {
-        if (e.gamma === null || e.beta === null) return;
-        this.tilt.supported = true;
-
-        // gamma is left-to-right tilt (-90 to 90)
-        // beta is front-to-back tilt (-180 to 180, typically ~30-60 when holding phone)
-        const rawX = Math.max(-30, Math.min(30, e.gamma)) / 30; // normalized
-        const neutralBeta = 45; // comfortable phone holding angle
-        const rawY = Math.max(-30, Math.min(30, (e.beta - neutralBeta))) / 30;
-
-        this.targetTilt.x = rawX;
-        this.targetTilt.y = rawY;
+        if (e.gamma == null || e.beta == null) return;
+        this.tiltEnabled = true;
+        this.target.x = Math.max(-1, Math.min(1, e.gamma / 30));
+        this.target.y = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
       },
-      { passive: true }
+      { passive: true },
     );
   }
 
-  private startTiltLoop() {
-    const loop = () => {
-      if (!this.isReducedMotion && this.tilt.supported) {
-        // Smooth lerp (10% per frame)
-        this.tilt.x += (this.targetTilt.x - this.tilt.x) * 0.08;
-        this.tilt.y += (this.targetTilt.y - this.tilt.y) * 0.08;
-      } else {
-        this.tilt.x = 0;
-        this.tilt.y = 0;
-      }
-      this.rafId = requestAnimationFrame(loop);
-    };
-    this.rafId = requestAnimationFrame(loop);
+  setTiltHandler(fn: (x: number, y: number) => void) {
+    this.onTilt = fn;
   }
 
-  public getTilt(): { x: number; y: number } {
-    return { x: this.tilt.x, y: this.tilt.y };
-  }
-
-  // Haptic feedback
-  public vibrate(pattern: number | number[]) {
-    if (this.isReducedMotion) return;
+  vibrate(pattern: number | number[]) {
+    if (REDUCED) return;
     try {
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(pattern);
-      }
+      navigator.vibrate?.(pattern);
     } catch {
-      // Ignored if device lacks vibration
+      /* ignore */
     }
   }
 
-  // Screen Wake Lock
-  public async acquireWakeLock() {
-    if (typeof navigator === 'undefined' || !('wakeLock' in navigator)) return;
+  async sessionStarted() {
+    this.sessionActive = true;
+    await this.acquireWakeLock();
+    this.checkHeadphones();
+  }
+
+  sessionEnded() {
+    this.sessionActive = false;
+    this.releaseWakeLock();
+  }
+
+  private async acquireWakeLock() {
+    if (!('wakeLock' in navigator) || this.wakeLock) return;
     try {
       this.wakeLock = await (navigator as any).wakeLock.request('screen');
-      this.wakeLock.addEventListener('release', () => {
-        this.wakeLock = null;
-      });
-    } catch (err) {
-      console.warn('Screen WakeLock error:', err);
+      this.wakeLock.addEventListener('release', () => (this.wakeLock = null));
+    } catch {
+      /* low battery or hidden */
     }
   }
 
-  public async releaseWakeLock() {
-    if (this.wakeLock) {
-      try {
-        await this.wakeLock.release();
-      } catch {}
-      this.wakeLock = null;
-    }
-  }
-
-  private async reacquireWakeLock() {
-    if (!this.wakeLock && typeof document !== 'undefined' && document.visibilityState === 'visible') {
-      await this.acquireWakeLock();
-    }
-  }
-
-  // Headphones check
-  private async checkAudioDevices() {
+  private async releaseWakeLock() {
     try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const hasHeadphones = devices.some(
-        (d) =>
-          d.kind === 'audiooutput' &&
-          (d.label.toLowerCase().includes('headphone') ||
-            d.label.toLowerCase().includes('airpods') ||
-            d.label.toLowerCase().includes('buds') ||
-            d.label.toLowerCase().includes('bluetooth'))
-      );
+      await this.wakeLock?.release();
+    } catch {
+      /* ignore */
+    }
+    this.wakeLock = null;
+  }
 
-      if (hasHeadphones !== this.headphonesConnected) {
-        this.headphonesConnected = hasHeadphones;
-        if (hasHeadphones) {
-          // Headphones connected: enable bed boost +3 dB
-          soundDesign.boostBed(1.41); // ~ +3 dB
-        } else {
-          soundDesign.boostBed(1.0);
-        }
+  private async checkHeadphones() {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const has = devices.some((d) => d.kind === 'audiooutput' && /headphone|airpods|buds|bluetooth|headset/i.test(d.label));
+      if (has !== this.headphones) {
+        this.headphones = has;
+        soundDesign.setBoost(has ? 1.41 : 1);
       }
     } catch {
-      // Device labels require audio permissions or are restricted
+      /* labels need permission */
     }
   }
 
-  // Noisy environment helper
-  private checkNoiseLevel(level: number) {
+  /** If the mic stays loud without recognised speech for 8 s, suggest holding to talk. */
+  private noise(level: number) {
     const now = performance.now();
-    if (level > 0.35) {
-      if (!this.highNoiseStartTime) {
-        this.highNoiseStartTime = now;
-      } else if (now - this.highNoiseStartTime > 8000 && !this.noisyHelperTriggered) {
-        this.noisyHelperTriggered = true;
-        bus.emit('suggest_questions', [
-          'Touch and hold Savannah to talk',
-          'علّق يدك على سفانة وتكلم',
-        ]);
+    if (level > 0.4) {
+      if (!this.noiseStart) this.noiseStart = now;
+      else if (now - this.noiseStart > 8000 && !this.noiseHinted) {
+        this.noiseHinted = true;
+        bus.emit('toast', { text: 'NOISY', kind: 'info' });
       }
-    } else if (level < 0.15) {
-      this.highNoiseStartTime = 0;
-    }
+    } else if (level < 0.15) this.noiseStart = 0;
   }
 
-  public resetNoiseHelper() {
-    this.highNoiseStartTime = 0;
-    this.noisyHelperTriggered = false;
+  get canInstall() {
+    return !!this.installEvent;
+  }
+
+  async promptInstall(): Promise<boolean> {
+    if (!this.installEvent) return false;
+    const ev = this.installEvent;
+    this.installEvent = null;
+    ev.prompt();
+    const r = await ev.userChoice;
+    return r?.outcome === 'accepted';
   }
 }
 

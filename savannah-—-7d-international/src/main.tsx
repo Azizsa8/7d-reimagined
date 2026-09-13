@@ -1,6 +1,6 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
-import App from './App.tsx';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -9,10 +9,8 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
-if ('serviceWorker' in navigator && typeof window !== 'undefined') {
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
-      console.warn('Service worker registration note:', err);
-    });
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }

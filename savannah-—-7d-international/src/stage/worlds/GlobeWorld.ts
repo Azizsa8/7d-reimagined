@@ -1,371 +1,308 @@
 import * as THREE from 'three';
-import { AudioLevels } from '../../state/bus';
+import type { World, WorldCtx, CameraWish } from './World';
+import { BRASS, TEAL, SAND } from './World';
+import type { AudioLevels } from '../../state/bus';
+import type { MorphTarget } from '../scenes/Presence';
+import { loadLandPoints, latLngToVec3 } from '../util/landPoints';
+import type { Hub } from '../../kb/types';
 import { soundDesign } from '../audio/SoundDesign';
 
-export interface HubData {
-  id: string;
-  cityEn: string;
-  cityAr: string;
-  countryEn: string;
-  countryAr: string;
-  lat: number;
-  lon: number;
-  isHq?: boolean;
+const R = 1.08;
+
+interface HubNode {
+  hub: Hub;
+  group: THREE.Group;
+  pillar: THREE.Mesh<THREE.CylinderGeometry, THREE.ShaderMaterial>;
+  core: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  ring: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
+  height: number;
+  targetHeight: number;
+  dim: number;
 }
 
-export const HUBS: HubData[] = [
-  { id: 'riyadh', cityEn: 'Riyadh', cityAr: 'الرياض', countryEn: 'Saudi Arabia', countryAr: 'المملكة العربية السعودية', lat: 24.7136, lon: 46.6753, isHq: true },
-  { id: 'florida', cityEn: 'Florida', cityAr: 'فلوريدا', countryEn: 'United States', countryAr: 'الولايات المتحدة', lat: 27.9506, lon: -82.4572 },
-  { id: 'ostrava', cityEn: 'Ostrava', cityAr: 'أوسترافا', countryEn: 'Czech Republic', countryAr: 'جمهورية التشيك', lat: 49.8209, lon: 18.2625 },
-  { id: 'seoul', cityEn: 'Seoul', cityAr: 'سيول', countryEn: 'South Korea', countryAr: 'كوريا الجنوبية', lat: 37.5665, lon: 126.9780 },
-  { id: 'sydney', cityEn: 'Sydney', cityAr: 'سيدني', countryEn: 'Australia', countryAr: 'أستراليا', lat: -33.8688, lon: 151.2093 },
-];
-
-function latLonToVector3(lat: number, lon: number, radius: number): THREE.Vector3 {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
-  const x = -(radius * Math.sin(phi) * Math.cos(theta));
-  const z = radius * Math.sin(phi) * Math.sin(theta);
-  const y = radius * Math.cos(phi);
-  return new THREE.Vector3(x, y, z);
-}
-
-export class GlobeWorld {
-  public group: THREE.Group;
-  private globeRadius = 1.35;
-  private landPointsMesh!: THREE.Points;
-  private atmosphereMesh!: THREE.Mesh;
-
-  // Hub visual elements
-  private hubGroups: Map<string, THREE.Group> = new Map();
-  private hubPillars: Map<string, THREE.Mesh> = new Map();
-  private routeArcsGroup: THREE.Group;
-
-  // Rotation & orientation targets
-  private globeRotGroup: THREE.Group;
-  private targetQuaternion = new THREE.Quaternion();
-  private currentQuaternion = new THREE.Quaternion();
-  private isAutoRotating = true;
-  private activeHubId: string = 'riyadh';
-
-  // Label 2D overlay tracking
-  public activeHubLabel: { city: string; country: string; opacity: number } = {
-    city: 'Riyadh',
-    country: 'Headquarters · Saudi Arabia',
-    opacity: 0,
-  };
-  private labelTargetOpacity = 0;
-  private activeLang: 'en' | 'ar' = 'en';
-
+/** "Five hubs, five continents" — a dark planet of land particles, brass hubs, pillars of light, great-circle routes. */
+export class GlobeWorld implements World {
+  readonly name = 'globe' as const;
+  readonly group = new THREE.Group();
+  private rot = new THREE.Group();
+  private land: THREE.Points | null = null;
+  private landPositions: Float32Array | null = null;
+  private atmosphere: THREE.Mesh;
+  private hubs: HubNode[] = [];
+  private routes: Array<{ mesh: THREE.Mesh<THREE.TubeGeometry, THREE.ShaderMaterial>; head: THREE.Mesh }> = [];
+  private routeT = -1;
+  private targetQ = new THREE.Quaternion();
+  private autoRotate = true;
+  private focused: string | null = null;
+  private ctx: WorldCtx | null = null;
   private time = 0;
+  private opacity = 0;
+  private opacityTarget = 1;
+  private labelFrame = 0;
+  private proj = new THREE.Vector3();
 
   constructor() {
-    this.group = new THREE.Group();
-    this.globeRotGroup = new THREE.Group();
-    this.group.add(this.globeRotGroup);
-    this.routeArcsGroup = new THREE.Group();
-    this.globeRotGroup.add(this.routeArcsGroup);
-
-    this.createAtmosphere();
-    this.createHubs();
-    this.createRouteArcs();
-    this.loadLandPoints();
-  }
-
-  private createAtmosphere() {
-    // Thin atmospheric rim fresnel shader
-    const geom = new THREE.SphereGeometry(this.globeRadius * 1.05, 48, 48);
+    this.group.add(this.rot);
+    const geom = new THREE.SphereGeometry(R * 1.04, 48, 48);
     const mat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      vertexShader: `
-        varying vec3 vNormal;
-        varying vec3 vViewPosition;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          vViewPosition = -mvPosition.xyz;
-          gl_Position = projectionMatrix * mvPosition;
-        }
-      `,
-      fragmentShader: `
-        varying vec3 vNormal;
-        varying vec3 vViewPosition;
-        void main() {
-          vec3 viewDir = normalize(vViewPosition);
-          float fresnel = pow(1.0 - abs(dot(viewDir, vNormal)), 2.8);
-          vec3 teal = vec3(0.184, 0.663, 0.545);
-          gl_FragColor = vec4(teal * 1.5, fresnel * 0.28);
-        }
-      `,
+      uniforms: { uOpacity: { value: 0 } },
+      vertexShader: `varying vec3 vN; varying vec3 vV; void main(){ vN = normalize(normalMatrix*normal); vec4 mv = modelViewMatrix*vec4(position,1.0); vV = -mv.xyz; gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `uniform float uOpacity; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - abs(dot(normalize(vV), vN)), 3.2); gl_FragColor = vec4(vec3(0.184,0.663,0.545)*1.2, f*0.16*uOpacity); }`,
     });
-    this.atmosphereMesh = new THREE.Mesh(geom, mat);
-    this.group.add(this.atmosphereMesh);
+    this.atmosphere = new THREE.Mesh(geom, mat);
+    this.group.add(this.atmosphere);
   }
 
-  private async loadLandPoints() {
-    let rawPoints: [number, number][] = [];
-    try {
-      const res = await fetch('/data/land-110m.json');
-      if (res.ok) {
-        rawPoints = await res.json();
-      }
-    } catch (_) {}
-
-    if (!rawPoints || rawPoints.length === 0) {
-      // Fallback procedural points if file fetch fails
-      for (let i = 0; i < 15000; i++) {
-        const lat = (Math.random() - 0.5) * 160;
-        const lon = (Math.random() - 0.5) * 360;
-        rawPoints.push([lat, lon]);
-      }
+  private async ensureLand(count: number) {
+    if (this.land) return;
+    const ll = await loadLandPoints(count);
+    const n = ll.length / 2;
+    const pos = new Float32Array(n * 3);
+    const col = new Float32Array(n * 3);
+    const v = new THREE.Vector3();
+    for (let i = 0; i < n; i++) {
+      v.copy(latLngToVec3(ll[i * 2], ll[i * 2 + 1], R));
+      pos.set([v.x, v.y, v.z], i * 3);
+      const bright = Math.random() < 0.12 ? 0.8 : 0.34;
+      col.set([0.86 * bright, 0.84 * bright, 0.78 * bright], i * 3);
     }
-
-    const count = rawPoints.length;
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-
-    const ivory = new THREE.Color(0xF4F1EA);
-    const dimIvory = new THREE.Color(0x606670);
-
-    for (let i = 0; i < count; i++) {
-      const [lat, lon] = rawPoints[i];
-      const pt = latLonToVector3(lat, lon, this.globeRadius);
-      positions[i * 3] = pt.x;
-      positions[i * 3 + 1] = pt.y;
-      positions[i * 3 + 2] = pt.z;
-
-      // Color variation across continents
-      const col = Math.random() < 0.2 ? ivory : dimIvory;
-      colors[i * 3] = col.r;
-      colors[i * 3 + 1] = col.g;
-      colors[i * 3 + 2] = col.b;
-    }
-
-    const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const mat = new THREE.PointsMaterial({
-      size: 0.016,
-      vertexColors: true,
+    this.landPositions = pos;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    const m = new THREE.ShaderMaterial({
       transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
       depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: { uOpacity: { value: 0 }, uDpr: { value: Math.min(window.devicePixelRatio || 1, 2) }, uTime: { value: 0 }, uSize: { value: 1.5 * Math.min(1.8, Math.sqrt(30000 / count)) } },
+      vertexShader: `attribute vec3 color; varying vec3 vC; varying float vA; uniform float uDpr; uniform float uSize; void main(){ vC = color; vec4 mv = modelViewMatrix*vec4(position,1.0); vec3 n = normalize(normalMatrix*normalize(position)); float facing = dot(normalize(-mv.xyz), n); vA = smoothstep(-0.15, 0.35, facing); gl_PointSize = uSize*uDpr*(6.0/-mv.z); gl_Position = projectionMatrix*mv; }`,
+      fragmentShader: `uniform float uOpacity; varying vec3 vC; varying float vA; void main(){ vec2 c = gl_PointCoord-0.5; float d = length(c); if(d>0.5) discard; float i = smoothstep(0.5,0.1,d); gl_FragColor = vec4(vC*i, i*vA*uOpacity*0.7); }`,
     });
-
-    this.landPointsMesh = new THREE.Points(geom, mat);
-    this.globeRotGroup.add(this.landPointsMesh);
+    this.land = new THREE.Points(g, m);
+    this.land.frustumCulled = false;
+    this.rot.add(this.land);
   }
 
-  private createHubs() {
-    const brass = 0xE0A94A;
-
-    HUBS.forEach((hub) => {
-      const hubGroup = new THREE.Group();
-      const pos = latLonToVector3(hub.lat, hub.lon, this.globeRadius);
-      hubGroup.position.copy(pos);
-
-      // Orient outward
-      hubGroup.lookAt(pos.clone().multiplyScalar(2));
-
-      // Brass beacon core point
-      const coreGeom = new THREE.SphereGeometry(hub.isHq ? 0.038 : 0.026, 16, 16);
-      const coreMat = new THREE.MeshBasicMaterial({ color: brass });
-      const coreMesh = new THREE.Mesh(coreGeom, coreMat);
-      hubGroup.add(coreMesh);
-
-      // Pulsating ring
-      const ringGeom = new THREE.RingGeometry(0.04, 0.052, 32);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: brass,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.8,
-      });
-      const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-      hubGroup.add(ringMesh);
-
-      // Additive Pillar of light (height 0.35, soft top fade)
-      const pillarGeom = new THREE.CylinderGeometry(0.012, 0.024, 0.35, 16, 1, true);
-      // Center cylinder base at the hub surface
-      pillarGeom.translate(0, 0.175, 0);
-      pillarGeom.rotateX(Math.PI / 2);
-
-      const pillarMat = new THREE.ShaderMaterial({
+  private buildHubs(ctx: WorldCtx) {
+    if (this.hubs.length) return;
+    const hubs = [...ctx.kb.hubs].sort((a, b) => a.order - b.order);
+    for (const hub of hubs) {
+      const g = new THREE.Group();
+      const p = latLngToVec3(hub.lat, hub.lng, R);
+      g.position.copy(p);
+      g.lookAt(p.clone().multiplyScalar(2));
+      const core = new THREE.Mesh(new THREE.SphereGeometry(0.022, 12, 12), new THREE.MeshBasicMaterial({ color: BRASS, transparent: true }));
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.034, 0.042, 32), new THREE.MeshBasicMaterial({ color: BRASS, transparent: true, opacity: 0.7, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false }));
+      const pg = new THREE.CylinderGeometry(0.008, 0.02, 0.35, 12, 1, true);
+      pg.translate(0, 0.175, 0);
+      pg.rotateX(Math.PI / 2);
+      const pm = new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
-        uniforms: {
-          uHeight: { value: 0.0 }, // animated 0 -> 1 on cue
-          uColor: { value: new THREE.Color(brass) },
-        },
-        vertexShader: `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: `
-          uniform float uHeight;
-          uniform vec3 uColor;
-          varying vec2 vUv;
-          void main() {
-            float fade = (1.0 - vUv.y) * step(vUv.y, uHeight);
-            gl_FragColor = vec4(uColor * 1.5, fade * 0.7);
-          }
-        `,
+        side: THREE.DoubleSide,
+        uniforms: { uH: { value: 0 }, uColor: { value: BRASS.clone() } },
+        vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+        fragmentShader: `uniform float uH; uniform vec3 uColor; varying vec2 vUv; void main(){ float h = vUv.y; float a = smoothstep(uH, uH-0.25, h) * (1.0-h) * 0.9; gl_FragColor = vec4(uColor*1.6, a); }`,
       });
-
-      const pillarMesh = new THREE.Mesh(pillarGeom, pillarMat);
-      hubGroup.add(pillarMesh);
-
-      this.hubPillars.set(hub.id, pillarMesh);
-      this.hubGroups.set(hub.id, hubGroup);
-      this.globeRotGroup.add(hubGroup);
-    });
-  }
-
-  private createRouteArcs() {
-    // Great-circle routes connecting: Ostrava -> Sydney -> Florida -> Riyadh -> Seoul
-    const routePairs = [
-      ['ostrava', 'sydney'],
-      ['sydney', 'florida'],
-      ['florida', 'riyadh'],
-      ['riyadh', 'seoul'],
-    ];
-
-    routePairs.forEach(([fromId, toId]) => {
-      const from = HUBS.find((h) => h.id === fromId)!;
-      const to = HUBS.find((h) => h.id === toId)!;
-      const vFrom = latLonToVector3(from.lat, from.lon, this.globeRadius);
-      const vTo = latLonToVector3(to.lat, to.lon, this.globeRadius);
-
-      // Sample great-circle arc
-      const numPoints = 64;
-      const curvePts: THREE.Vector3[] = [];
-      for (let i = 0; i <= numPoints; i++) {
-        const t = i / numPoints;
-        // Spherical linear interpolation
-        const pt = new THREE.Vector3().copy(vFrom).lerp(vTo, t).normalize();
-        // Lift arc slightly above sphere
-        const lift = Math.sin(t * Math.PI) * 0.28;
-        pt.multiplyScalar(this.globeRadius + lift);
-        curvePts.push(pt);
+      const pillar = new THREE.Mesh(pg, pm);
+      g.add(core, ring, pillar);
+      this.rot.add(g);
+      this.hubs.push({ hub, group: g, pillar, core, ring, height: 0, targetHeight: 0, dim: 1 });
+    }
+    // Great-circle routes in KB order with a travelling light head.
+    for (let i = 0; i < hubs.length - 1; i++) {
+      const a = latLngToVec3(hubs[i].lat, hubs[i].lng, R);
+      const b = latLngToVec3(hubs[i + 1].lat, hubs[i + 1].lng, R);
+      const pts: THREE.Vector3[] = [];
+      for (let s = 0; s <= 48; s++) {
+        const t = s / 48;
+        const v = a.clone().lerp(b, t).normalize();
+        v.multiplyScalar(R + Math.sin(t * Math.PI) * 0.22);
+        pts.push(v);
       }
-
-      const spline = new THREE.CatmullRomCurve3(curvePts);
-      const tubeGeom = new THREE.TubeGeometry(spline, 64, 0.006, 8, false);
-      const tubeMat = new THREE.MeshBasicMaterial({
-        color: 0xC8AA7C,
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const tube = new THREE.TubeGeometry(curve, 64, 0.004, 6, false);
+      const mat = new THREE.ShaderMaterial({
         transparent: true,
-        opacity: 0.22,
+        depthWrite: false,
         blending: THREE.AdditiveBlending,
+        uniforms: { uProgress: { value: 0 }, uOpacity: { value: 0 } },
+        vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+        fragmentShader: `uniform float uProgress; uniform float uOpacity; varying vec2 vUv; void main(){ float drawn = step(vUv.x, uProgress); float head = smoothstep(0.08, 0.0, abs(vUv.x-uProgress)); vec3 c = mix(vec3(0.784,0.667,0.486)*0.6, vec3(0.96,0.9,0.7)*2.0, head); gl_FragColor = vec4(c, (0.35 + head*0.9)*drawn*uOpacity); }`,
       });
-      const tube = new THREE.Mesh(tubeGeom, tubeMat);
-      this.routeArcsGroup.add(tube);
-    });
-  }
-
-  public focusHub(hubId: string, lang: 'en' | 'ar' = 'en') {
-    const hub = HUBS.find((h) => h.id === hubId) || HUBS[0];
-    this.activeHubId = hub.id;
-    this.activeLang = lang;
-    this.isAutoRotating = false;
-
-    // Slerp globe rotation to bring the hub towards camera (facing (0, 0, 1))
-    const targetPos = latLonToVector3(hub.lat, hub.lon, this.globeRadius);
-    const targetDir = targetPos.clone().normalize();
-    const cameraDir = new THREE.Vector3(0, 0, 1);
-
-    // Compute quaternion that rotates targetDir to cameraDir
-    this.targetQuaternion.setFromUnitVectors(targetDir, cameraDir);
-
-    // Rise pillar of light on focused hub and dim others
-    this.hubPillars.forEach((pillar, id) => {
-      const mat = pillar.material as THREE.ShaderMaterial;
-      if (id === hub.id) {
-        mat.uniforms.uHeight.value = 1.0;
-      } else {
-        mat.uniforms.uHeight.value = 0.2;
-      }
-    });
-
-    // Update label
-    const isAr = lang === 'ar';
-    this.activeHubLabel = {
-      city: isAr ? hub.cityAr : hub.cityEn,
-      country: isAr
-        ? `${hub.isHq ? 'المقر الرئيسي · ' : ''}${hub.countryAr}`
-        : `${hub.isHq ? 'Global Headquarters · ' : ''}${hub.countryEn}`,
-      opacity: 1.0,
-    };
-    this.labelTargetOpacity = 1.0;
-  }
-
-  public cue(key: string) {
-    // Cue matched a hub alias
-    const found = HUBS.find((h) => h.id === key);
-    if (found) {
-      this.focusHub(found.id, this.activeLang);
-      soundDesign.playGlassTone();
+      const mesh = new THREE.Mesh(tube, mat);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 8), new THREE.MeshBasicMaterial({ color: 0xfff1d0, transparent: true, opacity: 0 }));
+      this.rot.add(mesh, head);
+      this.routes.push({ mesh, head });
+      (mesh as any).curve = curve;
     }
   }
 
-  public enter(params: any, lang: 'en' | 'ar') {
-    this.group.visible = true;
-    this.activeLang = lang;
-    soundDesign.setWorldMotif('globe');
-
-    const focusId = params?.focus || params?.id || 'riyadh';
-    this.focusHub(focusId, lang);
+  async morphTarget(_params: Record<string, any>, ctx: WorldCtx): Promise<MorphTarget | null> {
+    this.ctx = ctx;
+    await this.ensureLand(ctx.tier.globeParticles);
+    this.buildHubs(ctx);
+    if (!this.landPositions) return null;
+    // Rotate target into the current globe orientation so the hand-off is seamless.
+    this.rot.updateMatrixWorld(true);
+    const m = this.rot.matrixWorld;
+    const out = new Float32Array(this.landPositions.length);
+    const v = new THREE.Vector3();
+    for (let i = 0; i < this.landPositions.length; i += 3) {
+      v.set(this.landPositions[i], this.landPositions[i + 1], this.landPositions[i + 2]).applyMatrix4(m);
+      out.set([v.x, v.y, v.z], i);
+    }
+    return { positions: out, center: new THREE.Vector3() };
   }
 
-  public exit() {
-    this.labelTargetOpacity = 0;
+  reverseTarget(): MorphTarget | null {
+    if (!this.landPositions) return null;
+    this.rot.updateMatrixWorld(true);
+    const m = this.rot.matrixWorld;
+    const out = new Float32Array(this.landPositions.length);
+    const v = new THREE.Vector3();
+    for (let i = 0; i < this.landPositions.length; i += 3) {
+      v.set(this.landPositions[i], this.landPositions[i + 1], this.landPositions[i + 2]).applyMatrix4(m);
+      out.set([v.x, v.y, v.z], i);
+    }
+    return { positions: out, center: new THREE.Vector3() };
   }
 
-  public update(dt: number, _audio: AudioLevels) {
+  enter(params: Record<string, any>, ctx: WorldCtx) {
+    this.ctx = ctx;
+    this.buildHubs(ctx);
+    this.ensureLand(ctx.tier.globeParticles).catch(() => {});
+    this.opacityTarget = 1;
+    this.opacity = 1; // the presence particles were already here; no fade needed
+    if (params.focus) this.focus(String(params.focus));
+    else {
+      this.focused = null;
+      this.autoRotate = true;
+      this.hubs.forEach((h) => (h.targetHeight = 0.35));
+      this.notify();
+    }
+    this.routeT = 0; // draw routes on entry
+  }
+
+  refocus(params: Record<string, any>, ctx: WorldCtx) {
+    this.ctx = ctx;
+    if (params.focus) this.focus(String(params.focus));
+  }
+
+  private focus(id: string) {
+    const node = this.hubs.find((h) => h.hub.id === id);
+    if (!node) return;
+    this.focused = id;
+    this.autoRotate = false;
+    const dir = latLngToVec3(node.hub.lat, node.hub.lng, 1).normalize();
+    // Face the camera, slightly north so the pillar reads against the rim.
+    const target = new THREE.Vector3(0, 0.25, 1).normalize();
+    this.targetQ.setFromUnitVectors(dir, target);
+    this.hubs.forEach((h) => {
+      h.targetHeight = h.hub.id === id ? 1 : 0.2;
+    });
+    soundDesign.glass();
+    this.notify();
+  }
+
+  private notify() {
+    if (!this.ctx) return;
+    const node = this.focused ? this.hubs.find((h) => h.hub.id === this.focused) : null;
+    const lang = this.ctx.lang;
+    this.ctx.notify({
+      focus: this.focused,
+      city: node ? node.hub.name[lang] : null,
+      country: node ? node.hub.country[lang] : null,
+      role: node ? node.hub.role[lang] : null,
+      hubs: this.hubs.map((h) => ({ id: h.hub.id, city: h.hub.name[lang], country: h.hub.country[lang] })),
+      label: this.labelXY(),
+    });
+  }
+
+  private labelXY(): { x: number; y: number } | null {
+    const node = this.focused ? this.hubs.find((h) => h.hub.id === this.focused) : null;
+    if (!node || !this.ctx) return null;
+    node.group.getWorldPosition(this.proj);
+    this.proj.y += 0.62;
+    return { x: this.proj.x / this.ctx.viewHalfW, y: this.proj.y / this.ctx.viewHalfH };
+  }
+
+  cue(entityId: string, category: string) {
+    if (category === 'hub') this.focus(entityId);
+    if (category === 'timeline' && entityId === 't-1996-2009') this.routeT = 0;
+    if (category === 'figure' && entityId === 'fig-5-continents') this.routeT = 0;
+  }
+
+  exit() {
+    this.opacityTarget = 0;
+  }
+
+  camera(): CameraWish {
+    return { dolly: 0.92, target: new THREE.Vector3(0, 0, 0), exposure: 0.95 };
+  }
+
+  bloom() {
+    return 0.42;
+  }
+
+  update(dt: number, _audio: AudioLevels) {
     this.time += dt;
+    this.opacity += (this.opacityTarget - this.opacity) * Math.min(1, dt * 4);
+    const reduced = this.ctx?.reduced;
+    if (this.autoRotate) this.rot.rotation.y += dt * (reduced ? 0.02 : 0.08);
+    else this.rot.quaternion.slerp(this.targetQ, Math.min(1, dt * 2.6));
 
-    // Slerp rotation
-    if (this.isAutoRotating) {
-      this.globeRotGroup.rotation.y += dt * 0.12;
-    } else {
-      this.currentQuaternion.slerp(this.targetQuaternion, dt * 2.8);
-      this.globeRotGroup.setRotationFromQuaternion(this.currentQuaternion);
+    if (this.land) (this.land.material as THREE.ShaderMaterial).uniforms.uOpacity.value = this.opacity;
+    (this.atmosphere.material as THREE.ShaderMaterial).uniforms.uOpacity.value = this.opacity;
+
+    for (const h of this.hubs) {
+      h.height += (h.targetHeight - h.height) * Math.min(1, dt * 3.5);
+      h.pillar.material.uniforms.uH.value = h.height;
+      const isF = h.hub.id === this.focused;
+      const pulse = 1 + 0.25 * Math.sin(this.time * 3.5 + (isF ? 1 : 0));
+      h.ring.scale.set(pulse, pulse, 1);
+      const dim = this.focused ? (isF ? 1 : 0.4) : 1;
+      h.ring.material.opacity = 0.7 * dim * this.opacity;
+      h.core.material.opacity = dim * this.opacity;
     }
 
-    // Pulsate hub rings
-    this.hubGroups.forEach((group, id) => {
-      const isFocused = id === this.activeHubId;
-      const ring = group.children[1] as THREE.Mesh;
-      if (ring) {
-        const pulse = 1.0 + 0.3 * Math.sin(this.time * 4.0 + (isFocused ? 2 : 0));
-        ring.scale.set(pulse, pulse, 1);
-        (ring.material as THREE.MeshBasicMaterial).opacity = isFocused ? 0.9 : 0.4;
-      }
-    });
+    if (this.routeT >= 0) {
+      this.routeT += dt / 0.9;
+      const total = this.routes.length;
+      this.routes.forEach((r, i) => {
+        const local = THREE.MathUtils.clamp(this.routeT - i, 0, 1);
+        r.mesh.material.uniforms.uProgress.value = local;
+        r.mesh.material.uniforms.uOpacity.value = this.opacity;
+        const curve = (r.mesh as any).curve as THREE.CatmullRomCurve3;
+        if (local > 0 && local < 1) {
+          r.head.position.copy(curve.getPoint(local));
+          (r.head.material as THREE.MeshBasicMaterial).opacity = this.opacity;
+        } else (r.head.material as THREE.MeshBasicMaterial).opacity = 0;
+      });
+      if (this.routeT > total + 1) this.routeT = -1;
+    }
 
-    // Label opacity smoothing
-    this.activeHubLabel.opacity += (this.labelTargetOpacity - this.activeHubLabel.opacity) * (dt * 5.0);
+    if (this.focused && ++this.labelFrame % 3 === 0) this.notify();
   }
 
-  public dispose() {
-    this.atmosphereMesh.geometry.dispose();
-    (this.atmosphereMesh.material as THREE.Material).dispose();
-    if (this.landPointsMesh) {
-      this.landPointsMesh.geometry.dispose();
-      (this.landPointsMesh.material as THREE.Material).dispose();
-    }
-    this.hubGroups.forEach((g) => {
-      g.children.forEach((c) => {
-        if ((c as any).geometry) (c as any).geometry.dispose();
-        if ((c as any).material) (c as any).material.dispose();
-      });
+  dispose() {
+    this.land?.geometry.dispose();
+    (this.land?.material as THREE.Material | undefined)?.dispose();
+    this.atmosphere.geometry.dispose();
+    (this.atmosphere.material as THREE.Material).dispose();
+    this.hubs.forEach((h) => {
+      h.core.geometry.dispose();
+      h.ring.geometry.dispose();
+      h.pillar.geometry.dispose();
+      h.pillar.material.dispose();
+    });
+    this.routes.forEach((r) => {
+      r.mesh.geometry.dispose();
+      r.mesh.material.dispose();
     });
   }
 }

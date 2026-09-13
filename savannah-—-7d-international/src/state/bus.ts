@@ -1,4 +1,4 @@
-import { PresenceState, SupportedLang } from '../config';
+import type { PresenceState, SupportedLang } from '../config';
 
 export interface AudioLevels {
   rms: number;
@@ -7,40 +7,65 @@ export interface AudioLevels {
   high: number;
 }
 
+export type WorldName = 'presence' | 'globe' | 'project' | 'timeline' | 'people' | 'disciplines' | 'figure' | 'contact';
+
+export interface SceneEvent {
+  world: WorldName;
+  params?: Record<string, unknown>;
+  /** performance.now() when the tool call arrived */
+  at: number;
+}
+
+export interface CaptionEvent {
+  text: string;
+  /** true when this is the final phrase of the turn */
+  final?: boolean;
+}
+
+export interface EnquiryDraft {
+  name?: string;
+  organisation?: string;
+  country?: string;
+  topic?: string;
+  email?: string;
+  phone?: string;
+  language: SupportedLang;
+}
+
+export interface StoryState {
+  status: 'idle' | 'playing' | 'paused' | 'done';
+  chapter: number; // 1-based, 0 when idle
+  total: number;
+  title?: string;
+}
+
 export interface BusEvents {
   state: PresenceState;
-  caption: string;
+  caption: CaptionEvent;
   userCaption: string;
   level: AudioLevels;
   micLevel: number;
   interrupted: boolean;
   lang: SupportedLang;
   error: string | null;
-  scene: { name: string; params?: any };
+  scene: SceneEvent;
+  cue: { entityId: string; category: string };
   connected: boolean;
   reconnecting: boolean;
+  quality: 'good' | 'degraded' | 'lost';
   muted: boolean;
-  sessionEnded: boolean;
+  sessionEnded: string;
   micAvailable: boolean;
-  show_fact_card: {
-    type: 'project' | 'hubs' | 'timeline' | 'person' | 'discipline' | 'figure' | 'contact';
-    data: any;
-    lang?: SupportedLang;
-  } | null;
-  suggest_questions: string[];
-  show_world: {
-    world: any;
-    params?: any;
-  };
-  transcription: string;
-  sound_mute_toggle: boolean;
-  story_state: {
-    status: 'idle' | 'playing' | 'paused' | 'done';
-    currentChapter: number;
-    totalChapters: number;
-    chapter?: any;
-    progress?: { current: number; total: number; percent: number };
-  };
+  chips: { items: string[]; source: 'kb' | 'model' | 'system' };
+  story: StoryState;
+  enquiry: EnquiryDraft | null;
+  enquiryResult: 'sent' | 'failed' | 'unconfigured';
+  transcriptTurn: { role: 'user' | 'model'; text: string };
+  toast: { text: string; kind?: 'info' | 'warn' };
+  ptt: boolean;
+  overlay: { world: WorldName; data: any };
+  worldActive: WorldName;
+  tier: string;
 }
 
 type EventKey = keyof BusEvents;
@@ -60,22 +85,18 @@ class EventBus {
   }
 
   off<K extends EventKey>(event: K, handler: Handler<BusEvents[K]>): void {
-    const set = this.handlers.get(event);
-    if (set) {
-      set.delete(handler);
-    }
+    this.handlers.get(event)?.delete(handler);
   }
 
   emit<K extends EventKey>(event: K, data: BusEvents[K]): void {
     const set = this.handlers.get(event);
-    if (set) {
-      set.forEach((h) => {
-        try {
-          h(data);
-        } catch (err) {
-          console.error(`Error in event bus listener for ${event}:`, err);
-        }
-      });
+    if (!set) return;
+    for (const h of Array.from(set)) {
+      try {
+        h(data);
+      } catch (err) {
+        console.error(`[bus] listener for ${event} threw`, err);
+      }
     }
   }
 }

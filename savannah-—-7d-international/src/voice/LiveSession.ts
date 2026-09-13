@@ -1,512 +1,508 @@
+import { GoogleGenAI, type LiveServerMessage, type Session, type LiveConnectConfig } from '@google/genai';
 import { bus } from '../state/bus';
-import {
-  LIVE_MODEL,
-  SupportedLang,
-  PrebuiltVoice,
-  SESSION_CAP_MS,
-  IDLE_WARNING_MS,
-  IDLE_TIMEOUT_MS,
-  SILENCE_CHIP_TRIGGER_MS,
-} from '../config';
-import { PlaybackManager } from './Playback';
+import { SESSION, pageNonce, type SupportedLang, type PrebuiltVoice } from '../config';
+import { Playback } from './Playback';
 import { MicCapture } from './MicCapture';
 import { CaptionManager } from './captions';
-import { strings } from '../i18n/strings';
-import { TOOL_DECLARATIONS, executeToolCall } from './tools';
-import { fetchKnowledgeBase } from '../kb/client';
-import { storyController } from '../story/story';
+import { executeTool, type ToolContext } from './tools';
+import { CueDirector } from '../stage/cue/CueDirector';
+import { story } from '../story/story';
+import { t } from '../i18n/strings';
+import { track } from '../analytics';
 
-export interface TurnHistory {
+export interface Turn {
   role: 'user' | 'model';
   text: string;
 }
 
+export type EndReason = 'USER' | 'IDLE' | 'CAP' | 'LOST' | 'RESTING' | 'NOT_CONFIGURED' | 'RATE_LIMITED' | 'ERROR';
+
+/**
+ * One Savannah conversation: ephemeral token → Live API session on @google/genai,
+ * with session resumption, silent goAway reconnects, barge-in, tool round-trips,
+ * clock-aligned captions and cues, idle and cap timers, and push-to-talk.
+ */
 export class LiveSession {
-  private ws: WebSocket | null = null;
-  public playback: PlaybackManager;
-  public mic: MicCapture;
-  public captions: CaptionManager;
+  public readonly playback = new Playback();
+  public readonly mic = new MicCapture();
+  public readonly captions: CaptionManager;
+  public readonly cues: CueDirector;
 
-  private lang: SupportedLang = 'en';
-  private voice: PrebuiltVoice = 'Aoede';
-  private isConnected = false;
-  private isReconnecting = false;
-  private isDestroyed = false;
+  private session: Session | null = null;
+  private lang: SupportedLang;
+  private voice: PrebuiltVoice;
+  private model = '';
+  private handle: string | null = null;
+  private closedByUs = false;
+  private destroyed = false;
+  private reconnectAttempt = 0;
+  private reconnecting = false;
+  private manualActivity = false;
 
-  // History buffer for language switching (last 6 turns)
-  private turnHistory: TurnHistory[] = [];
-  private currentTurnText = { user: '', model: '' };
-
-  // Timers
-  private sessionCapTimer: number | null = null;
-  private idleCheckInterval: number | null = null;
-  private lastActivityTime = Date.now();
-  private idleWarned = false;
-  private reconnectAttempts = 0;
-
-  // Silence timer for chips
+  private history: Turn[] = [];
+  private currentUser = '';
+  private turnStartedAt = 0;
+  private firstAudioReported = false;
+  private turns = 0;
+  private startedAt = 0;
+  private lastActivity = Date.now();
+  private idleAsked = false;
+  private capWarned = false;
+  private timers: number[] = [];
   private silenceTimer: number | null = null;
-  private onSilenceStateChange?: (showChips: boolean) => void;
+  private toolCtx: ToolContext;
+  private hidden = false;
+  private hiddenAt = 0;
+  private lastUserHeardAt = 0;
 
   constructor(lang: SupportedLang, voice: PrebuiltVoice) {
     this.lang = lang;
     this.voice = voice;
+    this.toolCtx = { lang, askedChips: new Set() };
+    this.captions = new CaptionManager(() => this.playback.clock, () => this.playback.queuedUntil());
+    this.cues = new CueDirector(() => this.playback.clock);
 
-    this.playback = new PlaybackManager();
-    this.mic = new MicCapture();
-    this.captions = new CaptionManager(() => this.playback.getCurrentTime());
-
-    // Connect playback clock to captions
-    this.playback.setOnAudioScheduled((startTime) => {
-      // Audio chunk enqueued at estimated startTime
-      this.resetSilenceTimer();
-      this.lastActivityTime = Date.now();
+    this.playback.onFirstChunkOfTurn = () => {
       bus.emit('state', 'speaking');
-    });
+      if (!this.firstAudioReported && this.turnStartedAt) {
+        this.firstAudioReported = true;
+        track('first_audio_ms', { value: Math.round(performance.now() - this.turnStartedAt), lang: this.lang });
+      }
+    };
+    this.playback.onEnded = () => {
+      if (this.destroyed) return;
+      bus.emit('state', 'listening');
+      this.armSilenceChips();
+    };
+
+    document.addEventListener('visibilitychange', this.onVisibility);
   }
 
-  public setOnSilenceStateChange(cb: (showChips: boolean) => void) {
-    this.onSilenceStateChange = cb;
+  get language() {
+    return this.lang;
+  }
+  get transcript(): Turn[] {
+    return this.history.slice();
+  }
+  get isConnected() {
+    return !!this.session;
   }
 
-  public async start(seedHistory?: TurnHistory[]): Promise<void> {
-    this.isDestroyed = false;
-    bus.emit('state', 'thinking');
+  /* ---------------- lifecycle ---------------- */
+
+  async start(): Promise<void> {
+    this.startedAt = performance.now();
+    this.lastActivity = Date.now();
     bus.emit('lang', this.lang);
-
-    if (seedHistory && seedHistory.length > 0) {
-      this.turnHistory = seedHistory.slice(-6);
-    }
-
-    try {
-      // Fetch ephemeral token from server
-      const tokenRes = await fetch('/api/live-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lang: this.lang,
-          voice: this.voice,
-        }),
-      });
-
-      if (!tokenRes.ok) {
-        const errorData = await tokenRes.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server error: ${tokenRes.status}`);
-      }
-
-      const data = await tokenRes.json();
-      const tokenName = data.token;
-
-      // Connect to Gemini Live Bidi WebSocket using the ephemeral token
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${encodeURIComponent(
-        tokenName
-      )}`;
-
-      await this.connectWebSocket(wsUrl);
-
-      // Start microphone capture (gracefully handles environments without mic hardware)
-      const micActive = await this.mic.start((pcm16Base64) => {
-        this.sendAudioChunk(pcm16Base64);
-        this.onUserActivity();
-      });
-
-      if (!micActive) {
-        // If mic is unavailable, activate suggestion chips immediately so user can interact
-        if (this.onSilenceStateChange) {
-          this.onSilenceStateChange(true);
-        }
-      }
-
-      this.startTimers();
-      bus.emit('connected', true);
-      bus.emit('reconnecting', false);
-    } catch (err: any) {
-      console.error('LiveSession start error:', err);
-      bus.emit('error', err.message || 'Connection failed');
-      bus.emit('state', 'idle');
-      throw err;
-    }
+    bus.emit('state', 'thinking');
+    await this.connect({ fresh: true });
+    const micOk = await this.mic.start((b64) => this.sendAudio(b64));
+    track(micOk ? 'mic_granted' : 'mic_denied', { lang: this.lang });
+    this.startTimers();
+    this.sendGreeting();
   }
 
-  private connectWebSocket(wsUrl: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        this.ws = new WebSocket(wsUrl);
-
-        this.ws.onopen = () => {
-          this.isConnected = true;
-          this.isReconnecting = false;
-          this.reconnectAttempts = 0;
-
-          // Send setup message to Gemini Live
-          if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(
-              JSON.stringify({
-                setup: {
-                  model: `models/${LIVE_MODEL}`,
-                  tools: [
-                    {
-                      functionDeclarations: TOOL_DECLARATIONS,
-                    },
-                  ],
-                },
-              })
-            );
-
-            // If we have seeded turn history (e.g. from language switch), inject context
-            if (this.turnHistory.length > 0) {
-              const turns = this.turnHistory.map((t) => ({
-                role: t.role,
-                parts: [{ text: t.text }],
-              }));
-
-              // Add instruction for language switch acknowledgment
-              const switchNote =
-                this.lang === 'ar'
-                  ? 'تم تغيير لغة المحادثة إلى العربية. رحبي بالزائر بلهجة سعودية بيضاء راقية وأكدي له تحويل اللغة وسؤاله كيف تساعدينه.'
-                  : 'Language has been switched to English. Greet the visitor warmly and confirm the switch.';
-
-              turns.push({
-                role: 'user',
-                parts: [{ text: switchNote }],
-              });
-
-              this.ws.send(
-                JSON.stringify({
-                  clientContent: {
-                    turns,
-                    turnComplete: true,
-                  },
-                })
-              );
-            } else {
-              // Initial greeting prompt so Savannah speaks first!
-              const initialPrompt =
-                this.lang === 'ar'
-                  ? 'ابدأي المحادثة بتحية سعودية دافئة وراقية للزائر، وعرفي بنفسك كسافانا، المضيفة الذكية لشركة سفن دي إنترناشونال، واسألي كيف تقدرين تساعدينه.'
-                  : 'Start the conversation by greeting the visitor warmly, introducing yourself as Savannah, the AI host for 7D International, and asking how you can guide them today.';
-
-              this.ws.send(
-                JSON.stringify({
-                  clientContent: {
-                    turns: [
-                      {
-                        role: 'user',
-                        parts: [{ text: initialPrompt }],
-                      },
-                    ],
-                    turnComplete: true,
-                  },
-                })
-              );
-            }
-          }
-
-          resolve();
-        };
-
-        this.ws.onmessage = (evt) => {
-          this.handleServerMessage(evt.data);
-        };
-
-        this.ws.onerror = (err) => {
-          console.error('LiveSession WebSocket error:', err);
-          if (!this.isConnected) {
-            reject(err);
-          }
-        };
-
-        this.ws.onclose = (evt) => {
-          this.isConnected = false;
-          if (!this.isDestroyed) {
-            console.warn('LiveSession WebSocket closed:', evt.code, evt.reason);
-            this.attemptReconnect();
-          }
-        };
-      } catch (err) {
-        reject(err);
-      }
+  private async mintToken(resuming: boolean) {
+    const res = await fetch('/api/live-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang: this.lang, voice: this.voice, nonce: pageNonce(), resuming }),
     });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const code = body?.error || `HTTP_${res.status}`;
+      throw Object.assign(new Error(code), { code });
+    }
+    return res.json() as Promise<{ token: string; model: string }>;
   }
 
-  private handleServerMessage(data: any) {
-    try {
-      const msg = typeof data === 'string' ? JSON.parse(data) : data;
+  private async connect(opts: { fresh: boolean; seed?: Turn[] }) {
+    const { token, model } = await this.mintToken(!opts.fresh && !!this.handle);
+    this.model = model;
+    const ai = new GoogleGenAI({ apiKey: token, httpOptions: { apiVersion: 'v1alpha' } });
+    const config: LiveConnectConfig = {
+      sessionResumption: this.handle && !opts.fresh ? { handle: this.handle } : {},
+      realtimeInputConfig: {
+        automaticActivityDetection: this.manualActivity
+          ? { disabled: true }
+          : { silenceDurationMs: SESSION.vadSilenceMs },
+      },
+    };
+    this.closedByUs = false;
+    const session = await ai.live.connect({
+      model,
+      config,
+      callbacks: {
+        onopen: () => {
+          this.reconnectAttempt = 0;
+          this.reconnecting = false;
+          bus.emit('connected', true);
+          bus.emit('reconnecting', false);
+          bus.emit('quality', 'good');
+        },
+        onmessage: (m) => this.onMessage(m),
+        onerror: (e) => {
+          console.error('[live] error', e);
+          bus.emit('quality', 'degraded');
+        },
+        onclose: (e) => {
+          const wasOurs = this.closedByUs;
+          this.session = null;
+          bus.emit('connected', false);
+          if (!wasOurs && !this.destroyed) {
+            console.warn('[live] closed', e?.code, e?.reason);
+            this.reconnect();
+          }
+        },
+      },
+    });
+    this.session = session;
+    if (opts.seed?.length) {
+      session.sendClientContent({
+        turns: opts.seed.map((tn) => ({ role: tn.role, parts: [{ text: tn.text }] })),
+        turnComplete: false,
+      });
+    }
+  }
 
-      // Handle direct toolCall from Gemini Live API
-      if (msg.toolCall && msg.toolCall.functionCalls) {
-        this.handleFunctionCalls(msg.toolCall.functionCalls);
+  private sendGreeting() {
+    const prompt =
+      this.lang === 'ar'
+        ? 'ابدئي: رحبي بالزائر بلهجة سعودية بيضاء، عرّفي بنفسك سافانا، قولي بجملة وحدة وش أنتِ، واسألي سؤال مفتوح واحد. بدون أدوات.'
+        : 'Begin: greet the visitor, say you are Savannah, say in one sentence what you are here for on behalf of 7D International, and ask one open question. No tools for this turn.';
+    this.sendText(prompt, { silent: true });
+  }
+
+  private async reconnect() {
+    if (this.destroyed || this.reconnecting) return;
+    this.reconnecting = true;
+    bus.emit('reconnecting', true);
+    bus.emit('quality', 'lost');
+    const delay = SESSION.reconnectDelays[Math.min(this.reconnectAttempt, SESSION.reconnectDelays.length - 1)];
+    this.reconnectAttempt++;
+    await new Promise((r) => setTimeout(r, delay));
+    if (this.destroyed) return;
+    try {
+      await this.connect({ fresh: !this.handle });
+      if (!this.handle) {
+        // No resumable state: re-seed the conversation so she does not lose the thread.
+        this.session?.sendClientContent({
+          turns: this.history.slice(-6).map((tn) => ({ role: tn.role, parts: [{ text: tn.text }] })),
+          turnComplete: false,
+        });
+      }
+      this.reconnecting = false;
+    } catch (e: any) {
+      this.reconnecting = false;
+      if (this.reconnectAttempt >= 5 || e?.code === 'RESTING' || e?.code === 'RATE_LIMITED') {
+        this.end('LOST');
         return;
       }
+      this.reconnect();
+    }
+  }
 
-      // Handle serverContent
-      if (msg.serverContent) {
-        const sc = msg.serverContent;
-
-        // Interrupted barge-in from user speaking
-        if (sc.interrupted) {
-          this.playback.interrupt();
-          this.captions.interrupt();
-          storyController.pause();
-          bus.emit('state', 'listening');
-          bus.emit('interrupted', true);
-          this.resetSilenceTimer();
-          return;
-        }
-
-        // Model audio turn
-        if (sc.modelTurn && sc.modelTurn.parts) {
-          bus.emit('state', 'speaking');
-          this.resetSilenceTimer();
-
-          for (const part of sc.modelTurn.parts) {
-            // Function call inside model turn part
-            if (part.functionCall) {
-              this.handleFunctionCalls([part.functionCall]);
-            }
-            // Audio data
-            if (part.inlineData && part.inlineData.data) {
-              this.playback.enqueuePcm16Base64(part.inlineData.data);
-            }
-            // Text data if provided
-            if (part.text) {
-              this.currentTurnText.model += part.text;
-              this.captions.onModelTextChunk(part.text);
-            }
-          }
-        }
-
-        // Transcription for captions
-        if (sc.outputAudioTranscription && sc.outputAudioTranscription.text) {
-          const text = sc.outputAudioTranscription.text;
-          this.currentTurnText.model += text;
-          this.captions.onModelTextChunk(text);
-        }
-
-        if (sc.inputAudioTranscription && sc.inputAudioTranscription.text) {
-          const text = sc.inputAudioTranscription.text;
-          this.currentTurnText.user += text;
-          this.captions.onUserTextChunk(text);
-          this.onUserActivity();
-        }
-
-        // Turn complete
-        if (sc.turnComplete) {
-          if (this.currentTurnText.model) {
-            this.turnHistory.push({ role: 'model', text: this.currentTurnText.model.trim() });
-            this.currentTurnText.model = '';
-          }
-          if (this.currentTurnText.user) {
-            this.turnHistory.push({ role: 'user', text: this.currentTurnText.user.trim() });
-            this.currentTurnText.user = '';
-          }
-          // Cap turn history to 6 turns
-          if (this.turnHistory.length > 6) {
-            this.turnHistory = this.turnHistory.slice(-6);
-          }
-
-          // Check if playback is still active or completed
-          setTimeout(() => {
-            if (!this.playback.isPlaying()) {
-              bus.emit('state', 'listening');
-              this.resetSilenceTimer();
-            }
-          }, 300);
-        }
-      }
-
-      // Handle goAway (graceful reconnection needed)
-      if (msg.goAway) {
-        console.log('Gemini Live sent goAway, reconnecting gracefully...');
-        this.attemptReconnect();
+  /** goAway: open a new connection with the resumption handle, then let the old one close. */
+  private async rotate() {
+    if (this.destroyed) return;
+    const old = this.session;
+    this.closedByUs = true;
+    try {
+      await this.connect({ fresh: false });
+      try {
+        old?.close();
+      } catch {
+        /* ignore */
       }
     } catch (e) {
-      console.error('Error handling WebSocket message:', e);
+      console.warn('[live] rotate failed, falling back to reconnect', e);
+      this.closedByUs = false;
+      this.reconnect();
     }
   }
 
-  private async handleFunctionCalls(calls: any[]) {
-    bus.emit('state', 'thinking');
-    const functionResponses: any[] = [];
-
-    for (const call of calls) {
-      try {
-        console.log(`[Savannah Tool Call] executing ${call.name} with args:`, call.args);
-        const result = await executeToolCall(call.name, call.args || {}, this.lang);
-        functionResponses.push({
-          response: { output: result },
-          id: call.id,
-        });
-      } catch (err: any) {
-        console.error(`Error executing tool ${call.name}:`, err);
-        functionResponses.push({
-          response: { error: err.message || 'Tool execution failed' },
-          id: call.id,
-        });
-      }
-    }
-
-    if (this.ws && this.ws.readyState === WebSocket.OPEN && functionResponses.length > 0) {
-      this.ws.send(
-        JSON.stringify({
-          toolResponse: {
-            functionResponses,
-          },
-        })
-      );
-    }
-  }
-
-  private sendAudioChunk(pcm16Base64: string) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-
-    this.ws.send(
-      JSON.stringify({
-        realtimeInput: {
-          mediaChunks: [
-            {
-              mimeType: 'audio/pcm;rate=16000',
-              data: pcm16Base64,
-            },
-          ],
-        },
-      })
-    );
-  }
-
-  public sendTextInput(text: string) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-
-    bus.emit('state', 'thinking');
-    bus.emit('userCaption', text);
-    this.onUserActivity();
-
-    this.ws.send(
-      JSON.stringify({
-        clientContent: {
-          turns: [
-            {
-              role: 'user',
-              parts: [{ text }],
-            },
-          ],
-          turnComplete: true,
-        },
-      })
-    );
-  }
-
-  private onUserActivity() {
-    this.lastActivityTime = Date.now();
-    this.idleWarned = false;
-    this.resetSilenceTimer();
-  }
-
-  private resetSilenceTimer() {
-    if (this.silenceTimer) {
-      clearTimeout(this.silenceTimer);
-    }
-    if (this.onSilenceStateChange) {
-      this.onSilenceStateChange(false);
-    }
-
-    // After 6s of silence while listening, float suggestion chips
-    this.silenceTimer = window.setTimeout(() => {
-      if (this.isConnected && !this.playback.isPlaying()) {
-        if (this.onSilenceStateChange) {
-          this.onSilenceStateChange(true);
-        }
-      }
-    }, SILENCE_CHIP_TRIGGER_MS);
-  }
-
-  private startTimers() {
-    // 10-minute session cap
-    this.sessionCapTimer = window.setTimeout(() => {
-      this.endSession('SESSION_CAP_REACHED');
-    }, SESSION_CAP_MS);
-
-    // Idle checks (90s warning, 120s timeout)
-    this.idleCheckInterval = window.setInterval(() => {
-      const idleTime = Date.now() - this.lastActivityTime;
-
-      if (idleTime >= IDLE_TIMEOUT_MS) {
-        this.endSession('IDLE_TIMEOUT');
-      } else if (idleTime >= IDLE_WARNING_MS && !this.idleWarned) {
-        this.idleWarned = true;
-        const idlePrompt =
-          this.lang === 'ar'
-            ? strings.ar.idleQuestion
-            : strings.en.idleQuestion;
-        this.sendTextInput(idlePrompt);
-      }
-    }, 5000);
-  }
-
-  private async attemptReconnect() {
-    if (this.isDestroyed || this.isReconnecting) return;
-    this.isReconnecting = true;
-    bus.emit('reconnecting', true);
-    bus.emit('state', 'thinking');
-
-    const delays = [500, 1000, 2000, 4000];
-    const delay = delays[Math.min(this.reconnectAttempts, delays.length - 1)];
-    this.reconnectAttempts++;
-
-    await new Promise((res) => setTimeout(res, delay));
-
-    try {
-      await this.start(this.turnHistory);
-    } catch (err) {
-      console.error('Reconnection failed:', err);
-      if (this.reconnectAttempts < 5) {
-        this.isReconnecting = false;
-        this.attemptReconnect();
-      } else {
-        bus.emit('error', 'CONNECTION_LOST');
-        this.endSession('CONNECTION_LOST');
-      }
-    }
-  }
-
-  public async switchLanguage(newLang: SupportedLang) {
-    if (this.lang === newLang) return;
-    this.lang = newLang;
-    bus.emit('lang', newLang);
-
-    // Close current connection cleanly
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
+  async switchLanguage(next: SupportedLang) {
+    if (next === this.lang) return;
+    this.lang = next;
+    this.toolCtx.lang = next;
+    bus.emit('lang', next);
     this.playback.interrupt();
     this.captions.interrupt();
-
-    // Reconnect with new language, preserving last 6 turns
-    await this.start(this.turnHistory);
-  }
-
-  public endSession(reason: string = 'USER_ENDED') {
-    this.isDestroyed = true;
-    bus.emit('sessionEnded', true);
-    bus.emit('state', 'idle');
-
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
+    this.cues.reset();
+    this.closedByUs = true;
+    try {
+      this.session?.close();
+    } catch {
+      /* ignore */
     }
-    this.playback.interrupt();
-    this.mic.stop();
-    this.captions.clear();
-
-    if (this.sessionCapTimer) clearTimeout(this.sessionCapTimer);
-    if (this.idleCheckInterval) clearInterval(this.idleCheckInterval);
-    if (this.silenceTimer) clearTimeout(this.silenceTimer);
+    this.session = null;
+    this.handle = null; // different system instruction: new session
+    bus.emit('state', 'thinking');
+    const seed = this.history.slice(-6);
+    await this.connect({ fresh: true, seed });
+    const note =
+      next === 'ar'
+        ? 'تحوّلت المحادثة للعربي. أكّدي التحويل بجملة سعودية قصيرة وكمّلي من وين وقفنا.'
+        : 'The conversation has switched to English. Acknowledge the switch in one short sentence and carry on from where we were.';
+    this.sendText(note, { silent: true });
   }
 
-  public dispose() {
-    this.endSession('DISPOSED');
+  end(reason: EndReason = 'USER') {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    this.closedByUs = true;
+    for (const t of this.timers) clearInterval(t);
+    if (this.silenceTimer) clearTimeout(this.silenceTimer);
+    try {
+      this.session?.close();
+    } catch {
+      /* ignore */
+    }
+    this.session = null;
+    this.mic.stop();
+    this.playback.interrupt();
+    this.captions.clear();
+    this.cues.reset();
+    story.stop();
+    document.removeEventListener('visibilitychange', this.onVisibility);
+    track('session_end', { duration: Math.round((performance.now() - this.startedAt) / 1000), turns: this.turns, code: reason });
+    bus.emit('state', 'idle');
+    bus.emit('sessionEnded', reason);
+  }
+
+  dispose() {
+    this.end('USER');
     this.playback.dispose();
     this.captions.dispose();
   }
+
+  /* ---------------- inbound ---------------- */
+
+  private onMessage(m: LiveServerMessage) {
+    if (m.sessionResumptionUpdate) {
+      if (m.sessionResumptionUpdate.resumable && m.sessionResumptionUpdate.newHandle) this.handle = m.sessionResumptionUpdate.newHandle;
+    }
+    if (m.goAway) {
+      this.rotate();
+    }
+    if (m.toolCall?.functionCalls?.length) {
+      this.onToolCalls(m.toolCall.functionCalls as Array<{ id?: string; name?: string; args?: Record<string, any> }>);
+    }
+    if (m.toolCallCancellation) {
+      /* side effects were only visual; nothing to undo */
+    }
+    const sc = m.serverContent;
+    if (!sc) return;
+
+    if (sc.interrupted) {
+      this.playback.interrupt();
+      this.captions.interrupt();
+      this.cues.reset();
+      story.pause();
+      track('interrupt');
+      bus.emit('interrupted', true);
+      bus.emit('state', 'listening');
+      return;
+    }
+
+    if (sc.inputTranscription?.text) {
+      const text = sc.inputTranscription.text;
+      this.currentUser += text;
+      this.lastUserHeardAt = performance.now();
+      this.touch();
+      bus.emit('userCaption', this.currentUser.trim());
+      if (!this.turnStartedAt) this.turnStartedAt = performance.now();
+    }
+
+    if (sc.outputTranscription?.text) {
+      const text = sc.outputTranscription.text;
+      const at = this.playback.queuedUntil();
+      this.captions.onModelText(text);
+      this.cues.feed(text, at);
+    }
+
+    if (sc.modelTurn?.parts) {
+      for (const part of sc.modelTurn.parts) {
+        if (part.inlineData?.data) this.playback.enqueueBase64(part.inlineData.data);
+      }
+    }
+
+    if (sc.turnComplete) {
+      if (this.currentUser.trim()) {
+        this.pushHistory('user', this.currentUser.trim());
+        this.currentUser = '';
+      }
+      this.captions.flushTurn();
+      this.turns++;
+      track('turn', { lang: this.lang });
+      this.turnStartedAt = 0;
+      this.firstAudioReported = false;
+      // If nothing was queued for playback (text-only or tool-only turn), listen again now.
+      if (!this.playback.isPlaying()) {
+        bus.emit('state', 'listening');
+        this.armSilenceChips();
+      }
+    }
+  }
+
+  private pushHistory(role: 'user' | 'model', text: string) {
+    this.history.push({ role, text });
+    if (this.history.length > 40) this.history = this.history.slice(-40);
+  }
+
+  private async onToolCalls(calls: Array<{ id?: string; name?: string; args?: Record<string, any> }>) {
+    bus.emit('state', 'thinking');
+    const responses = [];
+    for (const call of calls) {
+      const name = call.name || '';
+      let response: Record<string, unknown>;
+      try {
+        response = await executeTool(name, call.args || {}, this.toolCtx);
+      } catch (e: any) {
+        response = { error: e?.message || 'tool failed' };
+      }
+      responses.push({ id: call.id, name, response });
+    }
+    try {
+      this.session?.sendToolResponse({ functionResponses: responses });
+    } catch (e) {
+      console.error('[live] tool response failed', e);
+    }
+  }
+
+  /* ---------------- outbound ---------------- */
+
+  private sendAudio(b64: string) {
+    if (!this.session || this.hidden) return;
+    try {
+      this.session.sendRealtimeInput({ audio: { data: b64, mimeType: 'audio/pcm;rate=16000' } });
+    } catch {
+      /* socket closing */
+    }
+  }
+
+  /** Text into the live session (chips, type-instead, system nudges). */
+  sendText(text: string, opts: { silent?: boolean } = {}) {
+    if (!this.session) return;
+    if (!opts.silent) {
+      bus.emit('userCaption', text);
+      this.pushHistory('user', text);
+      this.toolCtx.askedChips.add(text);
+      this.turnStartedAt = performance.now();
+      this.firstAudioReported = false;
+    }
+    this.touch();
+    bus.emit('state', 'thinking');
+    try {
+      this.session.sendClientContent({ turns: [{ role: 'user', parts: [{ text }] }], turnComplete: true });
+    } catch (e) {
+      console.error('[live] sendText failed', e);
+    }
+  }
+
+  /** Tell the model the enquiry outcome (Phase 4 §2.1 step 6). */
+  notifyEnquiry(result: 'sent' | 'failed') {
+    this.sendText(result === 'sent' ? 'ENQUIRY_SENT' : 'ENQUIRY_FAILED', { silent: true });
+  }
+
+  /** Visitor tapped the stage while she speaks: interrupt locally and tell the model. */
+  interruptNow() {
+    if (!this.playback.isPlaying()) return;
+    this.playback.interrupt();
+    this.captions.interrupt();
+    this.cues.reset();
+    story.pause();
+    bus.emit('interrupted', true);
+    bus.emit('state', 'listening');
+    track('interrupt');
+  }
+
+  /* ---------------- push-to-talk ---------------- */
+
+  get isManualActivity() {
+    return this.manualActivity;
+  }
+
+  /** Switches VAD off/on by reconnecting with the resumption handle. */
+  async setManualActivity(on: boolean) {
+    if (on === this.manualActivity) return;
+    this.manualActivity = on;
+    this.mic.setGate(!on);
+    bus.emit('ptt', on);
+    await this.rotate();
+  }
+
+  pttDown() {
+    if (!this.manualActivity || !this.session) return;
+    this.interruptNow();
+    this.mic.setGate(true);
+    try {
+      this.session.sendRealtimeInput({ activityStart: {} });
+    } catch {
+      /* ignore */
+    }
+  }
+
+  pttUp() {
+    if (!this.manualActivity || !this.session) return;
+    this.mic.setGate(false);
+    this.turnStartedAt = performance.now();
+    try {
+      this.session.sendRealtimeInput({ activityEnd: {} });
+    } catch {
+      /* ignore */
+    }
+  }
+
+  /* ---------------- timers ---------------- */
+
+  private touch() {
+    this.lastActivity = Date.now();
+    this.idleAsked = false;
+    if (this.silenceTimer) {
+      clearTimeout(this.silenceTimer);
+      this.silenceTimer = null;
+    }
+  }
+
+  private armSilenceChips() {
+    if (this.silenceTimer) clearTimeout(this.silenceTimer);
+    this.silenceTimer = window.setTimeout(() => {
+      if (!this.destroyed && !this.playback.isPlaying()) bus.emit('chips', { items: [], source: 'system' });
+    }, SESSION.silenceChipsMs);
+  }
+
+  private startTimers() {
+    this.timers.push(
+      window.setInterval(() => {
+        if (this.destroyed) return;
+        const idle = Date.now() - this.lastActivity;
+        const elapsed = performance.now() - this.startedAt;
+        if (elapsed >= SESSION.capMs) return this.end('CAP');
+        if (elapsed >= SESSION.warnAtMs && !this.capWarned) {
+          this.capWarned = true;
+          this.sendText(t(this.lang).capWarning, { silent: true });
+        }
+        if (idle >= SESSION.idleCloseMs) return this.end('IDLE');
+        if (idle >= SESSION.idleAskMs && !this.idleAsked && !this.playback.isPlaying()) {
+          this.idleAsked = true;
+          this.sendText(t(this.lang).idleQuestion, { silent: true });
+        }
+      }, 2000),
+    );
+  }
+
+  private onVisibility = () => {
+    if (document.hidden) {
+      this.hidden = true;
+      this.hiddenAt = Date.now();
+      // Pause the mic stream but keep the socket for short app switches.
+      this.mic.setGate(false);
+    } else {
+      this.hidden = false;
+      const away = Date.now() - this.hiddenAt;
+      this.mic.setGate(!this.manualActivity);
+      if (away > SESSION.backgroundKeepMs && !this.session) this.reconnect();
+    }
+  };
 }

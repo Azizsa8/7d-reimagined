@@ -1,82 +1,25 @@
-// Savannah PWA Service Worker
-const CACHE_NAME = 'savannah-cache-v1';
-const ASSETS_TO_PRECACHE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icon.svg',
-  '/pwa-192x192.png',
-  '/pwa-512x512.png',
-  '/apple-touch-icon.png',
-  '/brand/7d-logo.svg',
-  '/brand/7d-logo.png',
-  '/kb/savannah-knowledge-base.json'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_PRECACHE).catch((err) => {
-        console.warn('Pre-caching partial failure (ok for runtime assets):', err);
-      });
-    })
-  );
+// Savannah offline shell. Bump CACHE when shipping cached files.
+const CACHE = 'savannah-v2';
+const SHELL = ['/manifest.webmanifest', '/icon.svg', '/pwa-192x192.png', '/pwa-512x512.png', '/apple-touch-icon.png', '/brand/7d-logo.png'];
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}));
   self.skipWaiting();
 });
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      )
-    )
-  );
+self.addEventListener('activate', (e) => {
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))));
   self.clients.claim();
 });
-
-self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-
-  // Never cache live API or websocket token endpoints
-  if (url.pathname.startsWith('/api/')) {
-    return;
-  }
-
-  // Network first, fallback to cache for navigations
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match('/index.html') || caches.match('/');
-      })
-    );
-    return;
-  }
-
-  // Cache first for static assets
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+  if (url.pathname.startsWith('/api/') || e.request.method !== 'GET') return; // never cache the token or the page nonce
+  if (e.request.mode === 'navigate') return; // the HTML carries a fresh nonce each load
+  e.respondWith(
+    caches.match(e.request).then((hit) => hit || fetch(e.request).then((res) => {
+      if (res.ok && res.type === 'basic' && /\.(png|svg|json|js|css|woff2?)$/.test(url.pathname)) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
       }
-      return fetch(event.request).then((networkResponse) => {
-        if (
-          !networkResponse ||
-          networkResponse.status !== 200 ||
-          networkResponse.type !== 'basic'
-        ) {
-          return networkResponse;
-        }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-        return networkResponse;
-      });
-    })
+      return res;
+    })),
   );
 });

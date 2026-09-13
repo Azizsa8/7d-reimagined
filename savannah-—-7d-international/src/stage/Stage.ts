@@ -4,280 +4,218 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { createGradePass } from './shaders/GradePass';
-import { SceneDirector, WorldName } from './SceneDirector';
+import { SceneDirector } from './SceneDirector';
 import { Presence } from './scenes/Presence';
 import { FilmGrain } from './Grain';
-import { PerformanceMonitor, TierConfig } from './PerformanceTier';
-import { CueDirector } from './cue/CueDirector';
-import { soundDesign } from './audio/SoundDesign';
-import { bus, AudioLevels } from '../state/bus';
-import { PresenceState } from '../config';
+import { PerformanceMonitor, type TierConfig } from './PerformanceTier';
+import { bus, type AudioLevels } from '../state/bus';
+import { REDUCED, type PresenceState } from '../config';
 
+/**
+ * One canvas, one requestAnimationFrame loop, outside React.
+ * RenderPass → UnrealBloomPass → grade pass → OutputPass (ACES, sRGB); 2D grain on top.
+ */
 export class Stage {
-  private container: HTMLElement;
+  public readonly scene = new THREE.Scene();
+  public readonly camera: THREE.PerspectiveCamera;
+  public readonly renderer: THREE.WebGLRenderer;
+  public readonly director: SceneDirector;
+  public readonly presence: Presence;
+  public readonly perf: PerformanceMonitor;
+  public tier: TierConfig;
+
+  private composer: EffectComposer;
+  private bloom: UnrealBloomPass;
+  private grade: ReturnType<typeof createGradePass>;
+  private grain: FilmGrain;
   private canvas3d: HTMLCanvasElement;
   private canvas2d: HTMLCanvasElement;
-
-  private scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
-  private renderer: THREE.WebGLRenderer;
-  private composer: EffectComposer;
-  private bloomPass: UnrealBloomPass;
-  private gradePass: any;
-
-  public director: SceneDirector;
-  public presence: Presence;
-  public cueDirector: CueDirector;
-  public perfMonitor: PerformanceMonitor;
-  private grain: FilmGrain;
-
-  private isRunning = false;
-  private isPaused = false;
-  private animationFrameId = 0;
   private clock = new THREE.Clock();
+  private running = false;
+  private paused = false;
+  private raf = 0;
+  private audio: AudioLevels = { rms: 0, low: 0, mid: 0, high: 0 };
+  private mic = 0;
+  private tilt = { x: 0, y: 0 };
+  private tiltTarget = { x: 0, y: 0 };
+  private unsubs: Array<() => void> = [];
+  private baseDistance = 5;
+  private viewportScale = 1;
+  private exposureTarget = 1;
 
-  private audioLevels: AudioLevels = { rms: 0, low: 0, mid: 0, high: 0 };
-  private micLevel = 0;
-  private prefersReducedMotion = false;
+  constructor(private container: HTMLElement) {
+    this.perf = new PerformanceMonitor((t) => this.applyTier(t));
+    this.tier = this.perf.tier;
 
-  // Parallax
-  private mouseX = 0;
-  private mouseY = 0;
-  private targetRotX = 0;
-  private targetRotY = 0;
-  private currentRotX = 0;
-  private currentRotY = 0;
-
-  // Camera breathing
-  private cameraBaseZ = 3.2;
-
-  // Subscriptions
-  private unsubscribes: Array<() => void> = [];
-
-  constructor(container: HTMLElement) {
-    this.container = container;
-
-    // Performance monitor
-    this.perfMonitor = new PerformanceMonitor((newTier: TierConfig) => {
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, newTier.dprCap));
-    });
-
-    // Create 3D canvas
     this.canvas3d = document.createElement('canvas');
-    this.canvas3d.className = 'absolute inset-0 w-full h-full pointer-events-none z-0';
-    container.appendChild(this.canvas3d);
-
-    // Create 2D grain canvas
+    this.canvas3d.className = 'stage-canvas';
+    this.canvas3d.setAttribute('aria-hidden', 'true');
     this.canvas2d = document.createElement('canvas');
-    this.canvas2d.className = 'absolute inset-0 w-full h-full pointer-events-none z-10';
+    this.canvas2d.className = 'stage-grain';
+    this.canvas2d.setAttribute('aria-hidden', 'true');
+    container.appendChild(this.canvas3d);
     container.appendChild(this.canvas2d);
 
-    this.checkReducedMotion();
-
-    // Three scene & camera
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 50);
-    this.camera.position.z = this.cameraBaseZ;
-
-    // WebGL Renderer
-    const isMobile = window.innerWidth < 768;
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas3d,
-      antialias: false,
-      powerPreference: 'high-performance',
-      alpha: true,
-    });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.perfMonitor.currentTier.dprCap));
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 60);
+    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas3d, antialias: false, powerPreference: 'high-performance', alpha: false });
+    this.renderer.setClearColor(0x050608, 1);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.0;
+    this.renderer.toneMappingExposure = 1;
 
-    // Post-processing Composer
-    // Pipeline: RenderPass -> UnrealBloomPass -> GradePass -> OutputPass
+    const isMobile = window.innerWidth < 768;
+    this.presence = new Presence(this.tier.presenceParticles, isMobile);
+    // Fewer particles on lower tiers → slightly larger points so the body stays luminous.
+    const density = Math.min(1.35, Math.sqrt(24000 / this.tier.presenceParticles));
+    this.presence.setPointSize((isMobile ? 2.6 : 3.0) * density);
+    this.scene.add(this.presence.group);
+    this.scene.add(this.presence.dustHolder);
+    this.director = new SceneDirector(this);
+
     const renderPass = new RenderPass(this.scene, this.camera);
-    this.bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.9,
-      0.6,
-      0.1
-    );
-    this.gradePass = createGradePass();
-    const outputPass = new OutputPass();
-
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.7, 0.6, 0.22);
+    this.grade = createGradePass();
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(renderPass);
-    this.composer.addPass(this.bloomPass);
-    this.composer.addPass(this.gradePass);
-    this.composer.addPass(outputPass);
+    this.composer.addPass(this.bloom);
+    this.composer.addPass(this.grade);
+    this.composer.addPass(new OutputPass());
 
-    // Film grain (4% overlay)
     this.grain = new FilmGrain(this.canvas2d);
-    this.grain.resize(window.innerWidth, window.innerHeight);
+    this.applyTier(this.tier);
+    this.resize();
 
-    // Presence & Scene Director
-    this.presence = new Presence(isMobile);
-    this.scene.add(this.presence.group);
-    this.director = new SceneDirector(this.scene, this.presence);
-
-    // Cue Director (word-level sync)
-    this.cueDirector = new CueDirector((match) => {
-      this.director.cue(match.entityId);
-    });
-
-    this.initEvents();
+    window.addEventListener('resize', this.resize);
+    window.addEventListener('pointermove', this.onPointer, { passive: true });
+    document.addEventListener('visibilitychange', this.onVisibility);
+    this.unsubs.push(
+      bus.on('state', (s: PresenceState) => this.presence.setState(s)),
+      bus.on('level', (l) => (this.audio = l)),
+      bus.on('micLevel', (m) => (this.mic = m)),
+      bus.on('interrupted', () => this.presence.hushNow()),
+      bus.on('quality', (q) => this.presence.setWarmth(q === 'good' ? 1 : q === 'degraded' ? 0.6 : 0.15)),
+    );
     this.start();
   }
 
-  private checkReducedMotion() {
-    this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** Device tilt (−1..1) from the device manager. */
+  setTilt(x: number, y: number) {
+    this.tiltTarget.x = x;
+    this.tiltTarget.y = y;
   }
 
-  private initEvents() {
-    window.addEventListener('resize', this.onResize);
-    window.addEventListener('mousemove', this.onMouseMove);
-    window.addEventListener('deviceorientation', this.onDeviceOrientation);
-    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  private onPointer = (e: PointerEvent) => {
+    if (REDUCED || e.pointerType === 'touch') return;
+    this.tiltTarget.x = (e.clientX / window.innerWidth) * 2 - 1;
+    this.tiltTarget.y = -((e.clientY / window.innerHeight) * 2 - 1);
+  };
 
-    // Initialize sound on first user gesture anywhere
-    const onUserInteraction = () => {
-      soundDesign.initOnUserGesture();
-      window.removeEventListener('pointerdown', onUserInteraction);
-      window.removeEventListener('keydown', onUserInteraction);
-    };
-    window.addEventListener('pointerdown', onUserInteraction);
-    window.addEventListener('keydown', onUserInteraction);
-
-    // Subscribe to event bus
-    this.unsubscribes.push(
-      bus.on('state', (state: PresenceState) => {
-        this.presence.setState(state);
-      }),
-      bus.on('level', (levels: AudioLevels) => {
-        this.audioLevels = levels;
-      }),
-      bus.on('micLevel', (level: number) => {
-        this.micLevel = level;
-      }),
-      bus.on('interrupted', (interrupted: boolean) => {
-        if (interrupted) {
-          this.presence.triggerHush();
-        }
-      }),
-      bus.on('show_world', (payload: { world: WorldName; params?: any }) => {
-        this.director.go(payload.world, payload.params);
-      })
-    );
+  private applyTier(t: TierConfig) {
+    this.tier = t;
+    const dpr = Math.min(window.devicePixelRatio || 1, t.dprCap);
+    this.renderer.setPixelRatio(dpr);
+    this.presence.setDpr(dpr);
+    (this.grade.uniforms as any).uChromaticAberration.value = t.chromaticAberration ? 0.0015 : 0;
+    this.resize();
   }
 
-  private onResize = () => {
-    const width = this.container.clientWidth || window.innerWidth;
-    const height = this.container.clientHeight || window.innerHeight;
-
-    this.camera.aspect = width / height;
+  resize = () => {
+    const w = this.container.clientWidth || window.innerWidth;
+    const h = this.container.clientHeight || window.innerHeight;
+    this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this.renderer.setSize(w, h, false);
+    this.composer.setSize(w, h);
+    const bloomScale = this.tier.bloomHalfRes ? 0.5 : 1;
+    this.bloom.setSize(w * bloomScale, h * bloomScale);
+    this.grain.resize(w, h);
 
-    this.renderer.setSize(width, height);
-    this.composer.setSize(width, height);
-    this.bloomPass.setSize(width, height);
-    this.grain.resize(width, height);
+    // Frame the presence: radius 1 should fill ~72 % of the narrower half-extent.
+    const halfV = Math.tan((this.camera.fov * Math.PI) / 360);
+    const halfH = halfV * this.camera.aspect;
+    const narrow = Math.min(halfV, halfH);
+    const portrait = h > w;
+    this.baseDistance = 1 / ((portrait ? 0.72 : 0.52) * narrow);
+    this.baseDistance = THREE.MathUtils.clamp(this.baseDistance, 3.2, 8.5);
+    this.viewportScale = 1;
+    // Where the ember sits: top corner inside the safe area.
+    const edgeX = halfH * this.baseDistance;
+    const edgeY = halfV * this.baseDistance;
+    // Ember: 64 px diameter, tucked under the top bar in the corner.
+    const pxPerUnit = h / 2 / (halfV * this.baseDistance);
+    const emberScale = 18 / pxPerUnit; // radius 1 → 18 px (≈64 px with its glow)
+    this.presence.setFraming(this.baseDistance, emberScale);
+    const pad = 50 / pxPerUnit;
+    this.presence.emberOffset.set(edgeX - pad - emberScale, edgeY - (74 + 44) / pxPerUnit, 0);
+    this.director.onResize(w, h, this.baseDistance);
   };
 
-  private onMouseMove = (e: MouseEvent) => {
-    if (this.prefersReducedMotion) return;
-    this.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-    this.mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-    // Parallax +/- 3 deg
-    this.targetRotY = this.mouseX * 0.052;
-    this.targetRotX = -this.mouseY * 0.052;
-  };
-
-  private onDeviceOrientation = (e: DeviceOrientationEvent) => {
-    if (this.prefersReducedMotion) return;
-    if (e.gamma !== null && e.beta !== null) {
-      const clampedGamma = Math.max(-30, Math.min(30, e.gamma));
-      const clampedBeta = Math.max(-30, Math.min(30, e.beta - 45));
-      this.targetRotY = (clampedGamma / 30) * 0.052;
-      this.targetRotX = (clampedBeta / 30) * 0.052;
-    }
-  };
-
-  private onVisibilityChange = () => {
+  private onVisibility = () => {
     if (document.hidden) {
-      this.isPaused = true;
+      this.paused = true;
+      cancelAnimationFrame(this.raf);
     } else {
-      this.isPaused = false;
-      this.clock.getDelta(); // reset delta
-      if (this.isRunning) {
-        this.loop();
-      }
+      this.paused = false;
+      this.clock.getDelta();
+      if (this.running) this.loop();
     }
   };
 
-  public start() {
-    if (this.isRunning) return;
-    this.isRunning = true;
+  start() {
+    if (this.running) return;
+    this.running = true;
     this.clock.start();
     this.loop();
   }
 
-  public stop() {
-    this.isRunning = false;
-    cancelAnimationFrame(this.animationFrameId);
+  stop() {
+    this.running = false;
+    cancelAnimationFrame(this.raf);
+  }
+
+  setExposure(v: number) {
+    this.exposureTarget = v;
   }
 
   private loop = () => {
-    if (!this.isRunning || this.isPaused) return;
-
-    this.animationFrameId = requestAnimationFrame(this.loop);
-
+    if (!this.running || this.paused) return;
+    this.raf = requestAnimationFrame(this.loop);
     const now = performance.now();
-    this.perfMonitor.recordFrame(now);
+    this.perf.record(now);
+    const dt = Math.min(this.clock.getDelta(), 0.08);
+    const t = this.clock.elapsedTime;
 
-    const delta = Math.min(this.clock.getDelta(), 0.1);
-    const elapsedTime = this.clock.getElapsedTime();
-
-    // Camera sinusoidal breathing (+/- 1.5% over 8s)
-    if (!this.prefersReducedMotion) {
-      const breathing = Math.sin((elapsedTime / 8) * Math.PI * 2) * 0.048;
-      const timelineZOffset = this.director.timelineWorld ? this.director.timelineWorld.cameraOffsetZ * 0.25 : 0;
-      this.camera.position.z = this.cameraBaseZ + breathing + timelineZOffset;
-
-      // Smooth camera parallax
-      this.currentRotX += (this.targetRotX - this.currentRotX) * (delta * 4.0);
-      this.currentRotY += (this.targetRotY - this.currentRotY) * (delta * 4.0);
-      this.camera.rotation.x = this.currentRotX;
-      this.camera.rotation.y = this.currentRotY;
+    // Camera: breathing dolly ±1.5 % over 8 s, tilt parallax ±3°, per-world offset.
+    const breathe = REDUCED ? 0 : Math.sin((t / 8) * Math.PI * 2) * 0.015;
+    const k = Math.min(1, dt * 4);
+    if (!REDUCED) {
+      this.tilt.x += (this.tiltTarget.x - this.tilt.x) * k;
+      this.tilt.y += (this.tiltTarget.y - this.tilt.y) * k;
     }
+    const cam = this.director.cameraState();
+    const dist = this.baseDistance * (1 + breathe) * cam.dolly;
+    this.camera.position.set(cam.target.x + Math.sin(this.tilt.x * 0.052) * dist, cam.target.y + Math.sin(this.tilt.y * 0.052) * dist, cam.target.z + dist);
+    this.camera.lookAt(cam.target);
 
-    // Update SceneDirector
-    this.director.update(delta, this.audioLevels, this.micLevel, this.prefersReducedMotion);
+    this.director.update(dt, this.audio, this.mic);
+    this.presence.update(dt, this.audio, this.mic, REDUCED, this.viewportScale);
 
-    // Dynamic bloom pass modulation
-    this.bloomPass.strength = this.presence.currentBloom;
-
-    // Render post-processed scene
+    this.bloom.strength += ((this.director.bloomOverride ?? this.presence.bloom) - this.bloom.strength) * Math.min(1, dt * 6);
+    this.renderer.toneMappingExposure += (this.exposureTarget * cam.exposure - this.renderer.toneMappingExposure) * Math.min(1, dt * 4);
     this.composer.render();
-
-    // Update film grain
     this.grain.update(now);
   };
 
-  public dispose() {
+  dispose() {
     this.stop();
-    window.removeEventListener('resize', this.onResize);
-    window.removeEventListener('mousemove', this.onMouseMove);
-    window.removeEventListener('deviceorientation', this.onDeviceOrientation);
-    document.removeEventListener('visibilitychange', this.onVisibilityChange);
-    this.unsubscribes.forEach((unsub) => unsub());
-
+    window.removeEventListener('resize', this.resize);
+    window.removeEventListener('pointermove', this.onPointer);
+    document.removeEventListener('visibilitychange', this.onVisibility);
+    this.unsubs.forEach((u) => u());
     this.director.dispose();
     this.presence.dispose();
+    this.composer.dispose();
     this.renderer.dispose();
-    if (this.canvas3d.parentElement) {
-      this.canvas3d.parentElement.removeChild(this.canvas3d);
-    }
-    if (this.canvas2d.parentElement) {
-      this.canvas2d.parentElement.removeChild(this.canvas2d);
-    }
+    this.canvas3d.remove();
+    this.canvas2d.remove();
   }
 }

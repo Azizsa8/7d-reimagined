@@ -1,373 +1,188 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { bus } from '../state/bus';
-import { Stage } from '../stage/Stage';
-import { WorldName } from '../stage/SceneDirector';
-import { HUBS } from '../stage/worlds/GlobeWorld';
-import { SupportedLang } from '../config';
-import { soundDesign } from '../stage/audio/SoundDesign';
+import { bus, type WorldName } from '../state/bus';
+import type { SupportedLang } from '../config';
+import { t } from '../i18n/strings';
+import { MailIcon, PhoneIcon, GlobeIcon, PinIcon } from './Icons';
 
-interface WorldOverlayProps {
-  stage: Stage | null;
+interface Props {
   lang: SupportedLang;
-  onAskQuestion?: (query: string) => void;
+  onAsk: (q: string) => void;
+  onFocus: (world: WorldName, params: Record<string, unknown>) => void;
+  onHome: () => void;
 }
 
-export const WorldOverlay: React.FC<WorldOverlayProps> = ({
-  stage,
-  lang,
-  onAskQuestion,
-}) => {
-  const [activeWorld, setActiveWorld] = useState<WorldName>('presence');
-  const [globeLabel, setGlobeLabel] = useState({ city: '', country: '', opacity: 0 });
-  const [projectData, setProjectData] = useState<any>(null);
-  const [timelineData, setTimelineData] = useState<any>(null);
-  const [personData, setPersonData] = useState<any>(null);
-  const [disciplineData, setDisciplineData] = useState<any>(null);
-  const [figureData, setFigureData] = useState<any>(null);
-  const [contactData, setContactData] = useState<any>(null);
-
-  const isAr = lang === 'ar';
-
+/** Title blocks and cards for the seven worlds. Everything shown comes from the KB via the world's overlay data. */
+export const WorldOverlay: React.FC<Props> = ({ lang, onAsk, onFocus, onHome }) => {
+  const [world, setWorld] = useState<WorldName>('presence');
+  const [all, setAll] = useState<Partial<Record<WorldName, any>>>({});
+  const data = all[world] || null;
   useEffect(() => {
-    const unsub = bus.on('show_world', (payload: { world: WorldName; params?: any }) => {
-      setActiveWorld(payload.world);
-      soundDesign.playClick();
+    const a = bus.on('worldActive', (w) => {
+      setWorld(w);
     });
-
-    // Poll current world state from Stage director
-    const interval = setInterval(() => {
-      if (!stage || !stage.director) return;
-      const curr = stage.director.current();
-      setActiveWorld(curr.name);
-
-      if (curr.name === 'globe' && stage.director.globeWorld) {
-        setGlobeLabel({ ...stage.director.globeWorld.activeHubLabel });
-      } else if (curr.name === 'project' && stage.director.projectWorld) {
-        setProjectData({ ...stage.director.projectWorld.overlay });
-      } else if (curr.name === 'timeline' && stage.director.timelineWorld) {
-        setTimelineData({ ...stage.director.timelineWorld.overlay });
-      } else if (curr.name === 'people' && stage.director.peopleWorld) {
-        setPersonData({ ...stage.director.peopleWorld.overlay });
-      } else if (curr.name === 'disciplines' && stage.director.disciplinesWorld) {
-        setDisciplineData({ ...stage.director.disciplinesWorld.overlay });
-      } else if (curr.name === 'figure' && stage.director.figureWorld) {
-        setFigureData({ ...stage.director.figureWorld.overlay });
-      } else if (curr.name === 'contact' && stage.director.contactWorld) {
-        setContactData({ ...stage.director.contactWorld.overlay });
-      }
-    }, 100);
-
+    const b = bus.on('overlay', (o) => setAll((m) => ({ ...m, [o.world]: o.data })));
     return () => {
-      unsub();
-      clearInterval(interval);
+      a();
+      b();
     };
-  }, [stage]);
-
-  const handleReturnToPresence = () => {
-    bus.emit('show_world', { world: 'presence' });
-    soundDesign.playClick();
-  };
-
-  const handleHubClick = (hubId: string) => {
-    if (stage?.director?.globeWorld) {
-      stage.director.globeWorld.focusHub(hubId, lang);
-      soundDesign.playClick();
-    }
-  };
-
-  const handleProjectChipClick = (projectName: string) => {
-    if (onAskQuestion) {
-      const q = isAr ? `احكي لي عن ${projectName}` : `Tell me about ${projectName}`;
-      onAskQuestion(q);
-      soundDesign.playClick();
-    }
-  };
-
-  if (activeWorld === 'presence') {
-    return null;
-  }
+  }, []);
+  const s = t(lang);
+  if (world === 'presence' || !data) return null;
+  const isAr = lang === 'ar';
+  const pct = (x: number) => `${Math.min(90, Math.max(10, ((x + 1) / 2) * 100))}%`;
+  const pctY = (y: number) => `${((1 - y) / 2) * 100}%`;
 
   return (
-    <div
-      id="world-overlay-container"
-      className="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-6 sm:p-10"
-      dir={isAr ? 'rtl' : 'ltr'}
-    >
-      {/* Top Bar: Return to Savannah presence button */}
-      <div className="flex items-center justify-between w-full">
-        <motion.button
-          id="btn-return-presence"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          onClick={handleReturnToPresence}
-          className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/10 text-xs text-[#F4F1EA] backdrop-blur-md transition-all active:scale-95 shadow-lg"
-        >
-          <span className="w-2 h-2 rounded-full bg-[#E0A94A] animate-pulse" />
-          <span>{isAr ? 'العودة إلى سفانة' : 'Return to Savannah'}</span>
-        </motion.button>
-
-        {/* Ember indicator label */}
-        <div className="text-[11px] font-mono tracking-widest text-[#E0A94A]/70 uppercase">
-          7D · {activeWorld}
-        </div>
+    <div className="overlay" dir={isAr ? 'rtl' : 'ltr'} lang={lang}>
+      <div className="sr-only" aria-live="polite">{s.showing}: {data.name || data.city || data.focus?.name || data.focus?.title || data.label || ''}</div>
+      <div className="overlay-top">
+        <button className="back-pill" onClick={onHome}><i />{s.returnToSavannah}</button>
       </div>
 
-      {/* World-specific overlays */}
-      <div className="w-full max-w-2xl mx-auto mb-20 pointer-events-auto">
-        <AnimatePresence mode="wait">
-          {/* 1. GLOBE WORLD OVERLAY */}
-          {activeWorld === 'globe' && globeLabel.city && (
-            <motion.div
-              key="overlay-globe"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/75 border border-[#E0A94A]/25 backdrop-blur-xl shadow-2xl"
-            >
-              <div className="flex flex-col gap-1">
-                <div className="text-xs font-mono tracking-wider text-[#E0A94A] uppercase">
-                  {isAr ? 'شبكة مراكز 7D العالمية' : '7D Global Hubs Network'}
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-bold font-['Michroma',sans-serif] text-[#F4F1EA]">
-                  {globeLabel.city}
-                </h2>
-                <p className="text-sm text-[#A7A39A]">{globeLabel.country}</p>
-              </div>
+      {world === 'project' && (
+        <>
+          <div className="title-block">
+            <span className="eyebrow">{data.location}</span>
+            <h2>
+              {data.name}
+              {data.concept && <span className="badge">{s.conceptBadge}</span>}
+            </h2>
+            <div className={`accent ${data.pulse ? 'pulse' : ''}`} />
+            <p className="role">{data.role}</p>
+          </div>
+          {data.chip && <div className="figure-chip">{data.chip}</div>}
+        </>
+      )}
 
-              {/* Quick Hub switcher pills */}
-              <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10">
-                {HUBS.map((h) => (
-                  <button
-                    key={h.id}
-                    id={`btn-hub-${h.id}`}
-                    onClick={() => handleHubClick(h.id)}
-                    className="px-3 py-1 rounded-full text-xs bg-white/[0.06] hover:bg-[#E0A94A]/20 hover:border-[#E0A94A]/40 border border-white/10 text-[#F4F1EA] transition-all"
-                  >
-                    {isAr ? h.cityAr : h.cityEn}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
+      {world === 'globe' && (
+        <>
+          {data.label && data.city && (
+            <div className="anchor-label" style={{ left: pct(data.label.x), top: pctY(data.label.y) }} key={data.focus}>
+              <div className="city">{data.city}</div>
+              <div className="country">{data.country}</div>
+            </div>
           )}
+          <div className="title-block">
+            <span className="eyebrow">{s.hubs}</span>
+            {data.city ? (
+              <>
+                <h2>{data.city}</h2>
+                <div className="accent" />
+                <p className="role">{data.role}</p>
+              </>
+            ) : (
+              <h2>{isAr ? 'خمس قارات' : 'Five continents'}</h2>
+            )}
+          </div>
+          <div className="hub-row">
+            {data.hubs?.map((h: any) => (
+              <button key={h.id} className={h.id === data.focus ? 'on' : ''} onClick={() => onFocus('globe', { focus: h.id })}>{h.city}</button>
+            ))}
+          </div>
+        </>
+      )}
 
-          {/* 2. PROJECT WORLD OVERLAY */}
-          {activeWorld === 'project' && projectData && (
-            <motion.div
-              key="overlay-project"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/80 border border-[#E0A94A]/25 backdrop-blur-xl shadow-2xl"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono text-[#E0A94A] tracking-wider uppercase">
-                  {projectData.location}
-                </span>
-                {projectData.isConcept && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                    {isAr ? 'تصميم مفاهيمي' : 'Concept Design'}
-                  </span>
-                )}
+      {world === 'timeline' && data.focus && (
+        <>
+          <div className="milestone-card" key={data.focus.id}>
+            <span className="year">{data.focus.year}</span>
+            <h3>{data.focus.title}</h3>
+            <p>{data.focus.detail}</p>
+          </div>
+          <div className="year-row">
+            {data.years?.map((y: any) => (
+              <button key={y.id} className={y.active ? 'on' : ''} onClick={() => onFocus('timeline', { id: y.id })}>{y.year}</button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {world === 'people' && (
+        <>
+          {data.people?.map((p: any) => (
+            <div key={p.id} className={`star-label ${p.active ? 'on' : ''}`} style={{ left: pct(p.x), top: pctY(p.y) }} onClick={() => onFocus('people', { id: p.id })}>
+              <div className="n">{p.name}</div>
+              <div className="t">{p.title}</div>
+            </div>
+          ))}
+          {data.focus && (
+            <div className="person-card" key={data.focus.id}>
+              <Portrait url={data.focus.portrait} initials={data.focus.initials} alt={data.focus.name} />
+              <div>
+                <h3>{data.focus.name}</h3>
+                <div className="alt" lang={isAr ? 'en' : 'ar'} dir={isAr ? 'ltr' : 'rtl'}>{data.focus.nameOther}</div>
+                <div className="title">{data.focus.title}</div>
+                <p>{data.focus.bio}</p>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold font-['Michroma',sans-serif] text-[#F4F1EA] tracking-wide">
-                {projectData.name}
-              </h2>
-              <div
-                className={`h-0.5 my-3 bg-gradient-to-r from-[#E0A94A] to-transparent transition-all duration-300 ${
-                  projectData.pulseFact ? 'scale-y-150 brightness-150' : 'opacity-60'
-                }`}
-              />
-              <p className="text-sm font-medium text-[#C8AA7C]">{projectData.role}</p>
-            </motion.div>
+            </div>
           )}
+        </>
+      )}
 
-          {/* 3. TIMELINE WORLD OVERLAY */}
-          {activeWorld === 'timeline' && timelineData && (
-            <motion.div
-              key="overlay-timeline"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/80 border border-[#E0A94A]/25 backdrop-blur-xl shadow-2xl"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#E0A94A] text-black">
-                  {timelineData.year}
-                </span>
-                <span className="text-xs font-mono text-[#A7A39A] uppercase tracking-wider">
-                  {isAr ? 'محطة فارقة في تاريخ 7D' : '7D Milestone'}
-                </span>
+      {world === 'disciplines' && (
+        <>
+          {data.items?.map((d: any) =>
+            d.active ? null : (
+              <div key={d.id} className="instrument-label" style={{ left: pct(d.x), top: pctY(d.y) }} onClick={() => onFocus('disciplines', { id: d.id })}>
+                {d.name}
               </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-[#F4F1EA] mb-1">
-                {timelineData.title}
-              </h3>
-              <p className="text-sm text-[#A7A39A] leading-relaxed">{timelineData.detail}</p>
-            </motion.div>
+            ),
           )}
-
-          {/* 4. PEOPLE WORLD OVERLAY */}
-          {activeWorld === 'people' && personData && (
-            <motion.div
-              key="overlay-people"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/80 border border-[#E0A94A]/25 backdrop-blur-xl shadow-2xl flex items-start gap-4"
-            >
-              {/* Michroma Monogram in brass ring */}
-              <div className="w-14 h-14 rounded-full border border-[#E0A94A] flex items-center justify-center bg-[#E0A94A]/10 shrink-0 shadow-[0_0_15px_rgba(224,169,74,0.3)]">
-                <span className="font-['Michroma',sans-serif] text-base font-bold text-[#F4F1EA]">
-                  {personData.initials}
-                </span>
-              </div>
-              <div className="flex-1">
-                <div className="flex flex-col">
-                  <h3 className="text-xl font-bold text-[#F4F1EA]">
-                    {isAr ? personData.nameAr : personData.name}
-                  </h3>
-                  <span className="text-xs font-semibold text-[#E0A94A] mb-2">
-                    {personData.title}
-                  </span>
-                </div>
-                <p className="text-xs sm:text-sm text-[#A7A39A] leading-relaxed">
-                  {personData.bio}
-                </p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* 5. DISCIPLINES WORLD OVERLAY */}
-          {activeWorld === 'disciplines' && disciplineData && (
-            <motion.div
-              key="overlay-disciplines"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/80 border border-[#2FA98B]/30 backdrop-blur-xl shadow-2xl"
-            >
-              <div className="text-xs font-mono text-[#2FA98B] tracking-wider uppercase mb-1">
-                {isAr ? 'تخصصات سفن دي السبعة' : '7D Core Disciplines'}
-              </div>
-              <h3 className="text-2xl font-bold font-['Michroma',sans-serif] text-[#F4F1EA] mb-2">
-                {disciplineData.name}
-              </h3>
-              <p className="text-sm text-[#A7A39A] leading-relaxed mb-4">
-                {disciplineData.summary}
-              </p>
-
-              {/* Related project chips */}
-              {disciplineData.relatedProjects && disciplineData.relatedProjects.length > 0 && (
-                <div>
-                  <div className="text-[11px] text-[#C8AA7C] font-semibold mb-2">
-                    {isAr ? 'مشاريع مرتبطة (انقر للسؤال عنها):' : 'Related Projects (tap to explore):'}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {disciplineData.relatedProjects.map((proj: string, idx: number) => (
-                      <button
-                        key={idx}
-                        id={`btn-disc-proj-${idx}`}
-                        onClick={() => handleProjectChipClick(proj)}
-                        className="px-3 py-1 rounded-full text-xs bg-[#2FA98B]/15 hover:bg-[#2FA98B]/30 border border-[#2FA98B]/40 text-[#F4F1EA] transition-all"
-                      >
-                        {proj}
-                      </button>
-                    ))}
-                  </div>
+          {data.focus ? (
+            <div className="discipline-card" key={data.focus.id}>
+              <span className="eyebrow">{s.disciplines}</span>
+              <h3>{data.focus.name}</h3>
+              <p>{data.focus.summary}</p>
+              {data.focus.related?.length > 0 && (
+                <div className="related">
+                  {data.focus.related.map((r: any) => (
+                    <button key={r.id} onClick={() => onAsk(isAr ? `احكي لي عن ${r.name}` : `Tell me about ${r.name}`)}>{r.name}</button>
+                  ))}
                 </div>
               )}
-            </motion.div>
+            </div>
+          ) : (
+            <div className="title-block">
+              <span className="eyebrow">{s.disciplines}</span>
+              <h2>{isAr ? 'سبعة تخصصات' : 'Seven disciplines'}</h2>
+            </div>
           )}
+        </>
+      )}
 
-          {/* 6. FIGURE WORLD OVERLAY */}
-          {activeWorld === 'figure' && figureData && (
-            <motion.div
-              key="overlay-figure"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/80 border border-[#E0A94A]/25 backdrop-blur-xl shadow-2xl text-center"
-            >
-              <div className="text-4xl sm:text-5xl font-bold font-['Michroma',sans-serif] text-[#E0A94A] mb-2">
-                {figureData.value}
-              </div>
-              <h3 className="text-lg font-semibold text-[#F4F1EA] mb-1">
-                {figureData.label}
-              </h3>
-              <p className="text-xs sm:text-sm text-[#A7A39A]">
-                {figureData.detail}
-              </p>
-            </motion.div>
-          )}
+      {world === 'figure' && (
+        <div className="figure-block">
+          <div className="label">{data.label}</div>
+        </div>
+      )}
 
-          {/* 7. CONTACT WORLD OVERLAY */}
-          {activeWorld === 'contact' && contactData && (
-            <motion.div
-              key="overlay-contact"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="p-6 rounded-2xl bg-[#0B0D12]/85 border border-[#E0A94A]/30 backdrop-blur-xl shadow-2xl"
-            >
-              <div className="text-xs font-mono text-[#E0A94A] tracking-wider uppercase mb-1">
-                {isAr ? 'قنوات التواصل الرسمية' : 'Official Channels'}
-              </div>
-              <h3 className="text-2xl font-bold font-['Michroma',sans-serif] text-[#F4F1EA] mb-4">
-                7D International
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <a
-                  href={`mailto:${contactData.generalEmail}`}
-                  className="p-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-all flex flex-col"
-                >
-                  <span className="text-[11px] text-[#C8AA7C] font-mono">
-                    {isAr ? 'البريد العام' : 'General Inquiries'}
-                  </span>
-                  <span className="text-sm font-semibold text-[#F4F1EA] truncate">
-                    {contactData.generalEmail}
-                  </span>
-                </a>
-
-                <a
-                  href={`mailto:${contactData.chairmanEmail}`}
-                  className="p-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-all flex flex-col"
-                >
-                  <span className="text-[11px] text-[#C8AA7C] font-mono">
-                    {isAr ? 'مكتب رئيس مجلس الإدارة' : "Chairman's Office"}
-                  </span>
-                  <span className="text-sm font-semibold text-[#F4F1EA] truncate">
-                    {contactData.chairmanEmail}
-                  </span>
-                </a>
-
-                <a
-                  href={contactData.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-all flex flex-col"
-                >
-                  <span className="text-[11px] text-[#C8AA7C] font-mono">
-                    {isAr ? 'الموقع الرسمي' : 'Official Website'}
-                  </span>
-                  <span className="text-sm font-semibold text-[#F4F1EA]">
-                    {contactData.website}
-                  </span>
-                </a>
-
-                <div className="p-3 rounded-xl bg-white/[0.05] border border-white/10 flex flex-col">
-                  <span className="text-[11px] text-[#C8AA7C] font-mono">
-                    {isAr ? 'مقر الرياض' : 'Riyadh Headquarters'}
-                  </span>
-                  <span className="text-xs text-[#F4F1EA] leading-snug">
-                    {contactData.riyadhOffice}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {world === 'contact' && (
+        <div className="contact-card card">
+          <img src="/brand/7d-logo.png" alt="7D International" />
+          <span className="eyebrow">{s.contact}</span>
+          <a className="contact-row" href={`mailto:${data.email}`}>
+            <span><small>{isAr ? 'الإيميل' : 'Email'}</small>{data.email}</span>
+            <MailIcon />
+          </a>
+          <a className="contact-row" href={`tel:${String(data.phone).replace(/\s/g, '')}`}>
+            <span><small>{isAr ? 'الهاتف' : 'Phone'}</small><span dir="ltr">{data.phone}</span></span>
+            <PhoneIcon />
+          </a>
+          <a className="contact-row" href={data.website} target="_blank" rel="noreferrer">
+            <span><small>{s.website}</small>{data.websiteLabel}</span>
+            <GlobeIcon />
+          </a>
+          <div className="contact-row">
+            <span><small>{s.offices}</small>{(data.offices || []).join(' · ')}</span>
+            <PinIcon />
+          </div>
+        </div>
+      )}
     </div>
   );
+};
+
+const Portrait: React.FC<{ url: string | null; initials: string; alt: string }> = ({ url, initials, alt }) => {
+  const [ok, setOk] = useState(!!url);
+  return <div className="portrait">{url && ok ? <img src={url} alt={alt} onError={() => setOk(false)} /> : <span>{initials}</span>}</div>;
 };

@@ -1,931 +1,426 @@
 {
   "meta": {
-    "version": "2.0.0",
-    "updated": "2026-09-13",
+    "name": "Savannah knowledge base — 7D International",
+    "version": "1.0.0",
+    "compiled": "2026-09-13",
     "status_legend": {
-      "verified": "Officially validated against published 7D records and authorized contracts.",
-      "official": "Directly published in official corporate materials and partnership agreements.",
-      "concept": "Visionary conceptual study or master planning concept.",
-      "historical": "Documented historical milestone or legacy work."
+      "official": "Published on the current 7dint.net site.",
+      "official_archive": "Published by 7D in the past (7dint.com 2015–2016, company profile PDF c.2015, earlier 7dint.net). Not on today's site.",
+      "registry": "Public company register (Czech ARES, Florida Sunbiz).",
+      "concept": "A design concept or proposal, not a delivered building."
     },
-    "approval_policy": "In production mode with KB_APPROVED_ONLY=true, any record where approved is false will be omitted from active retrieval.",
+    "approval": "Every record carries approved:false until 7D International confirms it for public voice use. The prototype may use all records; the public launch uses only approved:true.",
     "global_voice_rules": [
-      "Always speak in short, natural conversational sentences. Keep spoken answers between 2 and 4 sentences.",
-      "Never invent facts, projects, figures, or claims not explicitly present in the 7D knowledge base.",
-      "Lists must be capped at 3 items maximum when spoken.",
-      "Never say 7D built King Abdullah Park; 7D executed the dancing fountain in partnership with PF Korea and Gawdat Group.",
-      "Never claim 7D built or solely designed King Abdullah International Gardens; 7D launched the project alongside national entities and consortia.",
-      "Riyadh Eye is a concept design study, not an open attraction that visitors can ride today.",
-      "1,500 refers to telecommunication base stations rolled out across Europe and Australasia, not 1,500 projects.",
-      "Do not disclose confidential topics including polysilicon/Jubail plant, employee counts, revenue, financial figures, or awards.",
-      "Do not provide personal phone numbers; provide official emails info@7dint.net or chairman@7dint.net.",
-      "Never read JSON, ids, URLs, or tool names aloud."
+      "Speak only from this file. If something is not here, say you don't have that detail and offer the team's contact.",
+      "Describe 7D's role in any project only in the words given in role_as_stated. Never upgrade 'involved in', 'launched' or 'executed in association with' into 'designed and built'.",
+      "Never give a completion year for a project; 7D's own sources disagree on dates.",
+      "The Riyadh Eye and 7D World are concepts. Always say so.",
+      "Never state employee numbers, revenue, contract values other than those in figures, or awards.",
+      "Never mention anything in do_not_say, even if the visitor raises it. Say you can't speak to it and offer the team's contact.",
+      "Give only the general contact channels unless the visitor asks specifically how to reach the chairman's or CEO's office; then give the role email only, never a personal mobile number.",
+      "Say '7D' as 'seven D' in English and 'سفن دي' in Arabic."
     ]
   },
+
   "company": {
-    "id": "7d-international",
-    "name": "7D International",
-    "name_ar": "سفن دي إنترناشونال",
-    "tagline_en": "Bridging visionary architecture with disciplined execution across continents.",
-    "tagline_ar": "الربط بين العمارة الرؤيوية والتنفيذ المنضبط عبر القارات.",
+    "id": "company",
+    "status": "official",
+    "approved": false,
+    "name": { "en": "7D International", "ar": "سفن دي إنترناشونال" },
+    "descriptor": { "en": "Global Contracting & Consulting", "ar": "مقاولات واستشارات عالمية" },
+    "headline_as_published": "Architects of Global Identity.",
     "roots": {
-      "year": 1993,
-      "location": "Ostrava, Czech Republic",
-      "location_ar": "أوسترافا، جمهورية التشيك",
-      "heritage": "Founded in 1993 by architect Roman Kuba as Atelier Simona, evolving into an international contracting and consulting firm.",
-      "heritage_ar": "تأسست عام ١٩٩٣ على يد المعماري رومان كوبا تحت اسم أتيليه سيمونا، وتطورت لتصبح شركة مقاولات واستشارات دولية."
+      "en": "7D traces its roots to 1993 in the Czech Republic, where Pulec Finance and Banking marked the start of its journey in consulting. The group grew out of several companies, including Aus-consult in Australia and the Atelier Simona architecture studio in Ostrava.",
+      "ar": "ترجع جذور سفن دي إلى سنة ١٩٩٣ في جمهورية التشيك، مع شركة بوليك للتمويل والمصرفية اللي كانت بداية مشوارها في الاستشارات. وتكوّنت المجموعة من عدة شركات، منها أوس كونسلت في أستراليا واستوديو أتيليه سيمونا للعمارة في أوسترافا."
     },
-    "hqs": {
-      "global": {
-        "city": "Florida",
-        "country": "USA",
-        "label": "Global Headquarters",
-        "label_ar": "المقر الرئيسي العالمي"
-      },
-      "middle_east": {
-        "city": "Riyadh",
-        "country": "Saudi Arabia",
-        "label": "Middle East Headquarters",
-        "label_ar": "المقر الإقليمي للشرق الأوسط"
-      }
-    },
-    "vision": {
-      "en": "To bridge visionary architecture with disciplined execution, delivering sustainable landmarks across continents.",
-      "ar": "الربط بين العمارة الرؤيوية والتنفيذ المنضبط، لتقديم معالم مستدامة عبر القارات."
-    },
-    "mission": {
-      "en": "Delivering complex architectural, master planning, engineering, and multimedia infrastructure through multidisciplinary expertise and strategic alliances.",
-      "ar": "تنفيذ مشاريع العمارة والتخطيط الشامل والهندسة والبنية التحتية متعددة الوسائط المعقدة من خلال خبرات متكاملة وتحالفات استراتيجية."
-    },
+    "headquarters": { "en": "Florida, United States", "ar": "ولاية فلوريدا، الولايات المتحدة" },
+    "middle_east_headquarters": { "en": "Riyadh, Saudi Arabia", "ar": "الرياض، المملكة العربية السعودية" },
+    "reach": { "en": "Work delivered across five continents; operations named in Austria, Saudi Arabia, South Korea and Australia, alongside the United States and the Czech Republic.", "ar": "أعمال في خمس قارات، ونشاط في النمسا والسعودية وكوريا الجنوبية وأستراليا، إضافة إلى الولايات المتحدة وجمهورية التشيك." },
+    "vision_as_published": "We provide a full range of services connected with civil engineering projects of all dimensions. Through a strong commitment to superior design, we intend to make our mark on the global stage by contributing to architecture and environment design.",
+    "vision_ar": "نقدّم مجموعة متكاملة من الخدمات المرتبطة بمشاريع الهندسة المدنية بكل أحجامها. ومن خلال التزامنا بالتصميم المتميز، نطمح أن نترك بصمتنا عالميًا بالمساهمة في العمارة وتصميم البيئة.",
+    "mission_as_published": "7D International is eager to embody ambitious projects in architecture, civil engineering and infrastructure development. From city planning and zoning to city maintenance and further development — we ensure our solutions are properly realized and scalable.",
+    "mission_ar": "تسعى سفن دي إنترناشونال لتجسيد مشاريع طموحة في العمارة والهندسة المدنية وتطوير البنية التحتية. من تخطيط المدن وتقسيم الأراضي إلى صيانتها وتطويرها، نضمن إن حلولنا تتنفذ صح وقابلة للتوسع.",
+    "chairman_message_as_published": "Having completed many successful projects in Asia, Europe and America, our goal remains to deliver excellence without compromise.",
     "operating_model": {
-      "en": "Direct multidisciplinary delivery combined with strategic international and regional partnerships (including Takween Alrajhi, PF Korea, and Gawdat Group).",
-      "ar": "نموذج تشغيلي يجمع بين التنفيذ المباشر متعدد التخصصات والتحالفات الاستراتيجية الدولية والإقليمية (بما فيها تكوين الراجحي، وبي إف كوريا، ومجموعة جودت)."
+      "contracting": { "en": ["EPC solutions", "Procurement liaison", "On-site execution"], "ar": ["حلول الهندسة والتوريد والإنشاء", "تنسيق المشتريات", "التنفيذ في الموقع"] },
+      "consulting": { "en": ["Risk assessment", "Feasibility studies", "Strategic advisory"], "ar": ["تقييم المخاطر", "دراسات الجدوى", "الاستشارات الاستراتيجية"] }
     },
     "legal_entities": [
-      "7D International LLC (Florida, USA)",
-      "7D International Co. (Riyadh, Saudi Arabia)",
-      "Atelier Simona s.r.o. (Czech Republic)"
+      { "name": "7D International a.s.", "jurisdiction": "Czech Republic", "detail": "Registered seat in Ostrava; named 7D International a.s. since 23 January 2014.", "status": "registry" },
+      { "name": "7 D International USA Corp.", "jurisdiction": "Florida, USA", "detail": "Active Florida corporation with its principal address in Tampa.", "status": "registry" }
     ],
-    "status": "verified",
-    "approved": true,
-    "aliases": ["7d", "7d international", "company", "firm", "سفن دي", "سفن دي إنترناشونال", "الشركة"],
-    "source": "official"
+    "aliases": ["7D", "seven D", "7D International", "the company", "سفن دي", "سفن دي إنترناشونال", "الشركة"],
+    "sources": ["https://7dint.net/", "https://7dint.net/about/", "https://7dint.net/industries/", "https://7dint.net/contact/"]
   },
+
   "hubs": [
-    {
-      "id": "riyadh",
-      "name": "Riyadh Hub",
-      "name_ar": "مركز الرياض",
-      "city": "Riyadh",
-      "city_ar": "الرياض",
-      "country": "Saudi Arabia",
-      "country_ar": "المملكة العربية السعودية",
-      "coordinates": [24.7136, 46.6753],
-      "role": "Middle East Headquarters & Strategic Operations",
-      "role_ar": "المقر الإقليمي للشرق الأوسط والعمليات الاستراتيجية",
-      "summary_en": "7D's Middle East headquarters in Riyadh anchors major development projects, giga-project consultancy, and strategic partnerships across Saudi Arabia.",
-      "summary_ar": "المقر الإقليمي لسفن دي في الرياض يقود المشاريع الكبرى والاستشارات التنموية والشراكات الاستراتيجية في المملكة.",
-      "order": 1,
-      "aliases": ["riyadh", "saudi", "ksa", "الرياض", "السعودية", "المملكة", "middle east"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "florida",
-      "name": "Florida Hub",
-      "name_ar": "مركز فلوريدا",
-      "city": "Florida",
-      "city_ar": "فلوريدا",
-      "country": "USA",
-      "country_ar": "الولايات المتحدة الأمريكية",
-      "coordinates": [27.9506, -82.4572],
-      "role": "Global Headquarters & Executive Management",
-      "role_ar": "المقر الرئيسي العالمي والإدارة التنفيذية",
-      "summary_en": "7D's global headquarters in Florida steers corporate governance, international business development, and Americas operations.",
-      "summary_ar": "المقر العالمي لسفن دي في فلوريدا يدير الحوكمة المؤسسية وتطوير الأعمال الدولية وعمليات الأمريكيتين.",
-      "order": 2,
-      "aliases": ["florida", "usa", "america", "فلوريدا", "أمريكا", "tampa"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "ostrava",
-      "name": "Ostrava Hub",
-      "name_ar": "مركز أوسترافا",
-      "city": "Ostrava",
-      "city_ar": "أوسترافا",
-      "country": "Czech Republic",
-      "country_ar": "جمهورية التشيك",
-      "coordinates": [49.8209, 18.2625],
-      "role": "European Roots & Engineering Heritage",
-      "role_ar": "الجذور الأوروبية والإرث الهندسي",
-      "summary_en": "Founded in 1993 as Atelier Simona, the Ostrava hub embodies 7D's foundational European design craft, structural engineering, and heritage.",
-      "summary_ar": "تأسس عام ١٩٩٣ تحت اسم أتيليه سيمونا، ويمثل مركز أوسترافا الحرفية المعمارية الأوروبية والإرث الهندسي لسفن دي.",
-      "order": 3,
-      "aliases": ["ostrava", "czech", "czech republic", "أوسترافا", "التشيك", "europe", "atelier simona"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "seoul",
-      "name": "Seoul Hub",
-      "name_ar": "مركز سيول",
-      "city": "Seoul",
-      "city_ar": "سيول",
-      "country": "South Korea",
-      "country_ar": "كوريا الجنوبية",
-      "coordinates": [37.5665, 126.978],
-      "role": "Asia-Pacific Technology & Multimedia Engineering",
-      "role_ar": "تكنولوجيا آسيا والمحيط الهادئ والهندسة المائية",
-      "summary_en": "In partnership with PF Korea, Seoul drives high-tech water engineering, interactive multimedia systems, and advanced mechanical design.",
-      "summary_ar": "بالشراكة مع بي إف كوريا، يقود مركز سيول الابتكارات في الهندسة المائية والأنظمة متعددة الوسائط والتصميم الميكانيكي المتقدم.",
-      "order": 4,
-      "aliases": ["seoul", "korea", "south korea", "سيول", "كوريا", "pf korea", "asia"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "sydney",
-      "name": "Sydney Hub",
-      "name_ar": "مركز سيدني",
-      "city": "Sydney",
-      "city_ar": "سيدني",
-      "country": "Australia",
-      "country_ar": "أستراليا",
-      "coordinates": [-33.8688, 151.2093],
-      "role": "Australasia Infrastructure & Telecommunications",
-      "role_ar": "البنية التحتية والاتصالات في أسترالاسيا",
-      "summary_en": "The Sydney hub oversaw extensive telecommunications rollout of over 1,500 cellular base stations and infrastructure programs across the Pacific.",
-      "summary_ar": "أشرف مركز سيدني على مشاريع البنية التحتية للاتصالات وتنفيذ أكثر من ١,٥٠٠ محطة اتصالات خلوية في منطقة المحيط الهادئ.",
-      "order": 5,
-      "aliases": ["sydney", "australia", "australasia", "سيدني", "أستراليا"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    }
+    { "id": "tampa", "order": 3, "status": "official", "approved": false, "name": { "en": "Tampa", "ar": "تامبا" }, "country": { "en": "United States", "ar": "الولايات المتحدة" }, "lat": 27.9506, "lng": -82.4572, "role": { "en": "Headquarters region, Florida", "ar": "منطقة المقر الرئيسي في فلوريدا" }, "aliases": ["Tampa", "Florida", "United States", "America", "US", "تامبا", "فلوريدا", "أمريكا"], "source": "https://7dint.net/" },
+    { "id": "ostrava", "order": 1, "status": "official", "approved": false, "name": { "en": "Ostrava", "ar": "أوسترافا" }, "country": { "en": "Czech Republic", "ar": "جمهورية التشيك" }, "lat": 49.8209, "lng": 18.2625, "role": { "en": "European hub, home of the Atelier Simona architecture studio", "ar": "المركز الأوروبي، وموطن استوديو أتيليه سيمونا للعمارة" }, "aliases": ["Ostrava", "Czech", "Czech Republic", "Europe", "أوسترافا", "التشيك", "أوروبا"], "source": "https://7dint.net/" },
+    { "id": "sydney", "order": 2, "status": "official", "approved": false, "name": { "en": "Sydney", "ar": "سيدني" }, "country": { "en": "Australia", "ar": "أستراليا" }, "lat": -33.8688, "lng": 151.2093, "role": { "en": "Asia-Pacific hub, where the CEO is based", "ar": "مركز آسيا والمحيط الهادئ، ومقر الرئيس التنفيذي" }, "aliases": ["Sydney", "Australia", "سيدني", "أستراليا"], "source": "https://7dint.net/" },
+    { "id": "seoul", "order": 4, "status": "official", "approved": false, "name": { "en": "Seoul", "ar": "سيول" }, "country": { "en": "South Korea", "ar": "كوريا الجنوبية" }, "lat": 37.5665, "lng": 126.978, "role": { "en": "East Asia hub, home of 7D Fountains", "ar": "مركز شرق آسيا، وموطن سفن دي للنوافير" }, "aliases": ["Seoul", "Korea", "South Korea", "سيول", "كوريا"], "source": "https://7dint.net/" },
+    { "id": "riyadh", "order": 5, "status": "official", "approved": false, "name": { "en": "Riyadh", "ar": "الرياض" }, "country": { "en": "Saudi Arabia", "ar": "المملكة العربية السعودية" }, "lat": 24.7136, "lng": 46.6753, "role": { "en": "Middle East headquarters, established with Takween Alrajhi in December 2025", "ar": "المقر الإقليمي للشرق الأوسط، تأسس مع تكوين الراجحي في ديسمبر ٢٠٢٥" }, "aliases": ["Riyadh", "Saudi", "Saudi Arabia", "the Kingdom", "الرياض", "السعودية", "المملكة"], "source": "https://7dint.net/news/strategic-partnership-takween-alrajhi/" }
   ],
+
   "people": [
     {
-      "id": "roman-kuba",
-      "name": "Roman Kuba",
-      "name_ar": "رومان كوبا",
-      "title": "Founder & Chief Architect",
-      "title_ar": "المؤسس وكبير المعماريين",
-      "bio_en": "Founder and Chief Architect of 7D International with over three decades of architectural leadership, originating with Atelier Simona in the Czech Republic in 1993.",
-      "bio_ar": "مؤسس وكبير المعماريين في سفن دي إنترناشونال، بخبرة معمارية قيادية تتجاوز ثلاثة عقود انطلقت مع أتيليه سيمونا في جمهورية التشيك عام ١٩٩٣.",
-      "email": "chairman@7dint.net",
-      "portrait": "/kb/img/roman-kuba-team.jpeg",
-      "aliases": ["roman kuba", "kuba", "roman", "رومان كوبا", "رومان", "كوبا", "founder", "المؤسس", "chief architect"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "wael-el-mougy", "group": "leadership", "rank": 1, "status": "official", "approved": false,
+      "name": { "en": "Dr. Wael El-Mougy", "ar": "الدكتور وائل المغي" },
+      "title": { "en": "Chairman & Founder", "ar": "المؤسس ورئيس مجلس الإدارة" },
+      "bio": {
+        "en": "Founder of 7D International, with more than twenty years in business and corporate management and a doctorate in management. His studies began in computer science, and his main interests are management consulting, architecture and design. He has led a number of major projects in Riyadh.",
+        "ar": "مؤسس سفن دي إنترناشونال، وعنده أكثر من عشرين سنة خبرة في إدارة الأعمال والشركات، وحاصل على الدكتوراه في الإدارة. بدأ دراسته في علوم الحاسب، واهتماماته الرئيسية الاستشارات الإدارية والعمارة والتصميم، وقاد عدد من المشاريع الكبرى في الرياض."
+      },
+      "office_contact": "chairman@7dint.net",
+      "portrait_url": "/kb/img/mougy-photo-team.jpeg",
+      "aliases": ["Wael", "El-Mougy", "Elmougy", "the chairman", "the founder", "وائل", "المغي", "رئيس مجلس الإدارة", "المؤسس"],
+      "source": "https://7dint.net/leadership/dr-wael-el-mougy/"
     },
     {
-      "id": "wael-el-mougy",
-      "name": "Dr. Wael El-Mougy",
-      "name_ar": "الدكتور وائل المغي",
-      "title": "Managing Director / Partner",
-      "title_ar": "المدير العام والشريك",
-      "bio_en": "Managing Director steering strategic growth, major client engagements, and landmark master developments across the Middle East from Riyadh.",
-      "bio_ar": "المدير العام الذي يقود النمو الاستراتيجي والشراكات الكبرى والمشاريع التنموية الرائدة في منطقة الشرق الأوسط من الرياض.",
-      "email": "info@7dint.net",
-      "portrait": "/kb/img/mougy-photo-team.jpeg",
-      "aliases": ["wael", "el-mougy", "mougy", "dr wael", "وائل", "المغي", "دكتور وائل", "الدكتور وائل المغي", "managing director", "ceo"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "reza-rezaie", "group": "leadership", "rank": 2, "status": "official", "approved": false,
+      "name": { "en": "Eng. Reza Rezaie", "ar": "المهندس رضا رضائي" },
+      "title": { "en": "Chief Executive Officer", "ar": "الرئيس التنفيذي" },
+      "bio": {
+        "en": "More than thirty years in ICT consultancy and project management. He holds a bachelor's degree in electrical engineering and an MBA with distinction in strategy, joined 7D in 2005 and is based in Sydney. His particular interest is crisis management.",
+        "ar": "عنده أكثر من ثلاثين سنة في استشارات تقنية المعلومات والاتصالات وإدارة المشاريع. حاصل على بكالوريوس الهندسة الكهربائية وماجستير إدارة الأعمال بامتياز في الاستراتيجية، وانضم لسفن دي سنة ٢٠٠٥ ومقره سيدني. ومن اهتماماته الخاصة إدارة الأزمات."
+      },
+      "office_contact": "ceo@7dint.net",
+      "portrait_url": "/kb/img/rezaie-photo-team.jpeg",
+      "aliases": ["Reza", "Rezaie", "the CEO", "chief executive", "رضا", "رضائي", "الرئيس التنفيذي"],
+      "source": "https://7dint.net/leadership/eng-reza-rezaie/"
     },
     {
-      "id": "reza-rezaie",
-      "name": "Eng. Reza Rezaie",
-      "name_ar": "المهندس رضا رضائي",
-      "title": "Technical Director",
-      "title_ar": "المدير الفني والتقني",
-      "bio_en": "Technical Director directing advanced structural innovation, multidisciplinary engineering, and high-complexity project execution worldwide.",
-      "bio_ar": "المدير التقني المشرف على الابتكارات الإنشائية والهندسة متعددة التخصصات وتنفيذ المشاريع المعقدة عالمياً.",
-      "email": "info@7dint.net",
-      "portrait": "/kb/img/rezaie-photo-team.jpeg",
-      "aliases": ["reza", "rezaie", "eng reza", "رضا", "رضائي", "المهندس رضا", "technical director"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "evan-shim", "group": "leadership", "rank": 3, "status": "official", "approved": false,
+      "name": { "en": "Mr. Evan Shim", "ar": "الأستاذ إيفان شيم" },
+      "title": { "en": "General Manager", "ar": "المدير العام" },
+      "bio": {
+        "en": "General Manager of 7D's South Korean department, 7D Fountains. He spent 1977 to 2004 at Korean Air, retiring as a director, and brings more than thirty years in aviation trading and coaching.",
+        "ar": "المدير العام لقسم سفن دي في كوريا الجنوبية، سفن دي للنوافير. اشتغل في الخطوط الجوية الكورية من ١٩٧٧ إلى ٢٠٠٤ وتقاعد بمنصب مدير، وعنده أكثر من ثلاثين سنة في تجارة الطيران والتدريب."
+      },
+      "portrait_url": "/kb/img/shim-photo-team.jpeg",
+      "aliases": ["Evan", "Shim", "general manager", "7D Fountains", "إيفان", "شيم", "المدير العام"],
+      "source": "https://7dint.net/leadership/mr-evan-shim/"
     },
     {
-      "id": "evan-shim",
-      "name": "Evan Shim",
-      "name_ar": "إيفان شيم",
-      "title": "Director, Asia-Pacific & Korea Operations",
-      "title_ar": "مدير آسيا والمحيط الهادئ وعمليات كوريا",
-      "bio_en": "Director of Asia-Pacific operations spearheading high-tech water engineering and collaborative multimedia technology with partner PF Korea in Seoul.",
-      "bio_ar": "مدير عمليات آسيا والمحيط الهادئ وقائد التقنيات المائية المتقدمة والوسائط المتعددة بالتعاون مع شريكنا بي إف كوريا في سيول.",
-      "email": "info@7dint.net",
-      "portrait": "/kb/img/shim-photo-team.jpeg",
-      "aliases": ["evan shim", "evan", "shim", "إيفان شيم", "إيفان", "شيم", "korea lead"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "pavel-tkacik", "group": "leadership", "rank": 4, "status": "official", "approved": false,
+      "name": { "en": "Mr. Pavel Tkacik", "ar": "الأستاذ بافل تكاتشيك" },
+      "title": { "en": "Regional Director, Europe", "ar": "المدير الإقليمي لأوروبا" },
+      "bio": {
+        "en": "Supervises 7D's European and Asian projects, with more than thirty years in industrial engineering. He has worked with 7D since 2001, including on a steel service centre, high-quality steel processing, and international sales and distribution.",
+        "ar": "يشرف على مشاريع سفن دي في أوروبا وآسيا، وعنده أكثر من ثلاثين سنة في الهندسة الصناعية. يتعاون مع سفن دي من سنة ٢٠٠١، ومن أعماله مركز خدمات الحديد، ومعالجة الفولاذ عالي الجودة، والمبيعات والتوزيع الدولي."
+      },
+      "office_contact": "pavel@7dint.net",
+      "portrait_url": "/kb/img/tkacik-photo-team.jpeg",
+      "aliases": ["Pavel", "Tkacik", "regional director", "Europe director", "بافل", "تكاتشيك", "المدير الإقليمي"],
+      "source": "https://7dint.net/leadership/mr-pavel-tkacik/"
     },
     {
-      "id": "marian-tkacik",
-      "name": "Marian Tkacik",
-      "name_ar": "ماريان تكاسيك",
-      "title": "Director, European Operations",
-      "title_ar": "مدير العمليات الأوروبية",
-      "bio_en": "Director of European Operations managing institutional, commercial, and restoration architecture programs from 7D's Central European base.",
-      "bio_ar": "مدير العمليات الأوروبية المشرف على برامج العمارة المؤسسية والتجارية والترميم من مركز سفن دي في وسط أوروبا.",
-      "email": "info@7dint.net",
-      "portrait": "/kb/img/tkacik-photo-team.jpeg",
-      "aliases": ["marian tkacik", "marian", "tkacik", "ماريان تكاسيك", "ماريان", "europe lead"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "sam-erfan", "group": "leadership", "rank": 5, "status": "official", "approved": false,
+      "name": { "en": "Dr. Sam Erfan", "ar": "الدكتور سام عرفان" },
+      "title": { "en": "International Coordinator", "ar": "المنسق الدولي" },
+      "bio": {
+        "en": "Holds a doctorate with distinction in international marketing and management, and brings more than twenty-seven years in customer service, sales, communication and retail marketing.",
+        "ar": "حاصل على الدكتوراه بامتياز في التسويق الدولي والإدارة، وعنده أكثر من سبعة وعشرين سنة في خدمة العملاء والمبيعات والاتصال وتسويق التجزئة."
+      },
+      "portrait_url": "/kb/img/erfan-photo-team.jpeg",
+      "aliases": ["Sam", "Erfan", "international coordinator", "سام", "عرفان", "المنسق الدولي"],
+      "source": "https://7dint.net/leadership/dr-sam-erfan/"
     },
     {
-      "id": "erfan",
-      "name": "Erfan",
-      "name_ar": "عرفان",
-      "title": "Project & Operations Director",
-      "title_ar": "مدير المشاريع والعمليات",
-      "bio_en": "Operations director driving site delivery, engineering standards, contractor supervision, and milestone integration on signature works.",
-      "bio_ar": "مدير العمليات المشرف على التنفيذ الميداني وضبط الجودة الهندسية وإدارة المقاولين في المشاريع البارزة.",
-      "email": "info@7dint.net",
-      "portrait": "/kb/img/erfan-photo-team.jpeg",
-      "aliases": ["erfan", "عرفان", "operations lead"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "debbie-frye", "group": "leadership", "rank": 6, "status": "official", "approved": false,
+      "name": { "en": "Debbie Frye", "ar": "ديبي فراي" },
+      "title": { "en": "U.S. Representative", "ar": "ممثلة الشركة في الولايات المتحدة" },
+      "bio": {
+        "en": "A licensed Florida realtor with twenty-five years in residential and commercial property, and a certified distressed-property specialist.",
+        "ar": "وسيطة عقارية مرخّصة في فلوريدا، عندها خمسة وعشرين سنة خبرة في العقارات السكنية والتجارية، ومتخصصة معتمدة في العقارات المتعثرة."
+      },
+      "portrait_url": "/kb/img/frye-photo-team.jpeg",
+      "aliases": ["Debbie", "Frye", "US representative", "ديبي", "فراي"],
+      "source": "https://7dint.net/leadership/debbie-frye/"
     },
     {
-      "id": "frye",
-      "name": "Frye",
-      "name_ar": "فراي",
-      "title": "Director, Business Development",
-      "title_ar": "مدير تطوير الأعمال والتحالفات",
-      "bio_en": "Director of Business Development leading international client consortiums, strategic growth initiatives, and partnerships across North America and the GCC.",
-      "bio_ar": "مدير تطوير الأعمال الذي يقود التحالفات الدولية ومبادرات النمو والشراكات الاستراتيجية في أمريكا الشمالية ودول الخليج.",
-      "email": "info@7dint.net",
-      "portrait": "/kb/img/frye-photo-team.jpeg",
-      "aliases": ["frye", "فراي", "business development"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "roman-kuba", "group": "leadership", "rank": 7, "status": "official", "approved": false,
+      "name": { "en": "Eng. Roman Kuba", "ar": "المهندس رومان كوبا" },
+      "title": { "en": "Chief Architect", "ar": "كبير المعماريين" },
+      "bio": {
+        "en": "An architect continuing a family building tradition, known for organic, nature-inspired architecture — arches and curves in bank branches, administrative buildings and family estates. He founded the Atelier Simona studio in Ostrava.",
+        "ar": "معماري يكمل تقليد عائلته في البناء، ومعروف بالعمارة العضوية المستلهمة من الطبيعة، بالأقواس والمنحنيات في فروع البنوك والمباني الإدارية والمساكن العائلية. وهو مؤسس استوديو أتيليه سيمونا في أوسترافا."
+      },
+      "portrait_url": "/kb/img/roman-kuba-team.jpeg",
+      "aliases": ["Roman", "Kuba", "chief architect", "Atelier Simona", "رومان", "كوبا", "كبير المعماريين"],
+      "source": "https://7dint.net/leadership/eng-roman-kuba/"
     }
   ],
+
   "timeline": [
-    {
-      "id": "t-1993",
-      "year": "1993",
-      "title_en": "Founding in Central Europe",
-      "title_ar": "التأسيس في وسط أوروبا",
-      "summary_en": "Atelier Simona established in Ostrava, Czech Republic by architect Roman Kuba, laying the architectural foundations of 7D International.",
-      "summary_ar": "تأسيس أتيليه سيمونا في أوسترافا بجمهورية التشيك على يد المعماري رومان كوبا، واضعاً الركائز المعمارية لسفن دي إنترناشونال.",
-      "aliases": ["1993", "founding", "start", "origin", "تأسيس", "بداية"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "t-1996-2009",
-      "year": "1996–2009",
-      "title_en": "Continental Expansion & Telecom Rollout",
-      "title_ar": "التوسع القاري وشبكات الاتصالات",
-      "summary_en": "Expansion into Australasia and Europe; turnkey delivery of over 1,500 cellular telecommunication base stations with $80M in infrastructure contracts.",
-      "summary_ar": "التوسع في أسترالاسيا وأوروبا؛ وإنجاز أكثر من ١,٥٠٠ محطة اتصالات خلوية بعقود بنية تحتية بلغت ٨٠ مليون دولار.",
-      "aliases": ["1996", "2009", "expansion", "australasia", "telecom", "توسع", "أستراليا"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "t-2009-2015",
-      "year": "2009–2015",
-      "title_en": "Entry into Saudi Arabia & Riyadh Landmarks",
-      "title_ar": "الانطلاق في السعودية ومعالم الرياض",
-      "summary_en": "Execution of the landmark dancing fountain at King Abdullah Park in Al-Malaz with partners PF Korea and Gawdat Group; launch of King Abdullah International Gardens.",
-      "summary_ar": "تنفيذ النافورة الراقصة في منتزه الملك عبدالله بالملز مع بي إف كوريا ومجموعة جودت، وإطلاق مشروع حدائق الملك عبدالله العالمية.",
-      "aliases": ["2009", "2015", "riyadh entry", "fountain", "gardens", "الملز", "النافورة"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "t-2015-2020",
-      "year": "2015–2020",
-      "title_en": "Riyadh 2020 Urban Study & Concept Landmarks",
-      "title_ar": "دراسة الرياض ٢٠٢٠ والمعالم المفاهيمية",
-      "summary_en": "Delivery of the comprehensive Riyadh 2020 strategic urban study and concept design for the iconic Riyadh Eye observation wheel.",
-      "summary_ar": "إنجاز دراسة الرياض ٢٠٢٠ الحضرية الاستراتيجية وتصميم مفهوم عين الرياض لعجلة المشاهدة الأيقونية.",
-      "aliases": ["2015", "2020", "riyadh 2020", "riyadh eye", "دراسة", "عين الرياض"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "t-2025-12",
-      "year": "2025",
-      "title_en": "Takween Alrajhi Partnership & Regional HQ Expansion",
-      "title_ar": "شراكة تكوين الراجحي وتوسيع المقر الإقليمي",
-      "summary_en": "Formation of a strategic alliance with Takween Alrajhi and expansion of 7D's Middle East headquarters in Riyadh to support Saudi Vision 2030 developments.",
-      "summary_ar": "عقد شراكة استراتيجية مع تكوين الراجحي وتوسيع مقر الشرق الأوسط في الرياض لدعم مشاريع رؤية السعودية ٢٠٣٠.",
-      "aliases": ["2025", "takween", "alrajhi", "تكوين الراجحي", "الراجحي", "شراكة"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    }
+    { "id": "t-1993", "year": "1993", "status": "official", "approved": false, "title": { "en": "Where it began", "ar": "البداية" }, "detail": { "en": "Pulec Finance and Banking is established in the Czech Republic, the beginning of the journey in consulting.", "ar": "تأسيس بوليك للتمويل والمصرفية في جمهورية التشيك، بداية المشوار في الاستشارات." }, "aliases": ["1993", "nineteen ninety-three", "١٩٩٣", "ألف وتسعمية وثلاثة وتسعين"], "source": "https://7dint.net/about/" },
+    { "id": "t-1996-2009", "year": "1996–2009", "status": "official", "approved": false, "title": { "en": "Growth across continents", "ar": "التوسع عبر القارات" }, "detail": { "en": "Expansion with Aus-consult in Australia and the eighty-million-dollar operation and maintenance project in Saudi Arabia; the Atelier Simona architecture studio joins the group; more than 1,500 base stations built for 3G networks.", "ar": "التوسع مع أوس كونسلت في أستراليا ومشروع التشغيل والصيانة بقيمة ثمانين مليون دولار في السعودية، وانضمام استوديو أتيليه سيمونا للعمارة، وبناء أكثر من ألف وخمسمية محطة اتصالات لشبكات الجيل الثالث." }, "aliases": ["1996", "Aus-consult", "base stations", "3G", "أوس كونسلت", "محطات"], "source": "https://7dint.net/about/" },
+    { "id": "t-2001", "year": "2001", "status": "official", "approved": false, "title": { "en": "Europe", "ar": "أوروبا" }, "detail": { "en": "Pavel Tkacik begins working with 7D on industrial and steel projects.", "ar": "بافل تكاتشيك يبدأ تعاونه مع سفن دي في المشاريع الصناعية ومشاريع الحديد." }, "aliases": ["2001", "٢٠٠١"], "source": "https://7dint.net/leadership/mr-pavel-tkacik/" },
+    { "id": "t-2005", "year": "2005", "status": "official", "approved": false, "title": { "en": "Sydney leadership", "ar": "القيادة في سيدني" }, "detail": { "en": "Reza Rezaie joins 7D in Sydney; he later becomes CEO.", "ar": "رضا رضائي ينضم لسفن دي في سيدني، ويصير لاحقًا الرئيس التنفيذي." }, "aliases": ["2005", "٢٠٠٥"], "source": "https://7dint.net/leadership/eng-reza-rezaie/" },
+    { "id": "t-2009-2015", "year": "2009–2015", "status": "official", "approved": false, "title": { "en": "Riyadh", "ar": "الرياض" }, "detail": { "en": "In association with PF Korea and Gawdat Group, 7D executes the King Abdullah Park fountain and launches the King Abdullah International Gardens; it is awarded consultancy for the Riyadh 2020 urban study and launches the 7D World concept.", "ar": "بالشراكة مع بي إف كوريا ومجموعة جودت، نفّذت سفن دي نافورة منتزه الملك عبدالله وأطلقت حدائق الملك عبدالله العالمية، وحصلت على استشارات دراسة الرياض ٢٠٢٠ العمرانية، وأطلقت مفهوم عالم سفن دي." }, "aliases": ["2009", "2015", "PF Korea", "Gawdat", "جودت"], "source": "https://7dint.net/about/" },
+    { "id": "t-2014-12", "year": "2014", "status": "official_archive", "approved": false, "title": { "en": "Honoured guest in Riyadh", "ar": "ضيف شرف في الرياض" }, "detail": { "en": "7D is an honoured guest at the conference 'Landscape Architecture to Support Sustainable Development for Cities' at the King Fahd Cultural Centre in Riyadh, 21 to 23 December 2014.", "ar": "سفن دي ضيف شرف في مؤتمر عمارة المناظر الطبيعية لدعم التنمية المستدامة للمدن، في مركز الملك فهد الثقافي بالرياض، من ٢١ إلى ٢٣ ديسمبر ٢٠١٤." }, "aliases": ["2014", "conference", "King Fahd Cultural Centre", "مؤتمر", "مركز الملك فهد الثقافي"], "source": "archived 7dint.com/en/news-view-2" },
+    { "id": "t-2015-04", "year": "2015", "status": "official_archive", "approved": false, "title": { "en": "Seoul", "ar": "سيول" }, "detail": { "en": "The chairman takes part in the ICLEI World Congress 2015 in Seoul, 8 to 12 April, alongside Riyadh's vice mayor.", "ar": "رئيس مجلس الإدارة يشارك في المؤتمر العالمي لإيكلي ٢٠١٥ في سيول من ٨ إلى ١٢ أبريل، مع وكيل أمين منطقة الرياض." }, "aliases": ["2015", "ICLEI", "World Congress", "إيكلي"], "source": "archived 7dint.com/en/news-view-3" },
+    { "id": "t-2025-12", "year": "2025", "status": "official", "approved": false, "title": { "en": "Middle East headquarters", "ar": "المقر الإقليمي للشرق الأوسط" }, "detail": { "en": "On 21 December 2025, 7D announces a strategic partnership with Takween Alrajhi and establishes its Middle East headquarters in Riyadh, expanding delivery capacity across Saudi Arabia and the Middle East.", "ar": "في ٢١ ديسمبر ٢٠٢٥، أعلنت سفن دي شراكة استراتيجية مع تكوين الراجحي وأسست مقرها الإقليمي للشرق الأوسط في الرياض، لتوسيع قدرتها على التنفيذ في السعودية والشرق الأوسط." }, "aliases": ["2025", "December 2025", "Takween", "Alrajhi", "partnership", "تكوين", "الراجحي", "شراكة", "٢٠٢٥"], "source": "https://7dint.net/news/strategic-partnership-takween-alrajhi/" }
   ],
+
   "projects": [
     {
-      "id": "king-abdullah-park-fountain",
-      "name": "King Abdullah Park Dancing Fountain",
-      "name_ar": "نافورة منتزه الملك عبدالله بالملز",
-      "location": "King Abdullah Park, Al-Malaz, Riyadh, Saudi Arabia",
-      "location_ar": "منتزه الملك عبدالله، الملز، الرياض، المملكة العربية السعودية",
-      "kind": "delivered_involvement",
-      "role_as_stated": "Executed the landmark dancing fountain with partners PF Korea and Gawdat Group",
-      "role_as_stated_ar": "نفّذنا النافورة الراقصة الأيقونية مع شركائنا بي إف كوريا ومجموعة جودت",
-      "summary_en": "A landmark multimedia musical fountain combining synchronized hydraulic jets, light shows, and laser projections with traditional Saudi architectural motifs in Al-Malaz, Riyadh.",
-      "summary_ar": "نافورة مائية راقصة أيقونية في حي الملز بالرياض تجمع بين العروض الضوئية والليزر والهندسة المائية المتقدمة مع الطابع المعماري السعودي الأصيل.",
+      "id": "king-abdullah-park-fountain", "status": "official", "approved": false, "kind": "delivered_involvement",
+      "name": { "en": "King Abdullah Park Fountain", "ar": "نافورة منتزه الملك عبدالله" },
+      "location": { "en": "Al-Malaz, Riyadh", "ar": "الملز، الرياض" },
+      "client_as_stated": "King Abdullah Park",
+      "services_as_stated": ["Architecture & Design", "Project Management"],
+      "role_as_stated": { "en": "7D executed the fountain in association with PF Korea and Gawdat Group.", "ar": "نفّذت سفن دي النافورة بالشراكة مع بي إف كوريا ومجموعة جودت." },
+      "summary": {
+        "en": "A water feature that combines traditional Saudi aesthetics with modern engineering, in one of Riyadh's best-known parks in Al-Malaz. 7D's page highlights an innovative water circulation system, energy-efficient LED lighting and sustainable design.",
+        "ar": "معلم مائي يجمع بين الطابع السعودي الأصيل والهندسة الحديثة، في واحد من أشهر منتزهات الرياض في حي الملز. وتبرز صفحة سفن دي نظام تدوير مياه مبتكر، وإضاءة ليد موفرة للطاقة، وتصميم مستدام."
+      },
       "context_facts": [
-        "Located in King Abdullah Park, Al-Malaz, Riyadh.",
-        "Executed in partnership with PF Korea and Gawdat Group.",
-        "Combines traditional Saudi character with modern water engineering.",
-        "7D executed the dancing fountain; 7D did NOT build the entire park."
+        { "en": "The park covers about 318,000 square metres, with around 150,000 square metres of green space, a large lake and a dancing fountain with laser lighting.", "ar": "مساحة المنتزه حوالي ٣١٨ ألف متر مربع، منها حوالي ١٥٠ ألف متر مربع مساحات خضراء، وفيه بحيرة كبيرة ونافورة راقصة بإضاءة ليزر.", "status": "official_archive", "voice_rule": "These describe the whole park, not 7D's scope. Say 'the park' when using them." }
       ],
-      "voice_rules": [
-        "Never state that 7D built the entire King Abdullah Park; always state that 7D executed the dancing fountain in partnership with PF Korea and Gawdat Group.",
-        "Mention the fusion of authentic Saudi heritage and modern engineering."
-      ],
-      "images": ["/kb/img/kapf-4.jpeg"],
-      "aliases": [
-        "king abdullah park fountain",
-        "fountain",
-        "dancing fountain",
-        "al-malaz",
-        "malaz fountain",
-        "نافورة",
-        "نافورة الملز",
-        "نافورة منتزه الملك عبدالله",
-        "الملز"
-      ],
-      "related_ids": ["riyadh", "pf-korea", "gawdat-group", "water-multimedia-features"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "voice_rules": ["Do not give a year.", "Never say 7D built the park; 7D's work is the fountain, in association with partners."],
+      "images": [ { "url": "https://7dint.net/jpeg/kapf-4.jpeg", "local": "/kb/img/kapf-4.jpeg", "alt": { "en": "The King Abdullah Park fountain at night", "ar": "نافورة منتزه الملك عبدالله في الليل" } } ],
+      "disciplines": ["architecture"],
+      "hub": "riyadh",
+      "aliases": ["King Abdullah Park", "fountain", "the fountain", "Malaz", "dancing fountain", "منتزه الملك عبدالله", "النافورة", "نافورة", "الملز"],
+      "source": "https://7dint.net/projects/king-abdullah-park-fountain/"
     },
     {
-      "id": "king-abdullah-international-gardens",
-      "name": "King Abdullah International Gardens",
-      "name_ar": "حدائق الملك عبدالله العالمية",
-      "location": "Riyadh, Saudi Arabia",
-      "location_ar": "الرياض، المملكة العربية السعودية",
-      "kind": "consultancy",
-      "role_as_stated": "7D describes launching the project; it is a major national project with several firms involved",
-      "role_as_stated_ar": "سفن دي شاركت في إطلاق المشروع؛ وهو مشروع وطني كبير بمشاركة عدة جهات",
-      "summary_en": "A transformative botanical, environmental, and educational destination in Riyadh dedicated to showcasing the botanical history of the Arabian Peninsula across geological eras.",
-      "summary_ar": "وجهة نباتية وبيئية وتعليمية عالمية في الرياض مخصصة لعرض التاريخ النباتي للجزيرة العربية عبر العصور الجيولوجية المتعاقبة.",
+      "id": "king-abdullah-international-gardens", "status": "official", "approved": false, "kind": "delivered_involvement",
+      "name": { "en": "King Abdullah International Gardens", "ar": "حدائق الملك عبدالله العالمية" },
+      "location": { "en": "Riyadh", "ar": "الرياض" },
+      "client_as_stated": "King Abdullah International Garden Authority",
+      "services_as_stated": ["Architecture & Design", "Project Management"],
+      "role_as_stated": { "en": "7D describes launching the King Abdullah International Gardens and calls it one of its largest undertakings.", "ar": "تذكر سفن دي إنها أطلقت مشروع حدائق الملك عبدالله العالمية، وتعتبره من أكبر أعمالها." },
+      "summary": {
+        "en": "A large-scale landscape project in Riyadh, envisioned as an international meeting point connecting cultural and human knowledge with entertainment and social life. 7D's page highlights advanced irrigation, native plants and climate-responsive design.",
+        "ar": "مشروع مناظر طبيعية ضخم في الرياض، متصوَّر كنقطة التقاء عالمية تربط المعرفة الثقافية والإنسانية بالترفيه والحياة الاجتماعية. وتبرز صفحة سفن دي نظام ري متطور، ونباتات محلية، وتصميم يتجاوب مع المناخ."
+      },
       "context_facts": [
-        "Major national landmark project in Riyadh.",
-        "Multiple international and local engineering firms contributed.",
-        "7D describes launching the project; 7D did not build the entire complex.",
-        "Detailed project documentation is available via the team."
+        { "en": "7D's profile describes a design with two crescent-shaped structures holding exhibition spaces and galleries, a central tower with a lookout restaurant, and a trail along a former river bed.", "ar": "يصف ملف سفن دي تصميم فيه مبنيين على شكل هلال يضمان مساحات عرض ومعارض، وبرج في الوسط فيه مطعم مطل، ومسار على مجرى نهر قديم.", "status": "official_archive", "voice_rule": "Present as the design concept described in 7D's profile." }
       ],
-      "voice_rules": [
-        "Never claim 7D built or designed the entire gardens; 7D describes launching the project alongside national entities and consortia.",
-        "State that it is a major national project with several firms involved, and offer the team for technical questions."
-      ],
-      "images": ["/kb/img/kaig-main-photo.jpeg"],
-      "aliases": [
-        "king abdullah international gardens",
-        "gardens",
-        "kaig",
-        "حدائق الملك عبدالله العالمية",
-        "الحدائق العالمية",
-        "حدائق"
-      ],
-      "related_ids": ["riyadh", "environmental-botanical-landmarks"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "voice_rules": ["Do not give a year.", "Never claim 7D designed or built the gardens. If asked who designed or built them, say it is a major national project delivered by several firms and 7D's own description of its role is launching it; offer the team's contact for detail."],
+      "images": [ { "url": "https://7dint.net/jpeg/kaig-main-photo.jpeg", "local": "/kb/img/kaig-main-photo.jpeg", "alt": { "en": "Render of the King Abdullah International Gardens", "ar": "تصور لحدائق الملك عبدالله العالمية" } } ],
+      "disciplines": ["architecture", "environment"],
+      "hub": "riyadh",
+      "aliases": ["King Abdullah International Gardens", "King Abdullah Gardens", "the gardens", "KAIG", "حدائق الملك عبدالله", "الحدائق العالمية", "الحدائق"],
+      "source": "https://7dint.net/projects/king-abdullah-international-garden/"
     },
     {
-      "id": "riyadh-eye",
-      "name": "Riyadh Eye Observation Wheel",
-      "name_ar": "عين الرياض",
-      "location": "Riyadh, Saudi Arabia",
-      "location_ar": "الرياض، المملكة العربية السعودية",
-      "kind": "concept",
-      "role_as_stated": "Concept design for an observation wheel shaped like a spaceship and a water drop",
-      "role_as_stated_ar": "تصميم مفاهيمي لعجلة مشاهدة أيقونية مستوحاة من شكل مركبة فضائية وقطرة ماء",
-      "summary_en": "An iconic architectural concept design for an observation wheel in Riyadh, sculpted with fluid lines evoking a spacecraft and a drop of water with panoramic observation pods.",
-      "summary_ar": "تصميم مفاهيمي أيقوني لعجلة مشاهدة عملاقة في الرياض مستوحى من خطوط انسيابية تشبه مركبة فضائية وقطرة ماء مع كبسولات مشاهدة بانورامية.",
+      "id": "riyadh-2020-urban-study", "status": "official", "approved": false, "kind": "consultancy",
+      "name": { "en": "Riyadh 2020 Urban Study", "ar": "دراسة الرياض ٢٠٢٠ العمرانية" },
+      "location": { "en": "Riyadh", "ar": "الرياض" },
+      "client_as_stated": "Riyadh Development Authority",
+      "services_as_stated": ["Management Consulting", "Project Management"],
+      "role_as_stated": { "en": "7D was awarded consultancy for the Riyadh 2020 urban study.", "ar": "حصلت سفن دي على أعمال الاستشارات لدراسة الرياض ٢٠٢٠ العمرانية." },
+      "summary": {
+        "en": "Urban planning consultation for Riyadh's future development, focused on sustainable growth, smart city integration, traffic flow and green infrastructure.",
+        "ar": "استشارات تخطيط عمراني لتطوير الرياض مستقبلًا، تركّز على النمو المستدام، ودمج المدينة الذكية، وانسيابية الحركة المرورية، والبنية التحتية الخضراء."
+      },
       "context_facts": [
-        "Concept design created by 7D.",
-        "Inspired by an aerodynamic spaceship and a drop of water.",
-        "Not an open attraction today; visitors cannot ride it."
+        { "en": "7D's profile shows a design study along King Fahd Road: an arched shopping-mall gateway, a luxury hotel, Olaya Street taken underground to create a pedestrian zone, cultural and exhibition halls, and forms inspired by the butterfly, the flower, water and the sun.", "ar": "يعرض ملف سفن دي دراسة تصميمية على طريق الملك فهد: مدخل مول على شكل قوس، وفندق فاخر، وشارع العليا تحت الأرض عشان تتكون منطقة مشاة، وقاعات ثقافية ومعارض، وأشكال مستلهمة من الفراشة والزهرة والماء والشمس.", "status": "official_archive", "voice_rule": "Present as a design study from 7D's architecture team (Atelier Simona)." }
       ],
-      "voice_rules": [
-        "Clarify directly that Riyadh Eye is a concept design study, not an open attraction that visitors can ride today.",
-        "Describe the visual inspiration: shaped like a spaceship and a water drop."
-      ],
-      "images": ["/kb/img/riyadh-eye-main-photo.jpeg"],
-      "aliases": [
-        "riyadh eye",
-        "eye",
-        "observation wheel",
-        "wheel",
-        "عين الرياض",
-        "العجلة",
-        "عجلة الرياض"
-      ],
-      "related_ids": ["riyadh", "architecture-master-planning"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "voice_rules": ["Do not give a year.", "Call it consultancy and a design study, not a delivered development."],
+      "images": [ { "url": "https://7dint.net/jpeg/riyadh2020-main-photo.jpeg", "local": "/kb/img/riyadh2020-main-photo.jpeg", "alt": { "en": "Riyadh 2020 urban study render", "ar": "تصور دراسة الرياض ٢٠٢٠ العمرانية" } } ],
+      "disciplines": ["architecture"],
+      "hub": "riyadh",
+      "aliases": ["Riyadh 2020", "urban study", "twenty twenty", "King Fahd Road", "Olaya", "الرياض ٢٠٢٠", "الرياض 2020", "الدراسة العمرانية", "طريق الملك فهد", "العليا"],
+      "source": "https://7dint.net/projects/riyadh-2020/"
     },
     {
-      "id": "riyadh-2020",
-      "name": "Riyadh 2020 Urban Study",
-      "name_ar": "دراسة الرياض ٢٠٢٠",
-      "location": "Riyadh, Saudi Arabia",
-      "location_ar": "الرياض، المملكة العربية السعودية",
-      "kind": "design_consultancy",
-      "role_as_stated": "Comprehensive urban planning and development strategic study for Riyadh",
-      "role_as_stated_ar": "دراسة استراتيجية شاملة للتخطيط الحضري وتطوير مدينة الرياض",
-      "summary_en": "A visionary metropolitan advisory study examining urban density, transit corridors, public park infrastructure, and sustainable civic spaces across Riyadh.",
-      "summary_ar": "دراسة استشارية حضرية كبرى تبحث في الكثافة العمرانية ومسارات النقل المستدام والمساحات العامة الخضراء لتطوير العاصمة الرياض.",
-      "context_facts": [
-        "Strategic urban master planning advisory.",
-        "Focused on sustainable mobility, green spaces, and community life."
-      ],
-      "voice_rules": [
-        "Highlight 7D's urban advisory role analyzing sustainable mobility and civic connectivity."
-      ],
-      "images": ["/kb/img/riyadh2020-main-photo.jpeg"],
-      "aliases": [
-        "riyadh 2020",
-        "urban study",
-        "masterplan study",
-        "دراسة الرياض 2020",
-        "دراسة الرياض",
-        "تخطيط حضري"
-      ],
-      "related_ids": ["riyadh", "architecture-master-planning"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "riyadh-eye", "status": "concept", "approved": false, "kind": "concept",
+      "name": { "en": "Riyadh Eye", "ar": "عين الرياض" },
+      "location": { "en": "Riyadh", "ar": "الرياض" },
+      "client_as_stated": "Riyadh Municipality",
+      "services_as_stated": ["Architecture & Design"],
+      "role_as_stated": { "en": "A concept design by 7D for a giant observation wheel in Riyadh.", "ar": "تصميم مفاهيمي من سفن دي لعجلة مراقبة عملاقة في الرياض." },
+      "summary": {
+        "en": "A landmark concept: an observation wheel shaped like a spaceship and a water drop, with themed capsules on the history, culture and environment of the city, and a ride told in three chapters — the discovery, the ride and the return.",
+        "ar": "مفهوم لمعلم بارز: عجلة مراقبة على شكل مركبة فضائية وقطرة ماء، فيها كبائن بمواضيع عن تاريخ المدينة وثقافتها وبيئتها، ورحلة من ثلاث مراحل: الاكتشاف، ثم الجولة، ثم العودة."
+      },
+      "voice_rules": ["Always call it a concept design. Never say it was built or that it is the world's largest wheel.", "Do not give a year."],
+      "images": [ { "url": "https://7dint.net/jpeg/riyadh-eye-main-photo.jpeg", "local": "/kb/img/riyadh-eye-main-photo.jpeg", "alt": { "en": "Concept render of the Riyadh Eye", "ar": "تصور مفاهيمي لعين الرياض" } } ],
+      "disciplines": ["architecture"],
+      "hub": "riyadh",
+      "aliases": ["Riyadh Eye", "the Eye", "observation wheel", "wheel", "عين الرياض", "العجلة", "عجلة"],
+      "source": "https://7dint.net/projects/riyadh-eye/"
     },
     {
-      "id": "7d-world",
-      "name": "7D World Experiential Platform",
-      "name_ar": "عالم سفن دي",
-      "location": "Global / Digital Platform",
-      "location_ar": "منصة عالمية رقمية",
-      "kind": "concept",
-      "role_as_stated": "Immersive architectural and experiential platform uniting 7D's multidisciplinary work",
-      "role_as_stated_ar": "منصة تفاعلية وتجربة معمارية غامرة توحد أعمال سفن دي متعددة التخصصات",
-      "summary_en": "A unified physical and digital spatial platform demonstrating 7D's multidisciplinary portfolio, digital twin visualizations, and immersive environments.",
-      "summary_ar": "منصة مكانية رقمية وتفاعلية تستعرض محفظة مشاريع سفن دي المتكاملة والتوائم الرقمية والبيئات المعمارية المبتكرة.",
-      "context_facts": [
-        "Multidisciplinary showcase uniting architectural disciplines.",
-        "Interactive virtual and physical design environment."
-      ],
-      "voice_rules": [
-        "Present 7D World as an experiential platform connecting 7D's global heritage with future design concepts."
-      ],
-      "images": ["/kb/img/7DAlrajhi.jpeg"],
-      "aliases": ["7d world", "world", "عالم سفن دي", "عالم 7d"],
-      "related_ids": ["architecture-master-planning", "strategic-investment-consortiums"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "department-of-social-services", "status": "official", "approved": false, "kind": "design_consultancy",
+      "name": { "en": "Department of Social Services facility", "ar": "مبنى إدارة الخدمات الاجتماعية" },
+      "location": { "en": "Riyadh", "ar": "الرياض" },
+      "client_as_stated": "Department of Social Services",
+      "services_as_stated": ["Management Consulting", "Architecture & Design"],
+      "role_as_stated": { "en": "7D provided management consulting and architecture and design for a government facility.", "ar": "قدّمت سفن دي الاستشارات الإدارية والتصميم المعماري لمبنى حكومي." },
+      "summary": {
+        "en": "A modern government facility designed to serve the community with efficiency and accessibility, with accessible design standards, energy-efficient systems and community-focused planning.",
+        "ar": "مبنى حكومي حديث مصمم لخدمة المجتمع بكفاءة وسهولة وصول، بمعايير تصميم ميسّرة، وأنظمة موفرة للطاقة، وتخطيط يركّز على المجتمع."
+      },
+      "voice_rules": ["Do not give a year.", "There is no approved image; use the typographic hero."],
+      "images": [],
+      "disciplines": ["architecture"],
+      "hub": "riyadh",
+      "aliases": ["Department of Social Services", "social services", "government facility", "الخدمات الاجتماعية", "مبنى حكومي"],
+      "source": "https://7dint.net/projects/department-of-social-services/"
     },
     {
-      "id": "telecom-infrastructure-network",
-      "name": "Telecommunications Base Stations Network",
-      "name_ar": "شبكة محطات الاتصالات والبنية التحتية",
-      "location": "Australasia & Central Europe",
-      "location_ar": "أسترالاسيا ووسط أوروبا",
-      "kind": "delivered_involvement",
-      "role_as_stated": "Executed rollout of over 1,500 telecommunication base stations",
-      "role_as_stated_ar": "نفّذنا بنية تحتية لأكثر من ١,٥٠٠ محطة اتصالات خلوية",
-      "summary_en": "Turnkey engineering, site acquisition, and construction of more than 1,500 cellular telecommunication base stations across complex geographies with $80M in contracts.",
-      "summary_ar": "تنفيذ وتشغيل هندسي متكامل لأكثر من ١,٥٠٠ محطة اتصالات خلوية في تضاريس جغرافية صعبة بعقود قيمتها ٨٠ مليون دولار.",
-      "context_facts": [
-        "Over 1,500 telecommunication base stations delivered.",
-        "Contract values totaled $80M.",
-        "1,500 refers to base stations, NOT 1,500 projects."
-      ],
-      "voice_rules": [
-        "Always state that 1,500 refers to telecommunication base stations, not 1,500 projects.",
-        "Mention the eighty million dollar ($80M) infrastructure contract valuation."
-      ],
-      "images": ["/kb/img/kapf-4.jpeg"],
-      "aliases": [
-        "telecom",
-        "base stations",
-        "1500",
-        "cell towers",
-        "محطات الاتصالات",
-        "محطات",
-        "الاتصالات",
-        "١٥٠٠ محطة"
-      ],
-      "related_ids": ["sydney", "telecom-digital-infrastructure"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "7d-world", "status": "concept", "approved": false, "kind": "concept",
+      "name": { "en": "7D World", "ar": "عالم سفن دي" },
+      "location": { "en": "Saudi Arabia", "ar": "السعودية" },
+      "role_as_stated": { "en": "An original architectural concept launched by 7D.", "ar": "مفهوم معماري أصلي أطلقته سفن دي." },
+      "summary": {
+        "en": "An imaginative park concept centred on a vast building shaped like a mythological sea creature, surrounded by themed zones for desert, water, tropical, prehistoric and arctic worlds, with a zone of fantasy creatures drawn from Saudi stories.",
+        "ar": "مفهوم منتزه خيالي يتوسطه مبنى ضخم على شكل مخلوق بحري أسطوري، تحيط فيه مناطق بمواضيع الصحراء والماء والاستوائيات وما قبل التاريخ والقطب، ومنطقة لمخلوقات خيالية مستلهمة من الحكايات السعودية."
+      },
+      "voice_rules": ["Always call it a concept."],
+      "images": [],
+      "disciplines": ["architecture"],
+      "hub": "riyadh",
+      "aliases": ["7D World", "seven D world", "sea creature", "عالم سفن دي"],
+      "source": "https://7dint.net/about/ and 7D company profile (archive)"
     },
     {
-      "id": "atelier-simona-portfolio",
-      "name": "Atelier Simona Architectural Heritage",
-      "name_ar": "إرث أتيليه سيمونا المعماري",
-      "location": "Ostrava & Central Europe",
-      "location_ar": "أوسترافا ووسط أوروبا",
-      "kind": "studio_portfolio",
-      "role_as_stated": "Civic, cultural, and residential architectural heritage dating back to 1993",
-      "role_as_stated_ar": "إرث معماري وثقافي ومدني يمتد منذ عام ١٩٩٣",
-      "summary_en": "The foundational studio established by Roman Kuba in Ostrava in 1993, delivering civic architecture, residential complexes, and historic restorations across Central Europe.",
-      "summary_ar": "الاستوديو المعماري التأسيسي الذي أطلقه رومان كوبا في أوسترافا عام ١٩٩٣، محققاً تصاميم مدنية ومجمعات سكنية ومشاريع ترميم تاريخية بارزة.",
-      "context_facts": [
-        "Founded 1993 in Ostrava, Czech Republic by Roman Kuba.",
-        "The creative wellspring and heritage of 7D International.",
-        "Timeless European craftsmanship and build quality."
-      ],
-      "voice_rules": [
-        "Acknowledge Atelier Simona as the origin of 7D's architectural ethos and European craft."
-      ],
-      "images": ["/kb/img/roman-kuba-team.jpeg"],
-      "aliases": [
-        "atelier simona",
-        "simona",
-        "czech studio",
-        "heritage",
-        "أتيليه سيمونا",
-        "سيمونا",
-        "استوديو سيمونا"
-      ],
-      "related_ids": ["ostrava", "roman-kuba", "architecture-master-planning"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
+      "id": "atelier-simona-works", "status": "official_archive", "approved": false, "kind": "studio_portfolio",
+      "name": { "en": "Atelier Simona studio works", "ar": "أعمال استوديو أتيليه سيمونا" },
+      "location": { "en": "Czech Republic and Lebanon", "ar": "جمهورية التشيك ولبنان" },
+      "role_as_stated": { "en": "Works of Atelier Simona, the architecture studio in 7D's group led by Chief Architect Roman Kuba.", "ar": "أعمال أتيليه سيمونا، استوديو العمارة ضمن مجموعة سفن دي بقيادة كبير المعماريين رومان كوبا." },
+      "summary": {
+        "en": "Highlights include the Phoenix Tower, a residential and office building in Beirut; The Bird, an organic private house in the Czech Republic; and a regeneration study for the Zarubek brownfield in Ostrava.",
+        "ar": "من أبرزها برج فينيكس، مبنى سكني ومكتبي في بيروت؛ وبيت ذا بيرد، منزل خاص بتصميم عضوي في جمهورية التشيك؛ ودراسة لإعادة تأهيل موقع زاروبك في أوسترافا."
+      },
+      "voice_rules": ["Attribute these to Atelier Simona within the group, not to 7D International directly.", "Do not give years."],
+      "images": [],
+      "disciplines": ["architecture"],
+      "hub": "ostrava",
+      "aliases": ["Atelier Simona", "Phoenix Tower", "The Bird", "Zarubek", "Beirut", "أتيليه سيمونا", "برج فينيكس", "بيروت"],
+      "source": "7D company profile (archive)"
     }
   ],
+
   "disciplines": [
-    {
-      "id": "architecture-master-planning",
-      "name": "Architecture & Master Planning",
-      "name_ar": "العمارة والمخططات الشاملة",
-      "summary_en": "Visionary architectural design and urban master planning integrating cultural heritage, spatial intelligence, and sustainable civic development.",
-      "summary_ar": "تصاميم معمارية ومخططات حضرية شاملة تدمج الهوية الثقافية والذكاء المكاني والتنمية المستدامة.",
-      "related_projects": ["atelier-simona-portfolio", "riyadh-2020", "riyadh-eye"],
-      "aliases": ["architecture", "master planning", "urban design", "عمارة", "تخطيط شامل", "تصميم معماري"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "engineering-structural-design",
-      "name": "Engineering & Structural Design",
-      "name_ar": "الهندسة والتصميم الإنشائي",
-      "summary_en": "Rigorous civil, structural, and MEP engineering turning complex artistic concepts into resilient, buildable realities.",
-      "summary_ar": "هندسة إنشائية ومدنية وكهروميكانيكية دقيقة لتحويل الأفكار المعمارية الجريئة إلى منشآت آمنة وقابلة للتنفيذ.",
-      "related_projects": ["king-abdullah-park-fountain", "telecom-infrastructure-network"],
-      "aliases": ["engineering", "structural design", "civil engineering", "هندسة", "تصميم إنشائي"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "water-multimedia-features",
-      "name": "Water & Multimedia Features",
-      "name_ar": "النوافير والتقنيات المائية المتعددة",
-      "summary_en": "Turnkey design and execution of monumental musical fountains, synchronized water choreography, and multimedia laser spectacles.",
-      "summary_ar": "تصميم وتنفيذ متكامل للنوافير الموسيقية الكبرى والعروض المائية الراقصة المدعومة بتقنيات الليزر الحديثة.",
-      "related_projects": ["king-abdullah-park-fountain"],
-      "aliases": ["water features", "fountains", "multimedia", "نوافير", "عروض مائية", "مياه"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "telecom-digital-infrastructure",
-      "name": "Telecommunications & Digital Infrastructure",
-      "name_ar": "الاتصالات والبنية التحتية الرقمية",
-      "summary_en": "Cellular network engineering, base station rollout, fiber networks, and smart city digital infrastructure delivery.",
-      "summary_ar": "هندسة شبكات الاتصالات، وتنفيذ محطات الأبراج الخلوية، وتمديد الألياف الضوئية، والبنية التحتية للمدن الذكية.",
-      "related_projects": ["telecom-infrastructure-network"],
-      "aliases": ["telecom", "telecommunications", "digital infrastructure", "اتصالات", "بنية رقمية"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "environmental-botanical-landmarks",
-      "name": "Environmental & Botanical Landmarks",
-      "name_ar": "المعالم البيئية والحدائق النباتية",
-      "summary_en": "World-class environmental destinations, climatic biomes, botanical conservatories, and ecological public spaces.",
-      "summary_ar": "معالم بيئية عالمية ومحميات نباتية ومساحات خضراء كبرى تدعم الاستدامة والتنوع الحيوي.",
-      "related_projects": ["king-abdullah-international-gardens"],
-      "aliases": ["environmental", "botanical", "gardens", "حدائق", "بيئة", "معالم نباتية"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "project-construction-management",
-      "name": "Project & Construction Management",
-      "name_ar": "إدارة المشاريع والتشييد",
-      "summary_en": "End-to-end program governance, cost engineering, contractor integration, and international quality assurance on site.",
-      "summary_ar": "إدارة متكاملة لبرامج المشاريع، وضبط التكاليف، والتنسيق الميداني لضمان معايير الجودة العالمية في الوقت والميزانية المحددة.",
-      "related_projects": ["king-abdullah-park-fountain", "telecom-infrastructure-network"],
-      "aliases": ["project management", "construction management", "إدارة مشاريع", "تشييد", "مقاولات"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "strategic-investment-consortiums",
-      "name": "Strategic Investment & Consortiums",
-      "name_ar": "الاستثمار الاستراتيجي وتطوير التحالفات",
-      "summary_en": "Structuring international joint ventures, strategic equity partnerships, and developer consortia for landmark civic initiatives.",
-      "summary_ar": "هيكلة التحالفات الدولية والمشاريع المشتركة والشراكات الاستثمارية للمشاريع الوطنية الكبرى.",
-      "related_projects": ["7d-world", "riyadh-2020"],
-      "aliases": ["investment", "consortiums", "partnerships", "استثمار", "تحالفات", "شراكات"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    }
+    { "id": "architecture", "order": 1, "status": "official", "approved": false,
+      "name": { "en": "Architecture, Landscape & Waterscape Design", "ar": "العمارة وتصميم المناظر الطبيعية والمسطحات المائية" },
+      "summary": { "en": "Full consulting on architecture and design, specialising in urban studies, zoning plans and city planning — from site layouts, 3D visualisation and interior design to landscape consulting and waterscapes: fountains, pools and bodies of water of any size.", "ar": "استشارات متكاملة في العمارة والتصميم، متخصصة في الدراسات العمرانية ومخططات التقسيم وتخطيط المدن، من مخططات المواقع والتصور ثلاثي الأبعاد والتصميم الداخلي إلى استشارات المناظر الطبيعية والمسطحات المائية: النوافير والمسابح والمسطحات المائية بكل الأحجام." },
+      "aliases": ["architecture", "design", "landscape", "waterscape", "fountains", "urban planning", "العمارة", "التصميم", "المناظر الطبيعية", "المسطحات المائية", "النوافير", "التخطيط العمراني"],
+      "source": "https://7dint.net/industries/architecture-design/" },
+    { "id": "defense", "order": 2, "status": "official", "approved": false,
+      "name": { "en": "Defense, Aerospace & Aviation", "ar": "الدفاع والطيران والفضاء" },
+      "summary": { "en": "Contracting with businesses closely related to the sectors 7D covers, such as logistics, IT and information management, engineering and technical support, working through specialised partners.", "ar": "مقاولات مع جهات مرتبطة بالقطاعات اللي تغطيها سفن دي، مثل الخدمات اللوجستية، وتقنية المعلومات وإدارة البيانات، والهندسة والدعم الفني، بالتعاون مع شركاء متخصصين." },
+      "voice_rules": ["Do not name military clients or contracts; none are published."],
+      "aliases": ["defense", "defence", "aerospace", "aviation", "military", "الدفاع", "الطيران", "الفضاء"],
+      "source": "https://7dint.net/industries/defense-aerospace-aviation/" },
+    { "id": "finance", "order": 3, "status": "official", "approved": false,
+      "name": { "en": "Finance & Banking", "ar": "المالية والمصرفية" },
+      "summary": { "en": "Consultancy in general finance and in more specific banking operations and investment — from accounting and financial legislation to banking outsourcing, corporate finance and investment portfolios.", "ar": "استشارات في المالية العامة والعمليات المصرفية والاستثمار، من المحاسبة والتشريعات المالية إلى إسناد الخدمات المصرفية وتمويل الشركات والمحافظ الاستثمارية." },
+      "aliases": ["finance", "banking", "investment", "المالية", "المصرفية", "البنوك", "الاستثمار"],
+      "source": "https://7dint.net/industries/finance-banking/" },
+    { "id": "technology", "order": 4, "status": "official", "approved": false,
+      "name": { "en": "Technology", "ar": "التقنية" },
+      "summary": { "en": "Helping clients make strategic decisions on future business systems, new content delivery models, and media and technology — rooted in telecom system integration and challenging networks, including remote and rural ones.", "ar": "مساعدة العملاء في القرارات الاستراتيجية حول أنظمة الأعمال المستقبلية، ونماذج إيصال المحتوى الجديدة، والإعلام والتقنية، بخبرة أساسها تكامل أنظمة الاتصالات والشبكات الصعبة، ومنها الشبكات في المناطق النائية والريفية." },
+      "aliases": ["technology", "IT", "telecom", "telecommunications", "networks", "التقنية", "الاتصالات", "الشبكات", "تقنية المعلومات"],
+      "source": "https://7dint.net/industries/technology/" },
+    { "id": "private-equity", "order": 5, "status": "official", "approved": false,
+      "name": { "en": "Private Equity", "ar": "الملكية الخاصة" },
+      "summary": { "en": "Consulting including programme management for national and international companies undertaking major infrastructure projects — strategic risk management, tender evaluation and contract management.", "ar": "استشارات تشمل إدارة البرامج للشركات المحلية والدولية اللي تنفذ مشاريع بنية تحتية كبرى، من إدارة المخاطر الاستراتيجية إلى تقييم المناقصات وإدارة العقود." },
+      "aliases": ["private equity", "programme management", "program management", "infrastructure", "الملكية الخاصة", "إدارة البرامج", "البنية التحتية"],
+      "source": "https://7dint.net/industries/private-equity/" },
+    { "id": "energy", "order": 6, "status": "official", "approved": false,
+      "name": { "en": "Utilities & Alternative Energy", "ar": "المرافق والطاقة البديلة" },
+      "summary": { "en": "Energy with a focus on green energy — solar systems and efficient electrical projects, from LED street lighting and sun-tracking solar arrays to smart cities and waste-to-energy with trusted partners.", "ar": "الطاقة مع تركيز على الطاقة الخضراء: أنظمة الطاقة الشمسية والمشاريع الكهربائية عالية الكفاءة، من إنارة الشوارع بالليد والألواح الشمسية المتتبعة للشمس إلى المدن الذكية وتحويل النفايات إلى طاقة مع شركاء موثوقين." },
+      "aliases": ["energy", "solar", "utilities", "green energy", "renewable", "الطاقة", "الطاقة الشمسية", "المرافق", "الطاقة البديلة", "الطاقة المتجددة"],
+      "source": "https://7dint.net/industries/utilities-alternative-energy/" },
+    { "id": "environment", "order": 7, "status": "official", "approved": false,
+      "name": { "en": "Environment, Sorting, Recycling & Bulk Handling", "ar": "البيئة والفرز وإعادة التدوير ومناولة المواد السائبة" },
+      "summary": { "en": "Consulting in environment, sorting and bulk handling systems — waste separation with controlled-air and robotic technology, single-stream recycling and waste-to-energy.", "ar": "استشارات في البيئة وأنظمة الفرز ومناولة المواد السائبة، من فصل النفايات بتقنيات الهواء الموجّه والروبوتات إلى إعادة التدوير الموحّد وتحويل النفايات إلى طاقة." },
+      "aliases": ["environment", "recycling", "sorting", "waste", "bulk handling", "sustainability", "البيئة", "إعادة التدوير", "الفرز", "النفايات", "الاستدامة"],
+      "source": "https://7dint.net/industries/environment-recycling/" }
   ],
+
   "figures": [
-    {
-      "id": "fig-1993",
-      "value": "1993",
-      "spoken_en": "Nineteen ninety-three",
-      "spoken_ar": "ألف وتسعمية وثلاثة وتسعين",
-      "label_en": "Year Founded in Central Europe",
-      "label_ar": "سنة التأسيس في وسط أوروبا",
-      "detail_en": "Founded in Ostrava, Czech Republic by architect Roman Kuba as Atelier Simona.",
-      "detail_ar": "تأسست في أوسترافا بجمهورية التشيك على يد المعماري رومان كوبا تحت اسم أتيليه سيمونا.",
-      "aliases": ["1993", "founded", "year", "تأسيس", "سنة"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "fig-80m",
-      "value": "$80M",
-      "spoken_en": "Eighty million dollars",
-      "spoken_ar": "ثمانين مليون دولار",
-      "label_en": "Infrastructure Contract Value",
-      "label_ar": "قيمة عقود البنية التحتية",
-      "detail_en": "Contract value delivered across major international infrastructure rollouts.",
-      "detail_ar": "قيمة العقود المنجزة في مشاريع البنية التحتية والاتصالات الدولية.",
-      "aliases": ["80m", "$80m", "eighty million", "80 مليون", "ثمانين مليون"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "fig-1500-base-stations",
-      "value": "1,500+",
-      "spoken_en": "Over fifteen hundred base stations",
-      "spoken_ar": "أكثر من ألف وخمسمية محطة",
-      "label_en": "Telecommunications Base Stations",
-      "label_ar": "محطة اتصالات خلوية",
-      "detail_en": "Turnkey telecommunication base stations delivered across Europe and Australasia (not 1,500 projects).",
-      "detail_ar": "محطات اتصالات خلوية منجزة عبر أوروبا وأسترالاسيا (وليست ١,٥٠٠ مشروع).",
-      "aliases": ["1500", "base stations", "stations", "١٥٠٠", "محطة"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "fig-5-hubs",
-      "value": "5",
-      "spoken_en": "Five global hubs",
-      "spoken_ar": "خمسة مراكز عالمية",
-      "label_en": "Continents & Strategic Hubs",
-      "label_ar": "مراكز استراتيجية حول العالم",
-      "detail_en": "Riyadh, Florida, Ostrava, Seoul, and Sydney connecting East and West.",
-      "detail_ar": "الرياض، فلوريدا، أوسترافا، سيول، وسيدني تربط الشرق والغرب.",
-      "aliases": ["5", "five", "hubs", "خمسة", "مراكز"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "fig-7-disciplines",
-      "value": "7",
-      "spoken_en": "Seven core disciplines",
-      "spoken_ar": "سبعة تخصصات رئيسية",
-      "label_en": "Core Disciplines",
-      "label_ar": "تخصصات رئيسية متكاملة",
-      "detail_en": "From master planning and engineering to water features and consortiums.",
-      "detail_ar": "من التخطيط المعماري والهندسة إلى التقنيات المائية وتطوير التحالفات.",
-      "aliases": ["7", "seven", "disciplines", "سبعة", "تخصصات"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    }
+    { "id": "fig-1993", "status": "official", "approved": false, "value": "1993", "kind": "year", "label": { "en": "Where 7D's roots begin", "ar": "بداية جذور سفن دي" }, "spoken": { "en": "nineteen ninety-three", "ar": "ألف وتسعمية وثلاثة وتسعين" }, "aliases": ["1993", "nineteen ninety-three", "١٩٩٣", "ألف وتسعمية وثلاثة وتسعين"], "source": "https://7dint.net/about/" },
+    { "id": "fig-30-years", "status": "official", "approved": false, "value": "30+", "kind": "count", "label": { "en": "Years of work", "ar": "سنة من العمل" }, "spoken": { "en": "more than thirty years", "ar": "أكثر من ثلاثين سنة" }, "aliases": ["thirty years", "three decades", "ثلاثين سنة", "ثلاثة عقود"], "source": "https://7dint.net/about/" },
+    { "id": "fig-80m", "status": "official", "approved": false, "value": "$80M", "kind": "money", "label": { "en": "Operation and maintenance project in Saudi Arabia", "ar": "مشروع تشغيل وصيانة في السعودية" }, "spoken": { "en": "eighty million dollars", "ar": "ثمانين مليون دولار" }, "voice_rule": "Present it as an early milestone in the group's history through Aus-consult. Do not give a date range.", "aliases": ["80 million", "eighty million", "$80M", "ثمانين مليون"], "source": "https://7dint.net/about/" },
+    { "id": "fig-1500-base-stations", "status": "official", "approved": false, "value": "1,500+", "kind": "count", "label": { "en": "Base stations built for 3G networks", "ar": "محطة اتصالات لشبكات الجيل الثالث" }, "spoken": { "en": "more than fifteen hundred", "ar": "أكثر من ألف وخمسمية" }, "voice_rule": "These are base stations, not projects.", "aliases": ["1,500", "1500", "fifteen hundred", "base stations", "ألف وخمسمية", "محطة"], "source": "https://7dint.net/about/" },
+    { "id": "fig-5-continents", "status": "official", "approved": false, "value": "5", "kind": "count", "label": { "en": "Continents", "ar": "قارات" }, "spoken": { "en": "five continents", "ar": "خمس قارات" }, "aliases": ["five continents", "خمس قارات"], "source": "https://7dint.net/" },
+    { "id": "fig-5-hubs", "status": "official", "approved": false, "value": "5", "kind": "count", "label": { "en": "Strategic hubs", "ar": "مراكز استراتيجية" }, "spoken": { "en": "five hubs", "ar": "خمسة مراكز" }, "aliases": ["five hubs", "خمسة مراكز"], "source": "https://7dint.net/" },
+    { "id": "fig-7-disciplines", "status": "official", "approved": false, "value": "7", "kind": "count", "label": { "en": "Disciplines", "ar": "تخصصات" }, "spoken": { "en": "seven disciplines", "ar": "سبعة تخصصات" }, "aliases": ["seven disciplines", "سبعة تخصصات"], "source": "https://7dint.net/industries/" }
   ],
+
   "partners": [
-    {
-      "id": "takween-alrajhi",
-      "name": "Takween Alrajhi",
-      "name_ar": "تكوين الراجحي",
-      "role_en": "Strategic Saudi alliance partner for large-scale development, giga-project investments, and commercial partnerships.",
-      "role_ar": "شريك التحالف الاستراتيجي في المملكة للتطوير العقاري والاستثمار في المشاريع الكبرى.",
-      "aliases": ["takween alrajhi", "takween", "alrajhi", "تكوين الراجحي", "تكوين", "الراجحي"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "pf-korea",
-      "name": "PF Korea",
-      "name_ar": "بي إف كوريا",
-      "role_en": "High-tech Korean engineering partner specializing in monumental musical fountains, choreography, and multimedia aquatic technology.",
-      "role_ar": "الشريك الكوري المتخصص في الهندسة المائية المتقدمة والنوافير الموسيقية وعروض الوسائط المتعددة.",
-      "aliases": ["pf korea", "pf", "korea", "بي إف كوريا", "كوريا"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "gawdat-group",
-      "name": "Gawdat Group",
-      "name_ar": "مجموعة جودت",
-      "role_en": "Prominent Saudi contracting and execution partner for landmark installations, civil construction, and site delivery in Riyadh.",
-      "role_ar": "مجموعة وطنية رائدة وشريك التنفيذ والمقاولات المدنية في مشاريع الرياض.",
-      "aliases": ["gawdat group", "gawdat", "مجموعة جودت", "جودت"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "aus-consult",
-      "name": "Aus-consult",
-      "name_ar": "أوس كونسلت",
-      "role_en": "Infrastructure and engineering consultancy partner supporting Australasia civil and telecommunications initiatives.",
-      "role_ar": "شريك الاستشارات الهندسية والبنية التحتية لعمليات أسترالاسيا.",
-      "aliases": ["aus-consult", "aus consult", "أوس كونسلت"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    },
-    {
-      "id": "atelier-simona",
-      "name": "Atelier Simona",
-      "name_ar": "أتيليه سيمونا",
-      "role_en": "The original Czech architectural practice founded in 1993 by Roman Kuba, representing 7D's European design ethos.",
-      "role_ar": "الاستوديو المعماري التشيكي التأسيسي عام ١٩٩٣ ومصدر الإرث الأوروبي والحرفية التصميمية لسفن دي.",
-      "aliases": ["atelier simona", "simona", "أتيليه سيمونا", "سيمونا"],
-      "status": "verified",
-      "approved": true,
-      "source": "official"
-    }
+    { "id": "takween-alrajhi", "status": "official", "approved": false, "name": { "en": "Takween Alrajhi", "ar": "تكوين الراجحي" }, "relationship": { "en": "Strategic partner in Saudi Arabia since December 2025, combining 7D's global expertise with Takween Alrajhi's deep local knowledge and networks across the Kingdom.", "ar": "شريك استراتيجي في السعودية منذ ديسمبر ٢٠٢٥، يجمع خبرة سفن دي العالمية مع معرفة تكوين الراجحي المحلية العميقة وشبكة علاقاتها في المملكة." }, "voice_rule": "No deal terms are published. Do not describe any.", "aliases": ["Takween", "Alrajhi", "Al Rajhi", "تكوين", "الراجحي"], "source": "https://7dint.net/news/strategic-partnership-takween-alrajhi/" },
+    { "id": "pf-korea", "status": "official", "approved": false, "name": { "en": "PF Korea", "ar": "بي إف كوريا" }, "relationship": { "en": "Partner on Riyadh projects, including the King Abdullah Park fountain.", "ar": "شريك في مشاريع الرياض، ومنها نافورة منتزه الملك عبدالله." }, "aliases": ["PF Korea", "بي إف كوريا"], "source": "https://7dint.net/about/" },
+    { "id": "gawdat-group", "status": "official", "approved": false, "name": { "en": "Gawdat Group", "ar": "مجموعة جودت" }, "relationship": { "en": "Partner on Riyadh projects, including the King Abdullah Park fountain.", "ar": "شريك في مشاريع الرياض، ومنها نافورة منتزه الملك عبدالله." }, "aliases": ["Gawdat", "جودت"], "source": "https://7dint.net/about/" },
+    { "id": "aus-consult", "status": "official", "approved": false, "name": { "en": "Aus-consult", "ar": "أوس كونسلت" }, "relationship": { "en": "Australian consultancy in 7D's lineage, associated with telecom projects and the Saudi operation and maintenance project.", "ar": "شركة استشارات أسترالية من جذور مجموعة سفن دي، مرتبطة بمشاريع الاتصالات ومشروع التشغيل والصيانة في السعودية." }, "aliases": ["Aus-consult", "Ausconsult", "أوس كونسلت"], "source": "https://7dint.net/about/" },
+    { "id": "atelier-simona", "status": "official", "approved": false, "name": { "en": "Atelier Simona", "ar": "أتيليه سيمونا" }, "relationship": { "en": "Architecture studio in Ostrava within the group, led by Chief Architect Roman Kuba.", "ar": "استوديو عمارة في أوسترافا ضمن المجموعة، بقيادة كبير المعماريين رومان كوبا." }, "aliases": ["Atelier Simona", "Simona", "أتيليه سيمونا"], "source": "https://7dint.net/about/" }
   ],
+
   "contact": {
-    "general_email": "info@7dint.net",
-    "general_email_spoken_en": "info at seven d int dot net",
-    "general_email_spoken_ar": "إنفو آت سفن دي إنت دوت نت",
-    "chairman_email": "chairman@7dint.net",
-    "chairman_email_spoken_en": "chairman at seven d int dot net",
-    "chairman_email_spoken_ar": "تشيرمان آت سفن دي إنت دوت نت",
-    "website": "https://www.7dint.net",
-    "website_spoken_en": "seven d int dot net",
-    "website_spoken_ar": "سفن دي إنت دوت نت",
-    "riyadh_office": "Riyadh, Kingdom of Saudi Arabia",
-    "riyadh_office_ar": "الرياض، المملكة العربية السعودية",
-    "florida_office": "Florida, United States of America",
-    "florida_office_ar": "فلوريدا، الولايات المتحدة الأمريكية",
-    "phone": "+966 11 000 0000",
-    "status": "verified",
-    "approved": true,
-    "aliases": ["contact", "email", "phone", "website", "office", "تواصل", "إيميل", "رقم", "موقع"],
-    "source": "official"
+    "status": "official", "approved": false,
+    "email": "info@7dint.net",
+    "phone": "+1 727 219 1592",
+    "phone_spoken": { "en": "plus one, seven two seven, two one nine, one five nine two", "ar": "زائد واحد، سبعة اثنين سبعة، اثنين واحد تسعة، واحد خمسة تسعة اثنين" },
+    "website": "https://7dint.net",
+    "website_spoken": { "en": "seven D I N T dot net", "ar": "سفن دي آي إن تي دوت نت" },
+    "offices": { "en": ["Florida, USA (headquarters)", "Riyadh, Saudi Arabia", "Sydney, Australia", "Seoul, South Korea"], "ar": ["فلوريدا، الولايات المتحدة (المقر الرئيسي)", "الرياض، السعودية", "سيدني، أستراليا", "سيول، كوريا الجنوبية"] },
+    "voice_rule": "No street addresses are published; don't give any.",
+    "source": "https://7dint.net/contact/"
   },
+
   "faq": [
-    {
-      "question": "Who is 7D International?",
-      "question_ar": "مين سفن دي إنترناشونال؟",
-      "use_records": ["7d-international", "riyadh", "roman-kuba"]
-    },
-    {
-      "question": "What did you do in Riyadh?",
-      "question_ar": "وش سويتوا في الرياض؟",
-      "use_records": ["king-abdullah-park-fountain", "king-abdullah-international-gardens", "riyadh-2020"]
-    },
-    {
-      "question": "Did 7D build King Abdullah Park?",
-      "question_ar": "أنتم اللي بنيتوا منتزه الملك عبدالله؟",
-      "use_records": ["king-abdullah-park-fountain"]
-    },
-    {
-      "question": "Can I ride or visit the Riyadh Eye?",
-      "question_ar": "أقدر أركب عين الرياض؟",
-      "use_records": ["riyadh-eye"]
-    },
-    {
-      "question": "What is the Takween Alrajhi partnership?",
-      "question_ar": "وش الشراكة مع تكوين الراجحي؟",
-      "use_records": ["takween-alrajhi", "riyadh"]
-    },
-    {
-      "question": "Who founded 7D?",
-      "question_ar": "مين أسس سفن دي؟",
-      "use_records": ["roman-kuba", "atelier-simona-portfolio"]
-    },
-    {
-      "question": "How many base stations or projects did you build?",
-      "question_ar": "كم محطة بنيتوا؟",
-      "use_records": ["telecom-infrastructure-network", "fig-1500-base-stations"]
-    }
+    { "id": "faq-what-is-7d", "q": { "en": "What is 7D International?", "ar": "وش هي سفن دي إنترناشونال؟" }, "use_records": ["company", "fig-5-continents", "fig-7-disciplines"] },
+    { "id": "faq-riyadh", "q": { "en": "What has 7D done in Riyadh?", "ar": "وش سوّت سفن دي في الرياض؟" }, "use_records": ["king-abdullah-park-fountain", "king-abdullah-international-gardens", "riyadh-2020-urban-study", "riyadh-eye", "t-2025-12"] },
+    { "id": "faq-leaders", "q": { "en": "Who leads 7D?", "ar": "مين يقود سفن دي؟" }, "use_records": ["wael-el-mougy", "reza-rezaie", "roman-kuba"] },
+    { "id": "faq-hubs", "q": { "en": "Where does 7D work?", "ar": "وين تشتغل سفن دي؟" }, "use_records": ["tampa", "ostrava", "sydney", "seoul", "riyadh", "fig-5-continents"] },
+    { "id": "faq-history", "q": { "en": "How did 7D start?", "ar": "كيف بدأت سفن دي؟" }, "use_records": ["t-1993", "t-1996-2009", "t-2009-2015"] },
+    { "id": "faq-takween", "q": { "en": "What is the Takween Alrajhi partnership?", "ar": "وش قصة الشراكة مع تكوين الراجحي؟" }, "use_records": ["takween-alrajhi", "t-2025-12"] },
+    { "id": "faq-disciplines", "q": { "en": "What does 7D do?", "ar": "وش تسوي سفن دي؟" }, "use_records": ["architecture", "defense", "finance", "technology", "private-equity", "energy", "environment"] },
+    { "id": "faq-contact", "q": { "en": "How do I contact 7D?", "ar": "كيف أتواصل مع سفن دي؟" }, "use_records": ["contact"] }
   ],
+
   "do_not_say": [
-    {
-      "topic": "polysilicon plant / Jubail acquisition",
-      "keywords": ["polysilicon", "jubail", "plant", "بولي سيليكون", "الجبيل", "مصنع"],
-      "reason": "Confidential industrial project not publicly disclosed.",
-      "response_en": "That's not something I can speak to. The team at info@7dint.net can help.",
-      "response_ar": "هالتفصيل ما هو عندي الحين ومو من الأمور اللي أقدر أتكلم عنها. فريقنا على info@7dint.net يفيدكم بكل سرور."
-    },
-    {
-      "topic": "employees / revenue / internal financials",
-      "keywords": ["employee", "employees", "revenue", "turnover", "profit", "salary", "موظف", "موظفين", "إيرادات", "أرباح"],
-      "reason": "Internal proprietary company information.",
-      "response_en": "We don't publish that. I can tell you where we work, or connect you with the team.",
-      "response_ar": "هالأرقام ما نعلنها. أقدر أقول لك وين مراكزنا ومشاريعنا، أو أوصلك بفريقنا."
-    },
-    {
-      "topic": "awards",
-      "keywords": ["award", "awards", "trophy", "جائزة", "جوائز"],
-      "reason": "7D focuses on delivered work and partnerships rather than marketing award claims.",
-      "response_en": "We focus on the quality of our delivered projects and partnerships rather than industry awards. Want to see our work in Riyadh?",
-      "response_ar": "تركيزنا دائماً على جودة التنفيذ وشراكاتنا على أرض الواقع أكثر من الجوائز. تحب تشوف مشاريعنا بالرياض؟"
-    },
-    {
-      "topic": "personal phone number of chairman or leaders",
-      "keywords": ["chairman phone", "mobile", "personal number", "cell", "جوال", "رقم جوال", "رقم الرئيس"],
-      "reason": "Personal mobile numbers are strictly private.",
-      "response_en": "The chairman's office is reachable at chairman@7dint.net. For anything else, info@7dint.net is best.",
-      "response_ar": "مكتب رئيس مجلس الإدارة تقدر تتواصل معه عبر chairman@7dint.net، ولأي استفسار عام info@7dint.net هو الأنسب."
-    },
-    {
-      "topic": "built entire King Abdullah Park",
-      "keywords": ["built king abdullah park", "بنيتوا منتزه الملك عبدالله بالكامل"],
-      "reason": "7D executed the multimedia dancing fountain with partners PF Korea and Gawdat Group, not the entire municipal park.",
-      "response_en": "At King Abdullah Park in Al-Malaz, we executed the landmark multimedia dancing fountain with our partners PF Korea and Gawdat Group — blending traditional Saudi character with modern engineering. The park itself is a municipal development.",
-      "response_ar": "في منتزه الملك عبدالله بالملز، نفّذنا النافورة الراقصة الأيقونية مع شركائنا بي إف كوريا ومجموعة جودت بطابع سعودي أصيل وهندسة حديثة، والمنتزه ككل مشروع تابع للأمانة."
-    },
-    {
-      "topic": "1,500 projects misconception",
-      "keywords": ["1500 projects", "١٥٠٠ مشروع"],
-      "reason": "1,500 refers strictly to cellular base stations rolled out, not total projects.",
-      "response_en": "The figure of 1,500 refers to telecommunication base stations delivered across our Australasia and European infrastructure rollout, not individual projects.",
-      "response_ar": "رقم ألف وخمسمية يخص محطات الاتصالات الخلوية اللي نفّذناها في أسترالاسيا وأوروبا، وما هو عدد المشاريع الإجمالي."
-    }
+    { "topic": "Any acquisition of a polysilicon plant in Jubail or '7D Polysilicon Valley'", "reason": "The announcement was withdrawn from 7D's site and has no independent confirmation." },
+    { "topic": "'1,500 projects completed'", "reason": "The figure refers to base stations, not projects." },
+    { "topic": "'Seven countries' or '24/7 support' counters", "reason": "Marketing counters without a named basis." },
+    { "topic": "Employee numbers, revenue or company valuation", "reason": "Not published by 7D; third-party estimates conflict." },
+    { "topic": "Project completion years", "reason": "7D's own sources give conflicting years." },
+    { "topic": "Contract values for individual projects, or other firms' contracts on the same projects", "reason": "Not published by 7D for its scope." },
+    { "topic": "Awards", "reason": "No named award is published." },
+    { "topic": "Personal phone numbers, home addresses, birth dates or family of any person", "reason": "Privacy." },
+    { "topic": "Former company names, dissolved entities, or registry history beyond the two legal entities listed", "reason": "Not relevant to visitors and easily misread." },
+    { "topic": "Past product ventures (health drinks, medical foods, algae extracts)", "reason": "Not part of today's 7D offer." },
+    { "topic": "Unpublished credentials or affiliations of leaders beyond the bios here", "reason": "Not independently verified." }
   ],
+
   "suggested_questions": {
-    "opening": {
-      "en": ["What did you do in Riyadh?", "Who is 7D International?", "Tell me the story"],
-      "ar": ["وش سويتوا في الرياض؟", "مين سفن دي إنترناشونال؟", "احكي لي القصة"]
-    },
-    "after_project": {
-      "en": ["Tell me about the gardens", "Who was your partner?", "What disciplines were used?"],
-      "ar": ["احكي لي عن الحدائق", "مين كان شريككم؟", "وش التخصصات اللي استخدمتوها؟"]
-    },
-    "after_hubs": {
-      "en": ["Why Riyadh?", "Tell me about the founders", "What did 7D do in Seoul?"],
-      "ar": ["ليش الرياض؟", "احكي لي عن المؤسسين", "وش سوّت سفن دي في سيول؟"]
-    },
-    "after_person": {
-      "en": ["Who else leads 7D?", "What's Atelier Simona?", "How do I contact them?"],
-      "ar": ["مين غيره يقود سفن دي؟", "وش هو أتيليه سيمونا؟", "كيف أتواصل معهم؟"]
-    },
-    "after_disciplines": {
-      "en": ["Show me a water project", "Tell me about energy", "How do you partner?"],
-      "ar": ["وريني مشروع مائي", "احكي لي عن الطاقة", "كيف تبنون شراكاتكم؟"]
-    },
-    "after_figure": {
-      "en": ["Tell me about the eighty million dollar project", "What hubs do you have?", "Take me through the story"],
-      "ar": ["احكي لي عن مشروع الـ 80 مليون", "وش مراكزكم حول العالم؟", "احكي لي القصة"]
-    },
-    "after_contact": {
-      "en": ["Tell me about Roman Kuba", "What projects are in Riyadh?", "Can we work together?"],
-      "ar": ["احكي لي عن رومان كوبا", "وش مشاريعكم بالرياض؟", "كيف نقدر نتعاون؟"]
-    }
+    "opening": [
+      { "en": "Who is 7D?", "ar": "مين سفن دي؟", "faq": "faq-what-is-7d" },
+      { "en": "Show me Riyadh", "ar": "وريني الرياض", "faq": "faq-riyadh" },
+      { "en": "Where in the world are you?", "ar": "وين موجودين في العالم؟", "faq": "faq-hubs" },
+      { "en": "Tell me the story", "ar": "احكي لي القصة", "action": "start_story" }
+    ],
+    "after_project": [
+      { "en": "What else in Riyadh?", "ar": "وش غيره في الرياض؟" },
+      { "en": "Who designs this work?", "ar": "مين يصمم هالأعمال؟", "record": "roman-kuba" },
+      { "en": "What's the Takween partnership?", "ar": "وش الشراكة مع تكوين الراجحي؟", "faq": "faq-takween" }
+    ],
+    "after_hubs": [
+      { "en": "Why Riyadh?", "ar": "ليش الرياض؟", "record": "t-2025-12" },
+      { "en": "How did it start?", "ar": "كيف بدأت؟", "faq": "faq-history" },
+      { "en": "Who leads you?", "ar": "مين يقودكم؟", "faq": "faq-leaders" }
+    ],
+    "after_people": [
+      { "en": "What do you do?", "ar": "وش تسوون؟", "faq": "faq-disciplines" },
+      { "en": "Show me your projects", "ar": "وريني مشاريعكم", "faq": "faq-riyadh" },
+      { "en": "How do I reach the team?", "ar": "كيف أتواصل مع الفريق؟", "faq": "faq-contact" }
+    ],
+    "after_timeline": [
+      { "en": "Show me the numbers", "ar": "وريني الأرقام", "record": "fig-1500-base-stations" },
+      { "en": "What's happening now?", "ar": "وش الجديد الحين؟", "record": "t-2025-12" },
+      { "en": "Who founded 7D?", "ar": "مين أسس سفن دي؟", "record": "wael-el-mougy" }
+    ]
   },
+
   "pronunciation": {
-    "roman_kuba": { "en": "ROH-mahn KOO-bah", "ar": "رومان كوبا" },
-    "wael_el_mougy": { "en": "WAH-el el-MOO-jee", "ar": "وائل المغي" },
-    "reza_rezaie": { "en": "reh-ZAH reh-ZAH-ee", "ar": "رضا رضائي" },
-    "evan_shim": { "en": "EH-vun SHIM", "ar": "إيفان شيم" },
-    "takween_alrajhi": { "en": "tuck-WEEN ahl-RAHJ-hee", "ar": "تكوين الراجحي" },
-    "ostrava": { "en": "OH-strah-vah", "ar": "أوسترافا" }
+    "en": { "7D": "seven D", "Ostrava": "OSS-trah-vah", "Tkacik": "TKAH-chik", "Rezaie": "reh-ZAH-ee", "El-Mougy": "el-MOO-gee", "Takween Alrajhi": "tak-WEEN al-RAJ-hee", "Atelier Simona": "at-el-YAY see-MOH-nah", "Malaz": "MAH-laz", "Olaya": "oh-LAI-ya" },
+    "ar": { "7D": "سفن دي", "7dint.net": "سفن دي آي إن تي دوت نت", "Ostrava": "أوسترافا", "Tkacik": "تكاتشيك", "Atelier Simona": "أتيليه سيمونا", "ICLEI": "إيكلي" }
   }
 }

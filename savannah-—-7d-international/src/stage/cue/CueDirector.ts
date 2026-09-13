@@ -1,218 +1,92 @@
 import { bus } from '../../state/bus';
-import { fetchKnowledgeBase, KnowledgeBaseData } from '../../kb/client';
+import { fetchKB, normalize } from '../../kb/client';
+import type { KnowledgeBase } from '../../kb/types';
+import { STAGE } from '../../config';
 
-export interface AliasMatch {
+export interface Alias {
+  norm: string;
   entityId: string;
   category: 'hub' | 'project' | 'timeline' | 'person' | 'discipline' | 'figure' | 'partner';
-  targetWorld: string;
-  rawAlias: string;
 }
 
 /**
- * Normalises text for bilingual alias matching:
- * - lowercase
- * - remove Arabic diacritics (tashkeel) and tatweel (ـ)
- * - unify Arabic letter variants (أ إ آ → ا, ة → ه, ى → ي)
- * - convert Arabic-Indic digits (٠-٩) to ASCII (0-9)
- * - strip excessive punctuation
+ * Word-level cueing (Phase 3 §3). Output transcription text is appended to a rolling
+ * buffer; each new alias match is scheduled for the playback-clock time at which the
+ * audio queued at arrival begins to play, so the highlight lands as the word is heard.
  */
-export function normalizeText(str: string): string {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    // Convert Arabic-Indic digits
-    .replace(/[٠-٩]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 1632 + 48))
-    // Remove Arabic diacritics (harakat)
-    .replace(/[\u064B-\u065F\u0670]/g, '')
-    // Remove tatweel (kashida)
-    .replace(/\u0640/g, '')
-    // Unify Alef forms
-    .replace(/[إأآٱ]/g, 'ا')
-    // Unify Teh Marbuta
-    .replace(/ة/g, 'ه')
-    // Unify Alef Maksura
-    .replace(/ى/g, 'ي')
-    // Replace punctuation with spaces
-    .replace(/[.,/#!$%^&*;:{}=\-_`~()?"'«»]/g, ' ')
-    // Collapse spaces
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 export class CueDirector {
-  private aliases: Array<{ normalized: string; match: AliasMatch }> = [];
-  private rollingBuffer: string = '';
-  private lastCueTimes: Map<string, number> = new Map();
-  private cueCallback?: (match: AliasMatch) => void;
+  private aliases: Alias[] = [];
+  private buffer = '';
+  private scanned = 0; // characters of `buffer` already scanned for matches
+  private lastCue = new Map<string, number>();
+  private timers = new Set<number>();
 
-  constructor(onCue?: (match: AliasMatch) => void) {
-    this.cueCallback = onCue;
-    this.initAliasIndex();
-
-    // Listen to output transcription words from LiveSession / bus
-    bus.on('transcription', (text: string) => {
-      this.feedTranscription(text);
-    });
+  constructor(private clock: () => number) {
+    fetchKB().then((kb) => this.build(kb)).catch((e) => console.warn('[cue] no KB', e));
   }
 
-  public setCueHandler(handler: (match: AliasMatch) => void) {
-    this.cueCallback = handler;
-  }
-
-  public async initAliasIndex() {
-    try {
-      const kb = await fetchKnowledgeBase();
-      this.buildIndex(kb);
-    } catch (e) {
-      console.warn('CueDirector: Failed to load KB for alias index:', e);
-    }
-  }
-
-  private buildIndex(kb: KnowledgeBaseData) {
-    this.aliases = [];
-
-    const add = (
-      rawAliases: string[],
-      entityId: string,
-      category: AliasMatch['category'],
-      targetWorld: string
-    ) => {
-      rawAliases.forEach((alias) => {
-        const norm = normalizeText(alias);
-        if (norm && norm.length >= 2) {
-          this.aliases.push({
-            normalized: norm,
-            match: { entityId, category, targetWorld, rawAlias: alias },
-          });
-        }
-      });
-    };
-
-    // Hubs (world: 'globe')
-    kb.hubs.forEach((h) => {
-      const custom = [
-        h.id,
-        h.city,
-        h.city_ar,
-        h.name,
-        h.name_ar,
-        ...(h.aliases || []),
-      ];
-      if (h.id === 'riyadh') custom.push('الرياض', 'riyadh');
-      if (h.id === 'florida') custom.push('فلوريدا', 'florida', 'tampa');
-      if (h.id === 'ostrava') custom.push('اوسترافا', 'ostrava', 'czech');
-      if (h.id === 'seoul') custom.push('سيول', 'سول', 'seoul', 'korea');
-      if (h.id === 'sydney') custom.push('سيدني', 'sydney', 'australia');
-      add(custom, h.id, 'hub', 'globe');
-    });
-
-    // Projects (world: 'project')
-    kb.projects.forEach((p) => {
-      const custom = [
-        p.id,
-        p.name,
-        p.name_ar,
-        ...(p.aliases || []),
-      ];
-      if (p.id === 'king-abdullah-park-fountain') custom.push('نافوره', 'fountain', 'malaz', 'الملز');
-      if (p.id === 'king-abdullah-international-gardens') custom.push('حدائق', 'gardens', 'kaig');
-      if (p.id === 'riyadh-eye') custom.push('عين الرياض', 'observation wheel', 'wheel', 'spaceship');
-      if (p.id === 'riyadh-2020') custom.push('دراسه الرياض', 'riyadh 2020', 'urban study');
-      if (p.id === '7d-world') custom.push('عالم سفن دي', '7d world');
-      add(custom, p.id, 'project', 'project');
-    });
-
-    // Timeline years & milestones (world: 'timeline')
-    kb.timeline.forEach((t) => {
-      const custom = [
-        t.year,
-        t.title_en,
-        t.title_ar,
-        ...(t.aliases || []),
-      ];
-      if (t.year.includes('1993')) custom.push('1993', 'nineteen ninety-three', 'الف وتسعميه وثلاثه وتسعين');
-      if (t.year.includes('2009')) custom.push('2009', 'two thousand nine');
-      if (t.year.includes('2011')) custom.push('2011');
-      if (t.year.includes('2013')) custom.push('2013');
-      if (t.year.includes('2018')) custom.push('2018');
-      if (t.year.includes('2020')) custom.push('2020');
-      if (t.year.includes('2025')) custom.push('2025');
-      add(custom, t.id || t.year, 'timeline', 'timeline');
-    });
-
-    // People (world: 'people')
-    kb.people.forEach((person) => {
-      const custom = [
-        person.id,
-        person.name,
-        person.name_ar,
-        ...(person.aliases || []),
-      ];
-      add(custom, person.id, 'person', 'people');
-    });
-
-    // Disciplines (world: 'disciplines')
-    kb.disciplines.forEach((d) => {
-      const custom = [
-        d.id,
-        d.name,
-        d.name_ar,
-        ...(d.aliases || []),
-      ];
-      add(custom, d.id, 'discipline', 'disciplines');
-    });
-
-    // Figures (world: 'figure')
-    kb.figures.forEach((fig) => {
-      const custom = [
-        fig.id,
-        fig.value,
-        fig.spoken_en,
-        fig.spoken_ar,
-        ...(fig.aliases || []),
-      ];
-      if (fig.id === 'fig-1993') custom.push('1993', 'nineteen ninety-three', '١٩٩٣', 'الف وتسعميه وثلاثه وتسعين');
-      if (fig.id === 'fig-80m') custom.push('80m', '$80m', 'ثمانين مليون', 'eighty million');
-      if (fig.id === 'fig-1500-base-stations') custom.push('1500', '١٥٠٠', 'fifteen hundred', 'الف وخمسميه', 'محطه');
-      if (fig.id === 'fig-5-hubs') custom.push('5 hubs', 'خمس مراكز', 'five hubs');
-      if (fig.id === 'fig-7-disciplines') custom.push('7 disciplines', 'سبع تخصصات', 'seven disciplines');
-      add(custom, fig.id, 'figure', 'figure');
-    });
-
-    // Sort aliases by length descending so longer compound phrases match first
-    this.aliases.sort((a, b) => b.normalized.length - a.normalized.length);
-  }
-
-  public feedTranscription(chunk: string) {
-    if (!chunk) return;
-    this.rollingBuffer += ' ' + chunk;
-    // Keep last 300 characters
-    if (this.rollingBuffer.length > 300) {
-      this.rollingBuffer = this.rollingBuffer.slice(-300);
-    }
-
-    const normTail = normalizeText(this.rollingBuffer);
-    const now = performance.now();
-
-    for (const item of this.aliases) {
-      // Check if alias appears in the tail buffer
-      if (normTail.includes(item.normalized)) {
-        const lastTime = this.lastCueTimes.get(item.match.entityId) || 0;
-        // Never cue the same entity twice within 3.0 seconds
-        if (now - lastTime > 3000) {
-          this.lastCueTimes.set(item.match.entityId, now);
-          this.cueCallback?.(item.match);
-          break; // trigger highest priority match
-        }
+  private build(kb: KnowledgeBase) {
+    const add = (list: string[], entityId: string, category: Alias['category']) => {
+      for (const a of list) {
+        const norm = normalize(a);
+        if (norm.length >= 3) this.aliases.push({ norm, entityId, category });
       }
+    };
+    kb.hubs.forEach((h) => add([h.name.en, h.name.ar, ...h.aliases], h.id, 'hub'));
+    kb.projects.forEach((p) => add([p.name.en, p.name.ar, ...p.aliases], p.id, 'project'));
+    kb.timeline.forEach((t) => add([t.year, t.title.en, t.title.ar, ...t.aliases], t.id, 'timeline'));
+    kb.people.forEach((p) => add([p.name.en, p.name.ar, ...p.aliases], p.id, 'person'));
+    kb.disciplines.forEach((d) => add([d.name.en, d.name.ar, ...d.aliases], d.id, 'discipline'));
+    kb.figures.forEach((f) => add([f.value, f.spoken.en, f.spoken.ar, ...f.aliases], f.id, 'figure'));
+    kb.partners.forEach((p) => add([p.name.en, p.name.ar, ...p.aliases], p.id, 'partner'));
+    // Longest first so "King Abdullah International Gardens" beats "gardens".
+    this.aliases.sort((a, b) => b.norm.length - a.norm.length);
+  }
+
+  /** @param text transcription chunk; @param at playback time when its audio will start */
+  feed(text: string, at: number) {
+    if (!text) return;
+    this.buffer += text;
+    if (this.buffer.length > 400) {
+      const cut = this.buffer.length - 400;
+      this.buffer = this.buffer.slice(cut);
+      this.scanned = Math.max(0, this.scanned - cut);
+    }
+    const norm = normalize(this.buffer);
+    // Only look at the tail that includes the new text (with a little overlap for split words).
+    const tailStart = Math.max(0, Math.floor(this.scanned * (norm.length / Math.max(1, this.buffer.length))) - 40);
+    const tail = norm.slice(tailStart);
+    this.scanned = this.buffer.length;
+
+    const now = performance.now();
+    const fired = new Set<string>();
+    for (const a of this.aliases) {
+      if (fired.has(a.entityId)) continue;
+      const idx = tail.indexOf(a.norm);
+      if (idx < 0) continue;
+      // whole-word check
+      const before = tail[idx - 1];
+      const after = tail[idx + a.norm.length];
+      if ((before && /[\p{L}\p{N}]/u.test(before)) || (after && /[\p{L}\p{N}]/u.test(after))) continue;
+      const last = this.lastCue.get(a.entityId) || 0;
+      if (now - last < STAGE.cueDebounceMs) continue;
+      this.lastCue.set(a.entityId, now);
+      fired.add(a.entityId);
+      // Estimate where in the chunk the word sits and delay proportionally (spoken ~14 chars/s).
+      const offsetSec = Math.max(0, (idx - (tail.length - normalize(text).length)) / 14);
+      const delayMs = Math.max(0, (at - this.clock() + offsetSec) * 1000);
+      const t = window.setTimeout(() => {
+        this.timers.delete(t);
+        bus.emit('cue', { entityId: a.entityId, category: a.category });
+      }, delayMs);
+      this.timers.add(t);
     }
   }
 
-  public resetBuffer() {
-    this.rollingBuffer = '';
-  }
-
-  public feedTranscript(chunk: string) {
-    this.feedTranscription(chunk);
+  reset() {
+    this.buffer = '';
+    this.scanned = 0;
+    for (const t of this.timers) clearTimeout(t);
+    this.timers.clear();
   }
 }
