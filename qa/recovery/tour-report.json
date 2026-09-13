@@ -1,0 +1,116 @@
+[
+  {
+    "lang": "en",
+    "finished": true,
+    "errors": [],
+    "bad": [],
+    "chapters": [
+      {
+        "running": true,
+        "chapter": "1 / 8",
+        "caption": "Welcome to 7D International. I am Noorah, and if you have two minutes I will show you the firm myself.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "2 / 8",
+        "caption": "7D began in the Czech Republic in nineteen ninety three, and is headquartered in Florida. Contracting and consulting, across five continents.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "3 / 8",
+        "caption": "Five hubs carry the work. Tampa, Ostrava, Sydney, Seoul, and now Riyadh. Watch the network light up.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "4 / 8",
+        "caption": "In the Kingdom the record is on the ground. The King Abdullah Park Fountain. The International Gardens. The Riyadh Eye. The twenty twenty urban study for the capital.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "5 / 8",
+        "caption": "The practice is organised into seven disciplines, from architecture and waterscape design to defence, energy, and the environment.",
+        "project": 3
+      },
+      {
+        "running": true,
+        "chapter": "6 / 8",
+        "caption": "Three decades of it. An eighty million dollar operations contract in Saudi Arabia. More than fifteen hundred base stations built across continents.",
+        "project": 3
+      },
+      {
+        "running": true,
+        "chapter": "7 / 8",
+        "caption": "In December twenty twenty five, 7D partnered with Takween Alrajhi and opened its Middle East headquarters here in Riyadh.",
+        "project": 3
+      },
+      {
+        "running": true,
+        "chapter": "8 / 8",
+        "caption": "That is the firm. Tell us the sector, the country and the scale, and start a conversation with the team.",
+        "project": 3
+      }
+    ],
+    "video": "/tmp/7d-tour-qa/en-tour.webm"
+  },
+  {
+    "lang": "ar",
+    "finished": true,
+    "errors": [],
+    "bad": [],
+    "chapters": [
+      {
+        "running": true,
+        "chapter": "1 / 8",
+        "caption": "هلا وغلا فيك في سفن دي إنترناشونال. أنا نورة، وإذا عندك دقيقتين بأعرّفك على الشركة بنفسي.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "2 / 8",
+        "caption": "بدأت سفن دي في جمهورية التشيك سنة ألف وتسعمئة وثلاثة وتسعين، ومقرها الرئيسي في فلوريدا. مقاولات واستشارات في خمس قارات.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "3 / 8",
+        "caption": "خمسة مراكز تحمل العمل: تامبا، وأوسترافا، وسيدني، وسيول، والآن الرياض. شوف الشبكة وهي تضيء.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "4 / 8",
+        "caption": "في المملكة، السجل موجود على أرض الواقع: نافورة حديقة الملك عبدالله، والحديقة العالمية، وعين الرياض، ودراسة الرياض العمرانية لعام ألفين وعشرين.",
+        "project": 0
+      },
+      {
+        "running": true,
+        "chapter": "5 / 8",
+        "caption": "تنقسم أعمال الشركة إلى سبعة تخصصات، من العمارة وتصميم المسطحات المائية إلى الدفاع والطاقة والبيئة.",
+        "project": 3
+      },
+      {
+        "running": true,
+        "chapter": "6 / 8",
+        "caption": "ثلاثة عقود من العمل: عقد تشغيل وصيانة بثمانين مليون دولار في السعودية، وأكثر من ألف وخمسمئة محطة اتصالات حول العالم.",
+        "project": 3
+      },
+      {
+        "running": true,
+        "chapter": "7 / 8",
+        "caption": "في ديسمبر ألفين وخمسة وعشرين، عقدت سفن دي شراكة مع تكوين الراجحي وافتتحت مقرها للشرق الأوسط هنا في الرياض.",
+        "project": 3
+      },
+      {
+        "running": true,
+        "chapter": "8 / 8",
+        "caption": "هذي هي الشركة. أخبرنا بالقطاع والدولة وحجم المشروع لبدء المحادثة مع الفريق.",
+        "project": 3
+      }
+    ],
+    "video": "/tmp/7d-tour-qa/ar-tour.webm"
+  }
+]
