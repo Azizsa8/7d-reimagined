@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>7D International × AISERS Space</title>
+<meta name="description" content="Three concept directions for the 7D International digital presence, prepared by AISERS Systems.">
+<meta name="theme-color" content="#000000">
+<meta name="robots" content="noindex">
+<link rel="icon" href="brand/aisers-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* AISERS Space — the AISERS identity framing a client proposal.
+   Black ground, white type, AISERS green used sparingly as the signal colour.
+   Each concept carries its own imagery; the frame stays AISERS. */
+:root{
+  --bg:#000; --bg-2:#060607; --panel:#0C0D0E; --ink:#F5F6F7; --dim:#9BA0A6; --dimmer:#7F858B;
+  --line:rgba(245,246,247,.22); --line-soft:rgba(245,246,247,.1);
+  --accent:#2FBF71; --accent-ink:#04210F; --accent-soft:rgba(47,191,113,.14); --accent-glow:rgba(47,191,113,.5);
+  --brass:#E0A94A;
+  --mark:'Michroma',sans-serif; --sans:'IBM Plex Sans',-apple-system,system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --gut:clamp(20px,5vw,64px);
+}
+html[dir="rtl"]{--sans:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-snap-type:y mandatory;-webkit-text-size-adjust:100%;background:var(--bg)}
+@media(hover:hover) and (pointer:fine){html{scroll-snap-type:y proximity}}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;overflow-x:clip;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent);color:var(--accent-ink)}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+img{display:block;max-width:100%}
+.mono{font-family:var(--mono)}
+
+/* ---------- frame chrome ---------- */
+.top{position:fixed;inset-inline:0;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(12px + env(safe-area-inset-top)) var(--gut) 12px;background:linear-gradient(180deg,rgba(0,0,0,.8),transparent);pointer-events:none}
+.top>*{pointer-events:auto}
+.lockup{display:flex;align-items:center;gap:12px;text-decoration:none}
+.lockup svg{height:30px;width:auto}
+.lockup .word{font-family:var(--mark);font-size:12px;letter-spacing:.24em}
+.lockup .times{color:var(--dimmer);font-size:12px}
+.lockup img{height:28px;width:auto}
+.lang{height:36px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.lang:hover{border-color:var(--accent)}
+@media(max-width:420px){.lockup .word{display:none}}
+
+.rail{position:fixed;inset-inline-end:clamp(10px,2vw,26px);top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:14px}
+.rail button{position:relative;width:10px;height:10px;border-radius:50%;border:1px solid var(--line);transition:background .4s,border-color .4s,transform .4s var(--ease)}
+.rail button.on{background:var(--accent);border-color:var(--accent);transform:scale(1.3)}
+.rail button span{position:absolute;inset-inline-end:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none;text-transform:uppercase}
+html[dir="rtl"] .rail button span{font-family:var(--sans);letter-spacing:0;font-size:12px;text-transform:none}
+.rail button.on span{opacity:1}
+@media(max-width:600px){.rail button span{display:none}.rail{gap:12px}.rail button{width:7px;height:7px}.inner{padding-inline-end:calc(var(--gut) + 14px)}}
+
+.progress{position:fixed;inset-inline:0;top:0;height:2px;z-index:50;background:transparent}
+.progress i{display:block;height:100%;width:0;background:var(--accent);box-shadow:0 0 12px var(--accent-glow)}
+
+/* ---------- chapters ---------- */
+.ch{position:relative;min-height:100svh;scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;display:grid}
+.inner{position:relative;z-index:2;padding:calc(92px + env(safe-area-inset-top)) var(--gut) calc(34px + env(safe-area-inset-bottom));display:grid;align-content:end;gap:18px;max-width:1280px;width:100%}
+.kicker-line{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+html[dir="rtl"] .kicker-line{font-family:var(--sans);letter-spacing:0;font-size:13px;text-transform:none}
+.kicker-line::before{content:"";width:22px;height:1px;background:var(--accent)}
+.display{font-family:var(--sans);font-weight:500;font-size:clamp(2.1rem,7.4vw,5.6rem);line-height:1.02;letter-spacing:-.035em;text-wrap:balance}
+html[dir="rtl"] .display{letter-spacing:0;line-height:1.3;font-weight:600}
+.lede{max-width:52ch;color:var(--dim);font-size:clamp(1rem,2.4vw,1.15rem)}
+
+/* reveal: visible by default, animated when motion is allowed */
+.rv{transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.motion .rv{opacity:0;transform:translateY(22px)}
+.motion .ch.in .rv{opacity:1;transform:none}
+.motion .ch.in .rv:nth-child(2){transition-delay:.08s}.motion .ch.in .rv:nth-child(3){transition-delay:.16s}
+.motion .ch.in .rv:nth-child(4){transition-delay:.24s}.motion .ch.in .rv:nth-child(5){transition-delay:.32s}
+
+/* ---------- 0 · opening ---------- */
+#open{background:radial-gradient(90% 60% at 50% 30%,#07130C 0%,#000 60%)}
+#field{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.open-mark{position:absolute;inset:0;z-index:1;display:grid;place-items:center;padding-bottom:18vh;pointer-events:none}
+.open-mark svg{height:min(38svh,300px);width:auto;overflow:visible}
+.open-mark path{stroke:var(--ink);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:400;stroke-dashoffset:0}
+.motion .open-mark path{animation:draw 2.4s var(--ease) both}
+.open-mark path:nth-child(2){animation-delay:.25s}.open-mark path:nth-child(3){animation-delay:.5s}.open-mark path:nth-child(4){animation-delay:.75s}
+@keyframes draw{from{stroke-dashoffset:400}to{stroke-dashoffset:0}}
+.open-mark .halo{position:absolute;width:min(60vw,420px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--accent-soft),transparent 65%);filter:blur(10px)}
+.for{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.for img{height:44px;width:auto}
+.for span{font-size:14px;color:var(--dim)}
+.for b{display:block;color:var(--ink);font-weight:500;font-size:16px}
+.space-word{font-family:var(--mark);font-size:clamp(1.3rem,4.6vw,2.6rem);letter-spacing:.18em;line-height:1.2}
+.space-word em{font-style:normal;color:var(--accent)}
+html[dir="rtl"] .space-word{letter-spacing:.06em}
+.swipe{display:flex;align-items:center;gap:10px;color:var(--dimmer);font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase}
+html[dir="rtl"] .swipe{font-family:var(--sans);letter-spacing:0;font-size:13px;text-transform:none}
+.swipe i{width:1px;height:28px;background:linear-gradient(var(--accent),transparent);animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:scaleY(.4);transform-origin:top}50%{transform:scaleY(1)}}
+
+/* ---------- 1 · intent ---------- */
+#intent{background:var(--bg)}
+.status{display:flex;align-items:flex-start;gap:14px;max-width:62ch;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.status .dot{flex:none;margin-top:7px;width:9px;height:9px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 5px rgba(224,169,74,.14)}
+.status p{font-size:15px;color:var(--ink)}
+.status p span{color:var(--dim)}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:760px}
+.trio button{text-align:start;padding:14px;border:1px solid var(--line-soft);border-radius:12px;background:rgba(245,246,247,.02);transition:border-color .3s,background .3s}
+.trio button:hover{border-color:var(--accent);background:var(--accent-soft)}
+.trio b{display:block;font-family:var(--mark);font-size:12px;letter-spacing:.14em;color:var(--accent)}
+.trio span{display:block;margin-top:6px;font-size:14px;line-height:1.35}
+@media(max-width:560px){.trio{grid-template-columns:1fr}.trio button{display:flex;gap:14px;align-items:baseline}.trio span{margin-top:0}}
+
+/* ---------- concept chapters ---------- */
+.concept{background:#000}
+.media{position:absolute;inset:0;z-index:0}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.08);transition:opacity 1.6s var(--ease)}
+.media img.on{opacity:1}
+.motion .media img.on{animation:drift 9s linear both}
+@keyframes drift{from{transform:scale(1.14) translate3d(1.5%,1%,0)}to{transform:scale(1.02) translate3d(-1.5%,-1%,0)}}
+.media::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.05) 26%,rgba(0,0,0,.2) 52%,rgba(0,0,0,.92) 82%,#000 100%)}
+.num{position:absolute;z-index:1;inset-inline-end:var(--gut);top:calc(78px + env(safe-area-inset-top));font-family:var(--mark);font-size:clamp(4.2rem,20vw,13rem);line-height:.9;
+  color:transparent;-webkit-text-stroke:1px rgba(245,246,247,.35);letter-spacing:-.02em;pointer-events:none}
+.concept .display{font-size:clamp(2.2rem,8vw,6rem)}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags span{font-size:12.5px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:rgba(0,0,0,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--ink)}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;font-size:15px;font-weight:500;text-decoration:none;
+  border:1px solid var(--line);background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:border-color .3s,background .3s,transform .3s var(--ease)}
+.btn:hover{border-color:var(--ink)}
+.btn:active{transform:scale(.98)}
+.btn.go{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.go:hover{box-shadow:0 10px 30px -10px var(--accent-glow)}
+.btn svg{width:16px;height:16px}
+html[dir="rtl"] .btn svg{transform:scaleX(-1)}
+.state{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--brass);text-transform:uppercase}
+html[dir="rtl"] .state{font-family:var(--sans);letter-spacing:0;font-size:13px;text-transform:none}
+.state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brass)}
+@media(max-width:560px){.acts .btn{flex:1 1 auto}}
+
+/* ---------- compare ---------- */
+#compare{background:var(--bg-2)}
+.cmp{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px var(--gut) 12px;margin-inline:calc(var(--gut) * -1);scrollbar-width:none}
+.cmp::-webkit-scrollbar{display:none}
+.card{flex:0 0 min(84vw,380px);scroll-snap-align:center;border:1px solid var(--line-soft);border-radius:18px;background:var(--panel);padding:20px;display:grid;gap:14px;align-content:start}
+.card header{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card header b{font-family:var(--mark);font-size:13px;letter-spacing:.14em;color:var(--accent)}
+.card h3{font-weight:500;font-size:20px;line-height:1.2}
+.card dl{display:grid;gap:10px}
+.card dt{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--dimmer);text-transform:uppercase}
+html[dir="rtl"] .card dt{font-family:var(--sans);letter-spacing:0;font-size:12px;text-transform:none}
+.card dd{font-size:14.5px}
+.meter{display:flex;gap:4px;margin-top:4px}
+.meter i{flex:1;height:5px;border-radius:3px;background:rgba(245,246,247,.1)}
+.meter i.f{background:var(--accent)}
+@media(min-width:1100px){.cmp{overflow:visible;margin-inline:0;padding-inline:0}.card{flex:1 1 0}}
+
+/* ---------- completion ---------- */
+#complete{background:var(--bg)}
+.path{list-style:none;display:grid;gap:0;max-width:760px;border-inline-start:1px solid var(--line);margin-inline-start:4px}
+.path li{position:relative;padding:12px 0 12px 22px}
+html[dir="rtl"] .path li{padding:12px 22px 12px 0}
+.path li::before{content:"";position:absolute;inset-inline-start:-5px;top:20px;width:9px;height:9px;border-radius:50%;background:#000;border:1px solid var(--accent)}
+.path li:first-child::before{background:var(--accent)}
+.path b{display:block;font-weight:500;font-size:16px}
+.path span{color:var(--dim);font-size:14.5px}
+.streams{display:flex;flex-wrap:wrap;gap:8px;max-width:820px}
+.streams span{font-size:13px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-soft);color:var(--dim)}
+
+/* ---------- close ---------- */
+#close{background:radial-gradient(80% 60% at 50% 100%,#06160D 0%,#000 65%)}
+.close-mark svg{height:64px;width:auto}
+.close-mark path{stroke:var(--ink);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding-top:18px;border-top:1px solid var(--line-soft);font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--dimmer);text-transform:uppercase}
+html[dir="rtl"] .foot{font-family:var(--sans);letter-spacing:0;font-size:12px;text-transform:none}
+
+/* ---------- detail sheet ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;inset-inline:0;bottom:0;z-index:61;max-height:88svh;display:flex;flex-direction:column;background:var(--panel);border-top:1px solid var(--line);
+  border-radius:22px 22px 0 0;transform:translateY(104%);transition:transform .55s var(--ease);box-shadow:0 -30px 80px -30px #000}
+.sheet.on{transform:translateY(var(--drag,0px))}
+@media(min-width:900px){.sheet{inset-inline:auto 24px;bottom:24px;width:min(560px,44vw);border-radius:22px;border:1px solid var(--line);max-height:calc(100svh - 48px)}
+  html[dir="rtl"] .sheet{inset-inline:24px auto}}
+.grab{padding:10px 0 4px;display:grid;place-items:center;cursor:grab;touch-action:none}
+.grab i{width:44px;height:4px;border-radius:4px;background:var(--line)}
+.sheet-h{display:flex;justify-content:space-between;align-items:start;gap:12px;padding:6px 22px 14px;border-bottom:1px solid var(--line-soft)}
+.sheet-h b{font-family:var(--mark);font-size:12px;letter-spacing:.14em;color:var(--accent)}
+.sheet-h h3{font-weight:500;font-size:22px;line-height:1.2;margin-top:4px}
+.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);font-size:20px;line-height:1;flex:none}
+.sheet-b{overflow-y:auto;padding:16px 22px calc(26px + env(safe-area-inset-bottom));display:grid;gap:22px;overscroll-behavior:contain}
+.sheet-b h4{font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.2em;color:var(--dimmer);text-transform:uppercase;margin-bottom:10px}
+html[dir="rtl"] .sheet-b h4{font-family:var(--sans);letter-spacing:0;font-size:13px;text-transform:none}
+.sheet-b p{color:var(--ink);font-size:15.5px}
+.sheet-b ul{list-style:none;display:grid;gap:10px}
+.sheet-b li{position:relative;padding-inline-start:18px;font-size:15px;color:var(--ink)}
+.sheet-b li::before{content:"";position:absolute;inset-inline-start:0;top:.66em;width:7px;height:1.5px;background:var(--accent)}
+.sheet-b li span{color:var(--dim)}
+.sheet-b .todo li::before{background:var(--brass)}
+.note{padding:14px 16px;border-radius:12px;border:1px solid rgba(224,169,74,.35);background:rgba(224,169,74,.07);font-size:14.5px}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-snap-type:none}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .media img{transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+
+<header class="top">
+  <a class="lockup" href="#open" aria-label="AISERS Systems for 7D International">
+    <svg viewBox="0 0 60 300" aria-hidden="true"><path d="M1.25 0 L5.31 7.13 L6.25 128.27 L10.31 135.39 L25.94 149.64 L28.12 153.21 L28.75 267.22 L34.38 277.91" stroke="#F5F6F7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M2.19 153.21 L5.62 160.33 L5.62 245.84 L6.25 249.41 L10.31 256.53" stroke="#F5F6F7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M25.31 21.38 L29.69 28.5 L30 117.58 L33.44 124.7 L49.69 138.95 L53.12 146.08 L53.12 288.6 L58.44 299.29" stroke="#F5F6F7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M49.38 14.25 L53.44 21.38 L53.12 110.45 L53.75 114.01 L57.81 121.14" stroke="#F5F6F7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    <span class="word">AISERS</span>
+    <span class="times">×</span>
+    <img src="../assets/brand/logo.png" alt="7D International">
+  </a>
+  <button class="lang" id="lang" type="button">عربي</button>
+</header>
+
+<nav class="rail" id="rail" aria-label="Chapters"></nav>
+
+<main>
+  <!-- 0 · opening -->
+  <section class="ch" id="open" data-t="t.open">
+    <canvas id="field" aria-hidden="true"></canvas>
+    <div class="open-mark" aria-hidden="true">
+      <span class="halo"></span>
+      <svg viewBox="0 0 60 300"><path d="M1.25 0 L5.31 7.13 L6.25 128.27 L10.31 135.39 L25.94 149.64 L28.12 153.21 L28.75 267.22 L34.38 277.91"/><path d="M2.19 153.21 L5.62 160.33 L5.62 245.84 L6.25 249.41 L10.31 256.53"/><path d="M25.31 21.38 L29.69 28.5 L30 117.58 L33.44 124.7 L49.69 138.95 L53.12 146.08 L53.12 288.6 L58.44 299.29"/><path d="M49.38 14.25 L53.44 21.38 L53.12 110.45 L53.75 114.01 L57.81 121.14"/></svg>
+    </div>
+    <div class="inner">
+      <div class="space-word rv">AISERS <em>SPACE</em></div>
+      <div class="for rv"><img src="../assets/brand/logo.png" alt="7D International"><span data-i="prepared">Prepared for<b>7D International</b></span></div>
+      <p class="lede rv" data-i="openLede">Three concept directions for a new 7D International digital presence.</p>
+      <div class="swipe rv"><i></i><span data-i="swipe">Swipe to begin</span></div>
+    </div>
+  </section>
+
+  <!-- 1 · intent -->
+  <section class="ch" id="intent" data-t="t.intent">
+    <div class="inner">
+      <div class="kicker-line rv" data-i="intentK">The brief</div>
+      <h1 class="display rv" data-i="intentH">One firm. Three ways to tell its story.</h1>
+      <p class="lede rv" data-i="intentP">Each direction presents the same company: three decades of contracting and consulting, seven disciplines, five international hubs and a Middle East headquarters in Riyadh. What changes is how a visitor experiences it.</p>
+      <div class="status rv"><span class="dot"></span><p data-i="statusP">Concept prototypes, not finished products. <span>All three are working demonstrations of direction, interaction and technology. Bringing any one of them to launch requires considerable production effort, scoped once a direction is chosen.</span></p></div>
+      <div class="trio rv" id="trio"></div>
+    </div>
+  </section>
+
+  <!-- 2,3,4 · concepts (rendered from data) -->
+  <div id="concepts"></div>
+
+  <!-- 5 · compare -->
+  <section class="ch" id="compare" data-t="t.compare">
+    <div class="inner">
+      <div class="kicker-line rv" data-i="cmpK">Side by side</div>
+      <h2 class="display rv" data-i="cmpH">How the three directions differ</h2>
+      <div class="cmp rv" id="cmp"></div>
+    </div>
+  </section>
+
+  <!-- 6 · completion -->
+  <section class="ch" id="complete" data-t="t.complete">
+    <div class="inner">
+      <div class="kicker-line rv" data-i="doneK">From concept to launch</div>
+      <h2 class="display rv" data-i="doneH">What completion involves</h2>
+      <ol class="path rv" id="path"></ol>
+      <div class="streams rv" id="streams"></div>
+    </div>
+  </section>
+
+  <!-- 7 · close -->
+  <section class="ch" id="close" data-t="t.close">
+    <div class="inner">
+      <div class="close-mark rv" aria-hidden="true"><svg viewBox="0 0 60 300"><path d="M1.25 0 L5.31 7.13 L6.25 128.27 L10.31 135.39 L25.94 149.64 L28.12 153.21 L28.75 267.22 L34.38 277.91"/><path d="M2.19 153.21 L5.62 160.33 L5.62 245.84 L6.25 249.41 L10.31 256.53"/><path d="M25.31 21.38 L29.69 28.5 L30 117.58 L33.44 124.7 L49.69 138.95 L53.12 146.08 L53.12 288.6 L58.44 299.29"/><path d="M49.38 14.25 L53.44 21.38 L53.12 110.45 L53.75 114.01 L57.81 121.14"/></svg></div>
+      <h2 class="display rv" data-i="closeH">Choose a direction. We take it from there.</h2>
+      <p class="lede rv" data-i="closeP">Once a direction is selected, AISERS prepares the production scope, timeline and investment for bringing it to launch.</p>
+      <div class="acts rv">
+        <a class="btn go" href="https://www.aisers.net/" target="_blank" rel="noopener"><span data-i="closeBtn">AISERS Systems</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+        <button class="btn" type="button" data-jump="intent"><span data-i="closeBack">Review the concepts</span></button>
+      </div>
+      <div class="foot rv"><span>AISERS Systems · Riyadh</span><span data-i="foot">Confidential · prepared for 7D International</span></div>
+    </div>
+  </section>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" inert>
+  <div class="grab" id="grab" aria-hidden="true"><i></i></div>
+  <div class="sheet-h">
+    <div><b id="sheetNum">01</b><h3 id="sheetTitle"></h3></div>
+    <button class="x" id="sheetX" type="button" aria-label="Close">×</button>
+  </div>
+  <div class="sheet-b" id="sheetBody"></div>
+</aside>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(!REDUCED)document.documentElement.classList.add('motion');
+const BASE='https://7d-reimagined.vercel.app';
+
+/* ---------- content ---------- */
+const CONCEPTS=[
+ {id:'c1',link:BASE+'/concept-1/',imgs:['img/c1-fountain.jpg','img/c1-eye.jpg','img/c1-skyline.jpg','img/c1-globe.jpg'],meter:{exp:5,prod:5,weight:5},
+  en:{name:'The Guided Journey',line:'A narrated journey through 7D’s work, told in real-time 3D.',
+    tags:['Real-time 3D','Narrated tour','English · Arabic'],
+    what:'The visitor chooses a language and a bilingual guide takes over. The page moves on its own through a real-time 3D flight across the Riyadh projects, lights 7D’s five hubs on a live globe, and brings each of the seven disciplines to life as an animated instrument. A touch pauses the guide; a second touch resumes.',
+    tech:[['WebGL 2 · three.js','physically based materials, environment lighting, filmic tone mapping and bloom'],['Scroll-driven camera','a single continuous flight path synchronised with the narration'],['Neural voice narration','pre-rendered in English and Saudi Arabic for instant, reliable playback'],['Interruptible tour engine','touch, scroll or keyboard to pause, resume or exit'],['Canvas simulations','seven live discipline instruments'],['Installable web app','offline shell and full right-to-left Arabic']],
+    todo:['Production-grade 3D models of each project, built from surveys and approved renders','Film-quality lighting and art direction for every scene','A licensed Saudi voice and a finalised bilingual script','Performance engineering for mid-range phones','Approved content and Arabic copy'],
+    exp:'Cinematic, narrated, fully immersive',basis:'Real-time 3D models',intensity:'Very high'},
+  ar:{name:'الرحلة الموجَّهة',line:'رحلة مسرودة عبر أعمال 7D، تُروى بتقنية ثلاثية الأبعاد في الزمن الحقيقي.',
+    tags:['ثلاثي الأبعاد في الزمن الحقيقي','جولة مسرودة','عربي · إنجليزي'],
+    what:'يختار الزائر لغته فتتولى مرشدة صوتية ثنائية اللغة القيادة. تتحرك الصفحة وحدها في رحلة ثلاثية الأبعاد عبر مشاريع الرياض، وتُضيء مراكز 7D الخمسة على كرة أرضية حيّة، وتُحيي كل تخصص من التخصصات السبعة كأداة متحركة. لمسة واحدة توقف المرشدة، ولمسة ثانية تستأنفها.',
+    tech:[['WebGL 2 · three.js','مواد فيزيائية، وإضاءة بيئية، ومعالجة سينمائية للصورة'],['كاميرا يقودها التمرير','مسار طيران متصل يتزامن مع السرد'],['سرد صوتي احترافي','مُعدّ مسبقًا بالإنجليزية واللهجة السعودية لتشغيل فوري وموثوق'],['محرك جولة قابل للمقاطعة','باللمس أو التمرير أو لوحة المفاتيح للإيقاف والاستئناف والخروج'],['محاكاة Canvas','سبع أدوات حيّة للتخصصات'],['تطبيق ويب قابل للتثبيت','عمل دون اتصال ودعم كامل للعربية من اليمين إلى اليسار']],
+    todo:['نماذج ثلاثية الأبعاد بجودة إنتاجية لكل مشروع مبنية على المسوحات والتصاميم المعتمدة','إضاءة وإخراج فني بجودة سينمائية لكل مشهد','صوت سعودي مرخّص ونص سرد نهائي بلغتين','هندسة أداء للهواتف متوسطة الفئة','محتوى ونصوص عربية معتمدة'],
+    exp:'سينمائية، مسرودة، غامرة بالكامل',basis:'نماذج ثلاثية الأبعاد في الزمن الحقيقي',intensity:'عالية جدًا'}},
+ {id:'c2',link:BASE+'/concept-2/',imgs:['img/c2-fountain.jpg','img/c2-garden.jpg','img/c2-eye.jpg'],meter:{exp:3,prod:3,weight:2},
+  en:{name:'The Record',line:'7D’s delivered work, presented through its own photography.',
+    tags:['Photography-led','Fast on every device','Search-ready'],
+    what:'Built around the evidence: 7D’s own project photography and renders shown full-screen, with a slow cinematic push-in and numbered navigation between projects. A lightweight live globe traces the five hubs, the guided tour remains available, and the foundations for search and sharing are in place from the first page.',
+    tech:[['Static, fast-loading architecture','no heavy runtime on first view'],['Proximity image loading','each project loads only as it approaches'],['On-demand WebGL globe','loaded only when the visitor reaches it'],['Search and sharing','structured data, multilingual indexing, sitemap and social previews'],['Accessibility','automated WCAG 2.1 AA checks, keyboard navigation, reduced-motion mode'],['Guided tour','the same bilingual narrated journey']],
+    todo:['Professional photography and aerial footage of completed sites','Commissioned renders for projects without published imagery','Vector brand assets and a confirmed identity system','A content management system for projects and news','Enquiry routing and approved Arabic copy'],
+    exp:'Clear, credible, evidence-first',basis:'7D photography and renders',intensity:'Moderate'},
+  ar:{name:'السجل',line:'أعمال 7D المنجزة، معروضة من خلال صورها الخاصة.',
+    tags:['قائم على التصوير','سريع على كل الأجهزة','جاهز لمحركات البحث'],
+    what:'مبني حول الدليل: صور مشاريع 7D وتصاميمها معروضة بملء الشاشة مع اقتراب سينمائي هادئ وتنقل مرقّم بين المشاريع. كرة أرضية حيّة خفيفة ترسم المراكز الخمسة، والجولة الموجَّهة متاحة، وأسس البحث والمشاركة جاهزة من الصفحة الأولى.',
+    tech:[['بنية ثابتة سريعة التحميل','دون أحمال ثقيلة عند الفتح'],['تحميل الصور حسب القرب','يُحمَّل كل مشروع عند الاقتراب منه'],['كرة WebGL عند الطلب','تُحمَّل فقط عند وصول الزائر إليها'],['البحث والمشاركة','بيانات منظمة، وفهرسة متعددة اللغات، وخريطة موقع، ومعاينات اجتماعية'],['إمكانية الوصول','فحوص آلية وفق WCAG 2.1 AA، وتنقل بلوحة المفاتيح، ووضع الحركة المخففة'],['الجولة الموجَّهة','نفس الرحلة المسرودة بلغتين']],
+    todo:['تصوير احترافي وتصوير جوي للمواقع المنجزة','تصاميم مُعدّة للمشاريع التي لا تتوفر لها صور منشورة','أصول هوية متجهية ونظام هوية معتمد','نظام إدارة محتوى للمشاريع والأخبار','توجيه الاستفسارات ونصوص عربية معتمدة'],
+    exp:'واضحة، موثوقة، تبدأ بالدليل',basis:'صور 7D وتصاميمها',intensity:'متوسطة'}},
+ {id:'c3',link:BASE+'/concept-3/',imgs:['img/c3-sphere.jpg','img/c3-mark.jpg','img/c3-shards.jpg'],meter:{exp:5,prod:4,weight:4},
+  en:{name:'The Instrument',line:'An art-directed experience where the brand itself becomes the interface.',
+    tags:['Custom shaders','Motion-led','Ambient sound'],
+    what:'A crafted, editorial experience. A living sphere of light opens the site; the 7D mark assembles itself from cut-metal facets; statements write themselves as they are read; the seven disciplines grow as branches from a single trunk; and the projects play as a horizontal cinema. Optional ambient sound completes the atmosphere.',
+    tech:[['Custom GLSL shaders','a generative sphere shaded by depth and light'],['Physically based metal','cut facets with real environment reflections'],['Cinematic post-processing','bloom and filmic tone mapping'],['Inertial scrolling','smooth, weighted motion throughout'],['Path animation','the discipline tree grows with the scroll'],['Generative sound','ambient audio synthesised in the browser']],
+    todo:['A full art-direction and motion-design pass','Bespoke sound design','Brand-aligned 3D assets and approved photography','A device performance budget and testing','Content production in both languages'],
+    exp:'Crafted, editorial, memorable',basis:'Generative 3D and motion design',intensity:'High'},
+  ar:{name:'الأداة',line:'تجربة بإخراج فني تتحول فيها الهوية نفسها إلى واجهة.',
+    tags:['مظللات مخصصة','قائمة على الحركة','صوت محيطي'],
+    what:'تجربة تحريرية مصنوعة بعناية. كرة حيّة من الضوء تفتتح الموقع، وشعار 7D يتشكّل من قطع معدنية مصقولة، وعبارات تكتب نفسها أثناء قراءتها، والتخصصات السبعة تنمو كأغصان من جذع واحد، والمشاريع تُعرض كسينما أفقية. ويكمل صوتٌ محيطي اختياري الأجواء.',
+    tech:[['مظللات GLSL مخصصة','كرة مولَّدة تتظلل حسب العمق والضوء'],['معدن بمواد فيزيائية','قطع مصقولة بانعكاسات بيئية حقيقية'],['معالجة سينمائية للصورة','توهج وتدرج لوني سينمائي'],['تمرير بالقصور الذاتي','حركة سلسة وموزونة في كل الصفحة'],['تحريك المسارات','شجرة التخصصات تنمو مع التمرير'],['صوت مولَّد','صوت محيطي يُنتج داخل المتصفح']],
+    todo:['مرحلة كاملة من الإخراج الفني وتصميم الحركة','تصميم صوتي مخصص','أصول ثلاثية الأبعاد متوافقة مع الهوية وصور معتمدة','ميزانية أداء للأجهزة واختبارها','إنتاج المحتوى باللغتين'],
+    exp:'مصنوعة بعناية، تحريرية، لا تُنسى',basis:'تصميم ثلاثي الأبعاد مولَّد وحركة',intensity:'عالية'}}
+];
+const I={
+ en:{lang:'عربي',langLabel:'العربية',prepared:'Prepared for<b>7D International</b>',openLede:'Three concept directions for a new 7D International digital presence.',swipe:'Swipe to begin',
+   intentK:'The brief',intentH:'One firm. Three ways to tell its story.',
+   intentP:'Each direction presents the same company: three decades of contracting and consulting, seven disciplines, five international hubs and a Middle East headquarters in Riyadh. What changes is how a visitor experiences it.',
+   statusP:'Concept prototypes, not finished products. <span>All three are working demonstrations of direction, interaction and technology. Bringing any one of them to launch requires considerable production effort, scoped once a direction is chosen.</span>',
+   concept:'Concept',open:'Open the prototype',details:'Technology & scope',state:'Concept prototype',
+   sWhat:'The experience',sTech:'Technology',sTodo:'To complete this direction',sNote:'This concept is a working prototype. It demonstrates the direction and the technology; it is not a finished product.',
+   cmpK:'Side by side',cmpH:'How the three directions differ',cExp:'Experience',cBasis:'Visual basis',cImm:'Immersion',cProd:'Production effort',
+   doneK:'From concept to launch',doneH:'What completion involves',
+   path:[['Direction','7D selects one concept, or a combination of elements from several.'],['Discovery','Content, assets and priorities agreed with the 7D team.'],['Production','3D, photography, voice, motion and copy produced to launch quality.'],['Build','Engineering, content management, enquiry routing and analytics.'],['Review','Bilingual review, device testing, accessibility and performance.'],['Launch','Domain, hosting, security and handover.']],
+   streams:['Bilingual copy & approval','Brand alignment','Content management','Enquiry routing','Analytics & privacy','Security & hosting','Device & browser QA','Training & handover'],
+   closeH:'Choose a direction. We take it from there.',closeP:'Once a direction is selected, AISERS prepares the production scope, timeline and investment for bringing it to launch.',
+   closeBtn:'AISERS Systems',closeBack:'Review the concepts',foot:'Confidential · prepared for 7D International',
+   t:{open:'Opening',intent:'The brief',c1:'Concept 01',c2:'Concept 02',c3:'Concept 03',compare:'Compare',complete:'Completion',close:'Next step'}},
+ ar:{lang:'EN',langLabel:'English',prepared:'مُعدّ لـ<b>7D International</b>',openLede:'ثلاثة توجهات لمفهوم الحضور الرقمي الجديد لـ 7D International.',swipe:'مرّر للبدء',
+   intentK:'الموجز',intentH:'شركة واحدة. ثلاث طرق لرواية قصتها.',
+   intentP:'يقدّم كل توجه الشركة نفسها: ثلاثة عقود من المقاولات والاستشارات، وسبعة تخصصات، وخمسة مراكز دولية، ومقر إقليمي للشرق الأوسط في الرياض. ما يتغير هو طريقة عيش الزائر للتجربة.',
+   statusP:'نماذج أولية للمفاهيم، لا منتجات مكتملة. <span>الثلاثة جميعها عروض عملية للتوجه والتفاعل والتقنية. ويتطلب إطلاق أيٍّ منها جهدًا إنتاجيًا كبيرًا يُحدَّد نطاقه بعد اختيار التوجه.</span>',
+   concept:'المفهوم',open:'افتح النموذج',details:'التقنية والنطاق',state:'نموذج أولي',
+   sWhat:'التجربة',sTech:'التقنية',sTodo:'لإكمال هذا التوجه',sNote:'هذا المفهوم نموذج أولي عملي. يوضح التوجه والتقنية، وليس منتجًا مكتملًا.',
+   cmpK:'مقارنة',cmpH:'كيف تختلف التوجهات الثلاثة',cExp:'التجربة',cBasis:'الأساس البصري',cImm:'الانغماس',cProd:'الجهد الإنتاجي',
+   doneK:'من المفهوم إلى الإطلاق',doneH:'ما يتطلبه الإكمال',
+   path:[['التوجه','تختار 7D مفهومًا واحدًا، أو مزيجًا من عناصر عدة مفاهيم.'],['الاستكشاف','الاتفاق على المحتوى والأصول والأولويات مع فريق 7D.'],['الإنتاج','إنتاج المحتوى ثلاثي الأبعاد والتصوير والصوت والحركة والنصوص بجودة الإطلاق.'],['البناء','الهندسة وإدارة المحتوى وتوجيه الاستفسارات والتحليلات.'],['المراجعة','مراجعة بلغتين، واختبار الأجهزة، وإمكانية الوصول، والأداء.'],['الإطلاق','النطاق والاستضافة والأمان والتسليم.']],
+   streams:['نصوص بلغتين واعتمادها','التوافق مع الهوية','إدارة المحتوى','توجيه الاستفسارات','التحليلات والخصوصية','الأمان والاستضافة','اختبار الأجهزة والمتصفحات','التدريب والتسليم'],
+   closeH:'اختاروا التوجه، ونتولى الباقي.',closeP:'بعد اختيار التوجه، تُعدّ أيسرز نطاق الإنتاج والجدول الزمني والاستثمار اللازم للإطلاق.',
+   closeBtn:'أيسرز سيستمز',closeBack:'مراجعة المفاهيم',foot:'سري · مُعدّ لـ 7D International',
+   t:{open:'الافتتاح',intent:'الموجز',c1:'المفهوم 01',c2:'المفهوم 02',c3:'المفهوم 03',compare:'المقارنة',complete:'الإكمال',close:'الخطوة التالية'}}
+};
+let LANG=new URLSearchParams(location.search).get('lang')||(()=>{try{return localStorage.getItem('aisers_space_lang')}catch{return null}})()||((navigator.language||'').startsWith('ar')?'ar':'en');
+if(!I[LANG])LANG='en';
+
+const ARROW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+const bars=n=>Array.from({length:5},(_,i)=>`<i class="${i<n?'f':''}"></i>`).join('');
+
+/* ---------- render ---------- */
+function render(){
+  const L=I[LANG];
+  document.documentElement.lang=LANG;document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
+  document.title=LANG==='ar'?'7D International × مساحة أيسرز':'7D International × AISERS Space';
+  $$('[data-i]').forEach(el=>{const v=L[el.dataset.i];if(typeof v==='string')el.innerHTML=v;});
+  $('#lang').textContent=L.lang;$('#lang').setAttribute('aria-label',L.langLabel);
+
+  $('#trio').innerHTML=CONCEPTS.map((c,i)=>`<button type="button" data-jump="${c.id}"><b>0${i+1}</b><span>${c[LANG].name}</span></button>`).join('');
+
+  $('#concepts').innerHTML=CONCEPTS.map((c,i)=>{const C=c[LANG];return `
+  <section class="ch concept" id="${c.id}" data-t="t.${c.id}">
+    <div class="media" aria-hidden="true">${c.imgs.map((s,k)=>`<img src="${s}" alt="" ${k?'loading="lazy"':''} decoding="async">`).join('')}</div>
+    <div class="num" aria-hidden="true">0${i+1}</div>
+    <div class="inner">
+      <div class="state rv">${L.state}</div>
+      <div class="kicker-line rv">${L.concept} 0${i+1}</div>
+      <h2 class="display rv">${C.name}</h2>
+      <p class="lede rv">${C.line}</p>
+      <div class="tags rv">${C.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      <div class="acts rv">
+        <a class="btn go" href="${c.link}" target="_blank" rel="noopener">${L.open}${ARROW}</a>
+        <button class="btn" type="button" data-sheet="${i}">${L.details}</button>
+      </div>
+    </div>
+  </section>`;}).join('');
+
+  $('#cmp').innerHTML=CONCEPTS.map((c,i)=>{const C=c[LANG];return `
+  <article class="card">
+    <header><b>0${i+1}</b><span class="state">${L.state}</span></header>
+    <h3>${C.name}</h3>
+    <dl>
+      <div><dt>${L.cExp}</dt><dd>${C.exp}</dd></div>
+      <div><dt>${L.cBasis}</dt><dd>${C.basis}</dd></div>
+      <div><dt>${L.cImm}</dt><dd><div class="meter" role="img" aria-label="${c.meter.exp}/5">${bars(c.meter.exp)}</div></dd></div>
+      <div><dt>${L.cProd}</dt><dd>${C.intensity}<div class="meter" role="img" aria-label="${c.meter.prod}/5">${bars(c.meter.prod)}</div></dd></div>
+    </dl>
+    <a class="btn" href="${c.link}" target="_blank" rel="noopener">${L.open}${ARROW}</a>
+  </article>`;}).join('');
+
+  $('#path').innerHTML=L.path.map(p=>`<li><b>${p[0]}</b><span>${p[1]}</span></li>`).join('');
+  $('#streams').innerHTML=L.streams.map(s=>`<span>${s}</span>`).join('');
+
+  $('#rail').innerHTML=$$('.ch').map(ch=>`<button type="button" data-jump="${ch.id}" aria-label="${L.t[ch.id]}"><span>${L.t[ch.id]}</span></button>`).join('');
+  observe();startSlides();
+}
+
+/* ---------- chapter state ---------- */
+let io=null,current='open';
+function setCurrent(id){
+  if(id===current&&$('#rail .on'))return;
+  current=id;
+  $$('#rail button').forEach(b=>b.classList.toggle('on',b.dataset.jump===id));
+  // a light tick on phones, only after the visitor has touched the page
+  if(navigator.vibrate&&navigator.userActivation?.hasBeenActive&&!REDUCED)try{navigator.vibrate(6)}catch{}
+}
+function observe(){
+  io?.disconnect();
+  io=new IntersectionObserver(es=>es.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('in');if(e.intersectionRatio>.55)setCurrent(e.target.id);}
+  }),{threshold:[.2,.55,.8]});
+  $$('.ch').forEach(ch=>io.observe(ch));
+  // the first chapter never waits on an observer to become visible
+  $('#open').classList.add('in');
+}
+function sweep(){ // fallback when observers are throttled
+  const mid=innerHeight/2;
+  $$('.ch').forEach(ch=>{const r=ch.getBoundingClientRect();if(r.top<innerHeight*.85&&r.bottom>innerHeight*.15)ch.classList.add('in');if(r.top<=mid&&r.bottom>mid)setCurrent(ch.id);});
+  const max=document.documentElement.scrollHeight-innerHeight;$('#bar').style.width=(max>0?scrollY/max*100:0)+'%';
+}
+addEventListener('scroll',sweep,{passive:true});addEventListener('resize',sweep);setInterval(sweep,700);
+
+/* ---------- imagery: each concept cycles its frames ---------- */
+let slideTimer=null;
+function startSlides(){
+  clearInterval(slideTimer);
+  $$('.media').forEach(m=>{const im=m.querySelectorAll('img');im.forEach((x,i)=>x.classList.toggle('on',i===0));m.dataset.k=0;});
+  if(REDUCED)return;
+  slideTimer=setInterval(()=>{
+    $$('.concept').forEach(ch=>{
+      const r=ch.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
+      const m=ch.querySelector('.media'),im=m.querySelectorAll('img'),k=((+m.dataset.k||0)+1)%im.length;
+      im.forEach((x,i)=>x.classList.toggle('on',i===k));m.dataset.k=k;
+    });
+  },4200);
+}
+
+/* ---------- navigation ---------- */
+document.addEventListener('click',e=>{
+  const j=e.target.closest('[data-jump]');if(j){e.preventDefault();document.getElementById(j.dataset.jump)?.scrollIntoView({behavior:REDUCED?'auto':'smooth'});return;}
+  const s=e.target.closest('[data-sheet]');if(s){openSheet(+s.dataset.sheet,s);}
+});
+$('#lang').addEventListener('click',()=>{LANG=LANG==='ar'?'en':'ar';try{localStorage.setItem('aisers_space_lang',LANG)}catch{}const keep=current;render();document.getElementById(keep)?.scrollIntoView();});
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&$('#sheet').classList.contains('on'))closeSheet();
+});
+
+/* ---------- detail sheet ---------- */
+let lastFocus=null;
+function openSheet(i,from){
+  const c=CONCEPTS[i],C=c[LANG],L=I[LANG];
+  $('#sheetNum').textContent='0'+(i+1);$('#sheetTitle').textContent=C.name;
+  $('#sheetBody').innerHTML=`
+    <section><h4>${L.sWhat}</h4><p>${C.what}</p></section>
+    <section><h4>${L.sTech}</h4><ul>${C.tech.map(t=>`<li>${t[0]} <span>— ${t[1]}</span></li>`).join('')}</ul></section>
+    <section class="todo"><h4>${L.sTodo}</h4><ul>${C.todo.map(t=>`<li>${t}</li>`).join('')}</ul></section>
+    <p class="note">${L.sNote}</p>
+    <a class="btn go" href="${c.link}" target="_blank" rel="noopener">${L.open}${ARROW}</a>`;
+  lastFocus=from||document.activeElement;
+  const sh=$('#sheet');sh.inert=false;sh.style.removeProperty('--drag');
+  $('#scrim').classList.add('on');sh.classList.add('on');
+  document.documentElement.style.scrollSnapType='none';document.body.style.overflow='hidden';
+  setTimeout(()=>$('#sheetX').focus(),60);
+}
+function closeSheet(){
+  const sh=$('#sheet');sh.classList.remove('on');$('#scrim').classList.remove('on');sh.inert=true;
+  document.documentElement.style.scrollSnapType='';document.body.style.overflow='';
+  lastFocus?.focus?.();
+}
+$('#sheetX').addEventListener('click',closeSheet);$('#scrim').addEventListener('click',closeSheet);
+// drag the sheet down to dismiss it
+{let y0=null,dy=0;const sh=$('#sheet'),g=$('#grab');
+ g.addEventListener('pointerdown',e=>{y0=e.clientY;dy=0;g.setPointerCapture(e.pointerId);sh.style.transition='none';});
+ g.addEventListener('pointermove',e=>{if(y0==null)return;dy=Math.max(0,e.clientY-y0);sh.style.setProperty('--drag',dy+'px');});
+ const end=()=>{if(y0==null)return;sh.style.transition='';y0=null;if(dy>110)closeSheet();else sh.style.setProperty('--drag','0px');};
+ g.addEventListener('pointerup',end);g.addEventListener('pointercancel',end);}
+
+/* ---------- opening field: slow particles in AISERS green and white ---------- */
+(function field(){
+  const c=$('#field'),x=c.getContext('2d');let W,H,pts=[],dpr=Math.min(devicePixelRatio||1,2),tx=0,ty=0,px=0,py=0;
+  const size=()=>{W=c.clientWidth;H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);
+    const n=Math.round(Math.min(160,W*H/7000));pts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,z:.3+Math.random()*.7,g:Math.random()<.18}));};
+  size();addEventListener('resize',size);
+  addEventListener('pointermove',e=>{tx=e.clientX/innerWidth-.5;ty=e.clientY/innerHeight-.5;},{passive:true});
+  addEventListener('deviceorientation',e=>{if(e.gamma==null)return;tx=Math.max(-.5,Math.min(.5,e.gamma/60));ty=Math.max(-.5,Math.min(.5,(e.beta-45)/60));},{passive:true});
+  function draw(){
+    px+=(tx-px)*.05;py+=(ty-py)*.05;
+    x.clearRect(0,0,W,H);
+    for(const p of pts){
+      if(!REDUCED){p.y-=.12*p.z;if(p.y<-4){p.y=H+4;p.x=Math.random()*W;}}
+      const ox=p.x+px*40*p.z,oy=p.y+py*30*p.z;
+      // links to near neighbours, faint, so the field reads as a system rather than dust
+      if(p.g){for(const q of pts){if(q===p)continue;const dx=(q.x+px*40*q.z)-ox,dy=(q.y+py*30*q.z)-oy,d=dx*dx+dy*dy;if(d<5200){x.strokeStyle=`rgba(47,191,113,${(1-d/5200)*.18})`;x.lineWidth=1;x.beginPath();x.moveTo(ox,oy);x.lineTo(ox+dx,oy+dy);x.stroke();}}}
+      x.fillStyle=p.g?`rgba(47,191,113,${.55*p.z})`:`rgba(245,246,247,${.35*p.z})`;
+      x.beginPath();x.arc(ox,oy,p.g?1.6*p.z+.4:1.1*p.z,0,Math.PI*2);x.fill();
+    }
+    if(!REDUCED)requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+render();sweep();
+</script>
+</body>
+</html>
