@@ -1,0 +1,12 @@
+{
+  "name": "7D International",
+  "short_name": "7D",
+  "description": "Global contracting & consulting — Middle East HQ Riyadh",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0E0D",
+  "theme_color": "#0B0E0D",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
