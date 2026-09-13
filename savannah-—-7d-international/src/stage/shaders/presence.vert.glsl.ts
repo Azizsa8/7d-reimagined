@@ -86,7 +86,7 @@ void main() {
   vSpark = aSpark;
 
   float depthFade = smoothstep(-2.4, 0.4, pos.z * (1.0 - p));
-  float alpha = (0.55 + 0.45 * pow(1.0 - fresnel * 0.6, 2.0)) * (0.55 + 0.45 * depthFade);
+  float alpha = (0.42 + 0.5 * pow(1.0 - fresnel * 0.6, 2.0)) * (0.5 + 0.5 * depthFade);
   alpha *= (1.0 - uHush * 0.45) * (1.0 - uScatter) * uAlpha * (1.0 - uEmber * 0.6) * mix(0.02, 1.0, pow(uBodyScale, 4.0));
   vAlpha = alpha;
 

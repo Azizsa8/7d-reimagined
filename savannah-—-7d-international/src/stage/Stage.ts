@@ -65,14 +65,14 @@ export class Stage {
     const isMobile = window.innerWidth < 768;
     this.presence = new Presence(this.tier.presenceParticles, isMobile);
     // Fewer particles on lower tiers → slightly larger points so the body stays luminous.
-    const density = Math.min(1.35, Math.sqrt(24000 / this.tier.presenceParticles));
+    const density = Math.min(1.15, Math.sqrt(24000 / this.tier.presenceParticles));
     this.presence.setPointSize((isMobile ? 2.6 : 3.0) * density);
     this.scene.add(this.presence.group);
     this.scene.add(this.presence.dustHolder);
     this.director = new SceneDirector(this);
 
     const renderPass = new RenderPass(this.scene, this.camera);
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.7, 0.6, 0.22);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.7, 0.6, 0.3);
     this.grade = createGradePass();
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(renderPass);
