@@ -9,6 +9,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {SMAAPass} from 'three/addons/postprocessing/SMAAPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {textureSets} from './assets/tex/manifest.js';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouch = matchMedia('(hover:none)').matches;
@@ -28,26 +29,27 @@ const C={
 /* ---------- shared factories ---------- */
 let R=null;                                        // active renderer, for anisotropy
 
-/* Scanned materials. Files live in assets/tex/<name>-{basecolor,normal,roughness}.png and are
-   optional: when a set is missing the flat colour below stands in, so the scene never breaks.
+/* Optional scanned materials. Only files listed in the shipped manifest are requested.
    Every stone or sand material made through MAT registers itself and is dressed when the
    maps arrive. Colours keep multiplying the map, so the tints written into each site survive. */
 const TEX_SETS={stone:{repeat:1.6},sand:{repeat:2.4},paving:{repeat:1.2}};
-const TEX={}; const dressed={stone:[],sand:[],paving:[]};
+const TEX={}; const textureLoads={}; const dressed={stone:[],sand:[],paving:[]};
 function loadTextureSet(name){
-  if(TEX[name]!==undefined)return;
-  TEX[name]=null;
+  if(textureLoads[name])return textureLoads[name];
+  const files=textureSets[name];
+  if(!files?.basecolor)return textureLoads[name]=Promise.resolve(null);
   const L=new THREE.TextureLoader();
-  const one=(map,srgb)=>new Promise(res=>L.load(`assets/tex/${name}-${map}.png`,t=>{
+  const one=(map,srgb)=>!files[map]?Promise.resolve(null):new Promise(res=>L.load(files[map],t=>{
     t.wrapS=t.wrapT=THREE.MirroredRepeatWrapping;           // hides the seam a generated tile still has
     t.repeat.set(TEX_SETS[name].repeat,TEX_SETS[name].repeat);
     if(srgb)t.colorSpace=THREE.SRGBColorSpace;
     if(R)t.anisotropy=R.capabilities.getMaxAnisotropy();
     res(t);},undefined,()=>res(null)));
-  Promise.all([one('basecolor',true),one('normal',false),one('roughness',false)]).then(([map,normalMap,roughnessMap])=>{
-    if(!map)return;                                          // no set on disk: keep the flat colour
+  return textureLoads[name]=Promise.all([one('basecolor',true),one('normal',false),one('roughness',false)]).then(([map,normalMap,roughnessMap])=>{
+    if(!map){normalMap?.dispose();roughnessMap?.dispose();return null;}
     TEX[name]={map,normalMap,roughnessMap};
     dressed[name].forEach(m=>dress(m,TEX[name]));
+    return TEX[name];
   });
 }
 function dress(m,t){
@@ -333,8 +335,12 @@ export function initFlight(){
   /* ground: dark desert plain with a faint survey grid that fades out */
   const groundMat=new THREE.MeshStandardMaterial({color:0x141210,roughness:.95,metalness:.05,envMapIntensity:.35});
   const ground=mesh(new THREE.PlaneGeometry(700,700),groundMat,0,0,0,false,true);
-  loadTextureSet('sand');dressed.sand.push(groundMat);         // registered by hand: the plain wants a far denser tile
-  {const big=()=>{const t=TEX.sand;if(!t){setTimeout(big,400);return;}const cl=k=>{const c=t[k]?.clone();if(c){c.repeat.set(140,140);c.needsUpdate=true;}return c;};dress(groundMat,{map:cl('map'),normalMap:cl('normalMap'),roughnessMap:cl('roughnessMap')});};setTimeout(big,400);}
+  // The ground has its own tiling; complete once, including when no sand maps ship.
+  loadTextureSet('sand').then(t=>{
+    if(!t)return;
+    const cl=k=>{const c=t[k]?.clone();if(c){c.repeat.set(140,140);c.needsUpdate=true;}return c;};
+    dress(groundMat,{map:cl('map'),normalMap:cl('normalMap'),roughnessMap:cl('roughnessMap')});
+  });
   ground.rotation.x=-Math.PI/2; scene.add(ground);
   {const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
     x.strokeStyle='rgba(224,169,74,.20)';x.lineWidth=1.5;x.strokeRect(.75,.75,510.5,510.5);

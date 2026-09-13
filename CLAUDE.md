@@ -26,6 +26,7 @@ directly by the browser.
 | `viz.js` | 2D canvas illustrations for the seven discipline cards. |
 | `data/tour.json` | The narration script per chapter, both languages, plus per-chapter scroll targets. |
 | `data/land-110m.json` | TopoJSON land outlines for the globe. Ships with the site, never fetched from a CDN. |
+| `assets/tex/manifest.js` | Explicit list of shipped optional texture maps. Empty until assets are committed; no speculative image requests or retry polling. |
 | `tools/build-voice.mjs` | Pre-renders `tour.json` to `audio/{en,ar}/*.mp3` via ElevenLabs. Needs `ELEVENLABS_API_KEY` in the environment. Writes `audio/manifest.json`. |
 | `api/voice.js` | Vercel function. TTS proxy for the conversational assistant only, rate-limited. The tour never calls it. |
 | `sw.js` | Minimal offline shell. Bump the cache name `C` when shipping changes to cached files. |
@@ -85,10 +86,20 @@ Playwright with the pre-installed Chromium can drive this for screenshots.
 
 ## Brand
 
-Company site: https://7dint.net. Colours: near-black `#0B0E0D` ground, brass accents,
-mint/teal `#7DE3B4` as the 7D mark colour. The current mark in `icon.svg` and the nav is a
+Company site: https://7dint.net. Current design is Riyadh at dusk: near-black `#0A0C10`,
+panels `#12171D`, warm ivory `#F4F1EA`, brass `#E0A94A`, sand `#C8AA7C`, and horizon
+`#E9B27A`. Teal `#2FA98B` is a secondary accent, not a verified corporate logo colour.
+Legacy `--mint` tokens currently alias brass. The current mark in `icon.svg` and the nav is a
 placeholder diamond; the real 7D logo has not been added yet. Do not present the
 diamond as the company logo.
+
+## Recovery status
+
+The procedural building scenes are legacy placeholders slated for replacement under
+`ACTION_PLAN_ASTRA.md`; do not extend or polish that geometry. The cinematic asset route,
+offline tooling, and source material await owner decisions. The runtime remains build-free.
+Repository-wide third-party plugin activation has been removed pending the owner's choice.
+Arabic narration remains a placeholder pending approved voice regeneration and client review.
 
 ## Paid generation (Magnific, ElevenLabs, any credit-billed service)
 
