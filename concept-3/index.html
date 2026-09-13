@@ -5,247 +5,345 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>7D International — Concept 3</title>
 <meta name="description" content="7D International: global contracting and consulting since 1993. Seven disciplines, five hubs, Middle East headquarters in Riyadh.">
-<meta name="theme-color" content="#0D0D0C">
+<meta name="theme-color" content="#0B0B0A">
 <link rel="icon" href="../assets/brand/logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=Hanken+Grotesk:wght@300;400;500&family=Tajawal:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400&display=swap">
 <style>
-/* Concept 3 — a dark instrument opening onto a pale limestone page.
-   The opener borrows the ring-sphere idea; the body borrows the editorial
-   branching layout. Palette and forms are 7D's own: night, limestone, brass. */
+/* Concept 3 — instrument at night, editorial by day.
+   A dark opening carries the two WebGL moments; the page then turns to pale
+   limestone for the disciplines and ends back in the night for the work. */
 :root{
-  --night:#0D0D0C; --night-2:#1B1B19; --night-ink:#EFEAE0; --night-dim:#9C968A;
-  --stone:#ECE7DE; --stone-2:#E2DBCF; --ink:#26201B; --ink-dim:#5E554C; --line:#B9A98F;
-  --brass:#A26F27; --brass-hi:#E0A94A; --plum:#3B2C33;
+  --night:#0B0B0A; --night-2:#141412; --night-ink:#F1ECE2; --night-dim:#A39C8F; --night-line:rgba(241,236,226,.12);
+  --stone:#EDE8DF; --stone-2:#E3DCD0; --ink:#221C17; --ink-dim:#61574D; --stone-line:rgba(34,28,23,.14);
+  --brass:#9C6A22; --brass-hi:#E0A94A; --plum:#3B2C33;
   --display:'Familjen Grotesk','Hanken Grotesk',system-ui,sans-serif;
   --body:'Hanken Grotesk',system-ui,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,monospace;
-  --ease:cubic-bezier(.22,1,.36,1);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --gut:clamp(20px,4.2vw,56px);
 }
 html[dir="rtl"]{--display:'Tajawal',system-ui,sans-serif;--body:'Tajawal',system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:clip;-webkit-text-size-adjust:100%}
-body{background:var(--stone);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;overflow-x:clip}
+html{-webkit-text-size-adjust:100%}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{background:var(--night);color:var(--night-ink);font-family:var(--body);font-size:16px;line-height:1.6;overflow-x:clip;-webkit-font-smoothing:antialiased}
 ::selection{background:var(--brass-hi);color:var(--night)}
 a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-:focus-visible{outline:2px solid var(--brass-hi);outline-offset:4px;border-radius:2px}
+:focus-visible{outline:2px solid var(--brass-hi);outline-offset:4px;border-radius:3px}
+img{display:block;max-width:100%}
+
+/* film grain over everything, very quiet */
+.grain{position:fixed;inset:-50%;z-index:90;pointer-events:none;opacity:.07;mix-blend-mode:overlay;animation:grain .9s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}}
+
+/* ---------- preloader ---------- */
+.loader{position:fixed;inset:0;z-index:100;background:var(--night);display:grid;place-items:end start;padding:var(--gut);transition:clip-path 1.1s var(--ease)}
+.loader.done{clip-path:inset(0 0 100% 0)}
+.loader-count{font-family:var(--display);font-weight:500;font-size:clamp(4rem,14vw,12rem);line-height:.8;letter-spacing:-.05em;color:var(--night-ink);font-variant-numeric:tabular-nums}
+.loader-line{position:absolute;inset-inline:var(--gut);bottom:calc(var(--gut) - 14px);height:1px;background:var(--night-line)}
+.loader-line i{display:block;height:100%;width:0;background:var(--brass-hi);transition:width .25s linear}
+.loader-name{position:absolute;top:var(--gut);inset-inline-start:var(--gut);font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--night-dim)}
+
+/* ---------- cursor ---------- */
+.cursor{position:fixed;left:0;top:0;z-index:95;pointer-events:none;display:none}
+.cursor i{position:absolute;border-radius:50%;transform:translate(-50%,-50%)}
+.cursor .dot{width:5px;height:5px;background:var(--brass-hi)}
+.cursor .ring{width:38px;height:38px;border:1px solid rgba(224,169,74,.55);transition:width .35s var(--ease),height .35s var(--ease),background .35s}
+.cursor.hover .ring{width:74px;height:74px;background:rgba(224,169,74,.08)}
+@media(hover:hover) and (pointer:fine){.cursor{display:block}}
 
 /* ---------- header ---------- */
-.header{position:fixed;inset-inline:0;top:0;z-index:50;padding:18px clamp(18px,4vw,44px);display:flex;align-items:center;justify-content:space-between;gap:16px;
-  color:var(--night-ink);transition:color .5s var(--ease),background .5s var(--ease)}
-.header.light{color:var(--ink);background:rgba(236,231,222,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.header-left{display:flex;align-items:center;gap:14px;min-width:0}
-.header-logo{display:block;width:34px;height:40px;flex:none}
-.header-logo img{width:100%;height:100%;object-fit:contain}
-.header.light .header-logo img{filter:invert(1) brightness(.35)}
-.header-title{font-family:var(--display);font-size:15px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}
-.header-right{display:flex;align-items:center;gap:10px}
-.pill{height:40px;padding:0 18px;border:1px solid currentColor;border-radius:999px;font-size:14px;display:inline-flex;align-items:center;text-decoration:none;
-  transition:background .3s,color .3s}
-.pill:hover{background:var(--brass-hi);border-color:var(--brass-hi);color:var(--night)}
-.sound{width:40px;height:40px;border-radius:50%;border:1px solid currentColor;display:grid;grid-auto-flow:column;align-items:center;justify-content:center;gap:3px}
-.sound i{width:2px;height:6px;background:currentColor;border-radius:2px;transition:height .3s}
+.header{position:fixed;inset-inline:0;top:0;z-index:60;padding:20px var(--gut);display:flex;align-items:center;justify-content:space-between;gap:16px;
+  color:var(--night-ink);transition:color .6s var(--ease),transform .6s var(--ease)}
+.header.on-stone{color:var(--ink)}
+.header.hide{transform:translateY(-110%)}
+.brand{display:flex;align-items:center;gap:14px;text-decoration:none;min-width:0}
+.brand img{width:30px;height:36px;object-fit:contain;transition:filter .6s}
+.header.on-stone .brand img{filter:invert(1) brightness(.3)}
+.brand span{font-family:var(--display);font-size:15px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span b{font-weight:500;opacity:.55}
+.nav-r{display:flex;align-items:center;gap:10px}
+.pill{height:42px;padding:0 20px;border-radius:999px;border:1px solid currentColor;display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-size:14px;
+  position:relative;overflow:hidden;isolation:isolate}
+.pill::before{content:"";position:absolute;inset:0;background:var(--brass-hi);transform:translateY(101%);transition:transform .5s var(--ease);z-index:-1}
+.pill:hover{color:var(--night);border-color:var(--brass-hi)}
+.pill:hover::before{transform:none}
+.sound{width:42px;height:42px;border-radius:50%;border:1px solid currentColor;display:grid;grid-auto-flow:column;align-items:center;justify-content:center;gap:3px}
+.sound i{width:2px;height:5px;background:currentColor;border-radius:2px}
 .sound.on i{animation:bars 1.1s ease-in-out infinite}
-.sound.on i:nth-child(2){animation-delay:-.3s}.sound.on i:nth-child(3){animation-delay:-.6s}.sound.on i:nth-child(4){animation-delay:-.15s}
-@keyframes bars{0%,100%{height:5px}50%{height:16px}}
-@media(max-width:640px){.header-title{display:none}.pill.contact{display:none}}
+.sound.on i:nth-child(2){animation-delay:-.35s}.sound.on i:nth-child(3){animation-delay:-.7s}.sound.on i:nth-child(4){animation-delay:-.2s}
+@keyframes bars{0%,100%{height:4px}50%{height:17px}}
+@media(max-width:640px){.brand span{display:none}.pill.touch{display:none}}
 
-/* ---------- banner: the ring sphere ---------- */
-.banner{position:relative;min-height:100svh;background:radial-gradient(90% 70% at 70% 45%,#2A2926 0%,#161614 45%,var(--night) 75%);color:var(--night-ink);
-  display:grid;grid-template-columns:1fr;align-content:end;padding:120px clamp(18px,4vw,44px) clamp(40px,8vh,80px);overflow:hidden}
-@media(min-width:900px){.banner{grid-template-columns:1.05fr .95fr;align-content:center}}
-.banner-copy{position:relative;z-index:2;max-width:640px}
-.banner-title{font-family:var(--display);font-weight:500;font-size:clamp(2.4rem,6.4vw,5.6rem);line-height:.98;letter-spacing:-.035em;text-wrap:balance}
-html[dir="rtl"] .banner-title{letter-spacing:0;line-height:1.2;font-weight:700}
-.banner-title em{font-style:normal;color:var(--brass-hi)}
-.banner-subtitle{margin-top:28px;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass-hi)}
-html[dir="rtl"] .banner-subtitle{font-family:var(--body);letter-spacing:0;font-size:15px}
-.banner-text{margin-top:14px;max-width:48ch;color:var(--night-dim);font-size:clamp(1rem,1.5vw,1.12rem)}
-/* split-line reveal: words sit in a clipped line and rise into place */
-.split .ln{display:block;overflow:hidden;padding-bottom:.06em}
-.split .wd{display:inline-block;transform:translateY(105%);transition:transform 1.1s var(--ease)}
-.split.in .wd{transform:none}
-.sphere-wrap{position:absolute;inset:0;display:grid;place-items:center;z-index:1;pointer-events:none}
-@media(min-width:900px){.sphere-wrap{position:relative;inset:auto}}
-.sphere{width:min(92vw,620px);height:auto;overflow:visible;opacity:.95}
-@media(max-width:899px){.sphere-wrap{align-items:start;padding-top:88px}.sphere{width:min(118vw,560px);opacity:.6}}
-.sphere ellipse{fill:none;stroke-width:1;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center}
-.scroll-cue{position:absolute;bottom:22px;inset-inline-start:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--night-dim);z-index:2}
-html[dir="rtl"] .scroll-cue{transform:translateX(50%)}
+/* ---------- hero ---------- */
+.hero{position:relative;height:170vh}
+.hero-stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;align-content:end;padding:0 var(--gut) clamp(34px,7vh,72px)}
+.hero-gl{position:absolute;inset:0;z-index:0}
+.hero-gl canvas{width:100%;height:100%;display:block}
+.hero-gl::after{content:"";position:absolute;inset:0;background:radial-gradient(110% 80% at 30% 100%,rgba(11,11,10,.9) 0%,rgba(11,11,10,.2) 55%,transparent 75%)}
+.hero-copy{position:relative;z-index:1;display:grid;gap:26px;max-width:1400px}
+.hero h1{font-family:var(--display);font-weight:500;font-size:clamp(3rem,9.2vw,9.4rem);line-height:.9;letter-spacing:-.055em;max-width:12ch}
+html[dir="rtl"] .hero h1{letter-spacing:0;line-height:1.15;font-weight:700;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--brass-hi)}
+.hero-row{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:20px 40px}
+.hero-sub{max-width:46ch;color:var(--night-dim);font-size:clamp(1rem,1.3vw,1.12rem)}
+.hero-meta{display:flex;gap:28px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--night-dim)}
+html[dir="rtl"] .hero-meta{font-family:var(--body);letter-spacing:0;font-size:14px}
+.hero-meta b{display:block;font-family:var(--display);font-weight:500;letter-spacing:-.02em;font-size:clamp(1.6rem,2.6vw,2.4rem);color:var(--night-ink);text-transform:none;margin-bottom:2px}
+/* lines rise through a mask */
+.mask{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+.mask>span{display:inline-block;transform:translateY(105%);transition:transform 1.3s var(--ease)}
+.ready .mask>span{transform:none}
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity 1.2s var(--ease),transform 1.2s var(--ease)}
+.ready .fade-up{opacity:1;transform:none}
 
-/* ---------- pinned sections ---------- */
-.pinned{position:relative}
-.pinned .stage{position:sticky;top:0;height:100svh;overflow:hidden}
+/* ---------- statement: words fill as you read ---------- */
+.statement{position:relative;padding:clamp(120px,22vh,240px) var(--gut) clamp(120px,20vh,220px);background:var(--night)}
+.statement p{font-family:var(--display);font-weight:400;font-size:clamp(1.7rem,4.1vw,4rem);line-height:1.12;letter-spacing:-.03em;max-width:24ch}
+html[dir="rtl"] .statement p{letter-spacing:0;line-height:1.5}
+.statement .w{color:rgba(241,236,226,.14);transition:color .5s}
+.statement .w.on{color:var(--night-ink)}
+.statement .w.hl.on{color:var(--brass-hi)}
+.statement small{display:block;margin-top:40px;font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--night-dim)}
+html[dir="rtl"] .statement small{font-family:var(--body);letter-spacing:0;font-size:14px}
 
-/* ---------- mark: facets unfold like wings ---------- */
-#mark{height:260vh;background:linear-gradient(180deg,var(--night) 0%,var(--night) 30%,#34302A 70%,var(--stone) 100%)}
-#mark .stage{display:grid;place-items:center;color:var(--night-ink)}
-.mark-svg{width:min(78vw,520px);height:auto;overflow:visible}
-.mark-svg polygon{transform-box:view-box;transform-origin:500px 500px;stroke:rgba(239,234,224,.35);stroke-width:1.2;vector-effect:non-scaling-stroke}
-.mark-caption{position:absolute;bottom:clamp(40px,10vh,90px);inset-inline:0;text-align:center;padding:0 20px}
-.mark-caption h2{font-family:var(--display);font-weight:500;font-size:clamp(1.6rem,4vw,3rem);letter-spacing:-.03em}
-html[dir="rtl"] .mark-caption h2{letter-spacing:0;font-weight:700}
-.hubs{margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--night-dim)}
-html[dir="rtl"] .hubs{font-family:var(--body);letter-spacing:0;font-size:14px}
-.hubs span{opacity:.25;transition:opacity .5s,color .5s}
-.hubs span.on{opacity:1;color:var(--brass-hi)}
+/* ---------- mark ---------- */
+.mark{position:relative;height:300vh;background:linear-gradient(180deg,var(--night) 0%,var(--night) 62%,#2C2822 84%,var(--stone) 100%)}
+.mark-stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.mark-gl{position:absolute;inset:0}
+.mark-gl canvas{width:100%;height:100%;display:block}
+.mark-copy{position:absolute;inset-inline:var(--gut);bottom:clamp(30px,7vh,70px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:18px 40px;z-index:1}
+.mark-copy h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,5vw,4.6rem);letter-spacing:-.045em;line-height:.95}
+html[dir="rtl"] .mark-copy h2{letter-spacing:0;line-height:1.2;font-weight:700}
+.hubs{display:flex;flex-wrap:wrap;gap:10px 26px;list-style:none;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+html[dir="rtl"] .hubs{font-family:var(--body);letter-spacing:0;font-size:15px}
+.hubs li{color:rgba(241,236,226,.22);transition:color .6s;display:flex;align-items:center;gap:9px}
+.hubs li::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;transition:box-shadow .6s}
+.hubs li.on{color:var(--brass-hi)}
+.hubs li.on::before{box-shadow:0 0 0 4px rgba(224,169,74,.18)}
+.mark-index{position:absolute;top:clamp(90px,14vh,130px);inset-inline-start:var(--gut);font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--night-dim);z-index:1}
+html[dir="rtl"] .mark-index{font-family:var(--body);letter-spacing:0;font-size:14px}
 
-/* ---------- tree: seven disciplines branching from one trunk ---------- */
-#tree{height:320vh;background:var(--stone)}
-#tree .stage{display:grid;grid-template-rows:auto 1fr;padding:100px clamp(18px,4vw,44px) 30px}
-.tree-name{font-family:var(--display);font-size:clamp(1.8rem,4.4vw,3.4rem);font-weight:500;letter-spacing:-.03em;color:var(--ink)}
-html[dir="rtl"] .tree-name{letter-spacing:0;font-weight:700}
-.tree-name small{display:block;margin-top:6px;font-family:var(--body);font-size:15px;font-weight:400;letter-spacing:0;color:var(--ink-dim);max-width:52ch}
-.tree-wrapp{position:relative;width:min(100%,1060px);margin:0 auto;align-self:end;aspect-ratio:1000/620}
-.tree-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.tree-svg path{fill:none;stroke:var(--plum);stroke-width:1.4;vector-effect:non-scaling-stroke}
-.tree-circle{position:absolute;left:50%;top:96.8%;border-radius:50%;transform:translate(-50%,-50%);border:1px solid var(--plum)}
-.tree-circle.big{width:13%;aspect-ratio:1;opacity:.35}
-.tree-circle.small{width:4.4%;aspect-ratio:1;background:var(--plum);border:0}
-.tree-title{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;gap:6px;padding-bottom:10px;white-space:nowrap;
-  font-family:var(--display);font-size:clamp(11px,1.25vw,15px);color:var(--ink);opacity:0;transition:opacity .6s var(--ease),transform .6s var(--ease)}
-html[dir="rtl"] .tree-title{font-family:var(--body);font-size:clamp(12px,1.35vw,16px)}
-.tree-title.on{opacity:1}
-.tree-title button{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid transparent;transition:border-color .3s,background .3s}
-.tree-title button:hover,.tree-title button[aria-pressed="true"]{border-color:var(--plum);background:rgba(59,44,51,.06)}
-.tree-title b{font-family:var(--mono);font-weight:400;font-size:.8em;color:var(--brass)}
-.tree-ball{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--brass);transform:translate(-50%,-50%) scale(0);transition:transform .6s var(--ease)}
-.tree-ball.on{transform:translate(-50%,-50%) scale(1)}
-.tree-ball::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--brass);animation:ball 2.4s ease-out infinite;opacity:0}
-.tree-ball.on::after{opacity:1}
-@keyframes ball{from{transform:scale(.4);opacity:.8}to{transform:scale(2.2);opacity:0}}
-.tree-detail{position:absolute;left:50%;top:62%;transform:translate(-50%,-50%);width:min(88%,380px);text-align:center;color:var(--ink-dim);font-size:clamp(13px,1.3vw,15px);
-  opacity:0;transition:opacity .45s var(--ease)}
-.tree-detail.on{opacity:1}
-.tree-detail strong{display:block;color:var(--ink);font-family:var(--display);font-weight:500;font-size:clamp(15px,1.7vw,19px);margin-bottom:4px}
-/* narrow screens: the fan becomes a trunk with seven offshoots */
+/* ---------- tree ---------- */
+.tree{position:relative;height:340vh;background:var(--stone);color:var(--ink)}
+.tree-stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;grid-template-rows:auto 1fr;padding:clamp(96px,13vh,130px) var(--gut) 0}
+.tree-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:14px 40px}
+.tree-head h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,5vw,4.6rem);letter-spacing:-.045em;line-height:.95}
+html[dir="rtl"] .tree-head h2{letter-spacing:0;line-height:1.2;font-weight:700}
+.tree-head p{max-width:40ch;color:var(--ink-dim)}
+.tree-fig{position:relative;align-self:end;width:min(100%,1180px);margin:0 auto;aspect-ratio:1000/560;max-height:calc(100svh - 230px)}
+.tree-fig svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tree-fig .arc{fill:none;stroke:var(--stone-line);stroke-width:1;vector-effect:non-scaling-stroke}
+.tree-fig .br{fill:none;stroke:url(#brGrad);stroke-width:1.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.tree-fig .br-glow{fill:none;stroke:var(--brass-hi);stroke-width:7;stroke-linecap:round;opacity:.0;filter:blur(5px);vector-effect:non-scaling-stroke;transition:opacity .4s}
+.tree-fig .br-glow.hot{opacity:.35}
+.tree-fig .trunk{fill:none;stroke:var(--plum);stroke-width:1.6;vector-effect:non-scaling-stroke}
+.orb{position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%) scale(0);transition:transform .7s var(--ease);
+  background:radial-gradient(circle at 35% 30%,#FFE7B5 0%,#E0A94A 35%,#8A5A1B 80%);box-shadow:0 2px 10px rgba(156,106,34,.45)}
+.orb.on{transform:translate(-50%,-50%) scale(1)}
+.orb::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(156,106,34,.5);opacity:0}
+.orb.on::after{animation:orb 2.8s ease-out infinite}
+@keyframes orb{0%{transform:scale(.3);opacity:.9}100%{transform:scale(2);opacity:0}}
+.root{position:absolute;left:50%;bottom:0;width:22px;height:22px;border-radius:50%;background:var(--plum);transform:translate(-50%,50%)}
+.root::after{content:"";position:absolute;inset:-26px;border-radius:50%;border:1px solid var(--stone-line)}
+.lbl{position:absolute;width:max-content;max-width:min(190px,17vw);opacity:0;transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.lbl.on{opacity:1}
+.lbl button{display:grid;gap:3px;text-align:start;padding:8px 12px;border-radius:10px;transition:background .35s}
+.lbl button:hover,.lbl button[aria-pressed="true"]{background:rgba(34,28,23,.06)}
+.lbl b{font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.18em;color:var(--brass)}
+.lbl span{font-family:var(--display);font-weight:500;font-size:clamp(13px,1.3vw,17px);line-height:1.2;letter-spacing:-.01em}
+html[dir="rtl"] .lbl span{font-family:var(--body);font-weight:500;font-size:clamp(14px,1.35vw,17px);letter-spacing:0}
+.lbl.left{transform:translate(calc(-100% - 14px),-50%)}
+.lbl.right{transform:translate(14px,-50%)}
+.lbl.top{transform:translate(-50%,calc(-100% - 16px));text-align:center}
+.lbl.top button{text-align:center;justify-items:center}
+.tree-note{position:absolute;inset-inline-start:54%;bottom:3%;width:min(38%,400px);text-align:start;color:var(--ink-dim);font-size:15px;min-height:4.8em;transition:opacity .5s;
+  padding-inline-start:18px;border-inline-start:1px solid var(--stone-line)}
+.tree-note strong{display:block;color:var(--ink);font-family:var(--display);font-weight:500;font-size:clamp(16px,1.6vw,20px);margin-bottom:6px;letter-spacing:-.01em}
 .tree-list{display:none}
-@media(max-width:760px){
-  #tree{height:auto}
-  #tree .stage{position:relative;height:auto;padding-bottom:70px}
-  .tree-wrapp{display:none}
-  .tree-list{display:grid;gap:0;margin-top:34px;list-style:none;border-inline-start:1.4px solid var(--plum);margin-inline-start:8px}
-  .tree-list li{position:relative;padding:14px 0 14px 26px}
-  html[dir="rtl"] .tree-list li{padding:14px 26px 14px 0}
-  .tree-list li::before{content:"";position:absolute;inset-inline-start:0;top:26px;width:18px;height:1.4px;background:var(--plum)}
-  .tree-list li::after{content:"";position:absolute;inset-inline-start:18px;top:22px;width:9px;height:9px;border-radius:50%;background:var(--brass)}
-  .tree-list b{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--brass);margin-inline-start:14px}
-  .tree-list h3{display:inline;font-family:var(--display);font-weight:500;font-size:17px;margin-inline-start:6px}
-  .tree-list p{margin-top:4px;margin-inline-start:14px;color:var(--ink-dim);font-size:14px}
+@media(max-width:820px){
+  .tree{height:auto}
+  .tree-stage{position:relative;height:auto;padding-bottom:80px}
+  .tree-fig{display:none}
+  .tree-list{display:block;list-style:none;margin-top:40px;border-inline-start:1.5px solid var(--plum);margin-inline-start:6px}
+  .tree-list li{position:relative;padding:18px 0 18px 30px}
+  html[dir="rtl"] .tree-list li{padding:18px 30px 18px 0}
+  .tree-list li::before{content:"";position:absolute;inset-inline-start:0;top:31px;width:20px;height:1.5px;background:var(--plum)}
+  .tree-list li::after{content:"";position:absolute;inset-inline-start:17px;top:26px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE7B5,#E0A94A 40%,#8A5A1B)}
+  .tree-list b{display:block;margin-inline-start:14px;font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.18em;color:var(--brass)}
+  .tree-list h3{margin-inline-start:14px;font-family:var(--display);font-weight:500;font-size:19px;letter-spacing:-.01em;line-height:1.25}
+  .tree-list p{margin:6px 0 0 14px;color:var(--ink-dim);font-size:14.5px}
+  html[dir="rtl"] .tree-list p{margin:6px 14px 0 0}
 }
 
-/* ---------- projects: four pieces fly in and settle ---------- */
-#projects{height:240vh;background:var(--stone-2)}
-#projects .stage{display:grid;grid-template-rows:auto 1fr;padding:100px clamp(18px,4vw,44px) 30px}
-.proj-head{font-family:var(--display);font-size:clamp(1.8rem,4.4vw,3.4rem);font-weight:500;letter-spacing:-.03em}
-html[dir="rtl"] .proj-head{letter-spacing:0;font-weight:700}
-.proj-grid{align-self:center;display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(10px,1.6vw,20px);width:min(100%,1060px);margin:22px auto 0}
-.proj{position:relative;aspect-ratio:16/10;overflow:hidden;border-radius:6px;background:var(--night);will-change:transform}
-.proj img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9) contrast(1.03)}
-.proj[data-i="1"] img{object-position:center 50%}
-.proj[data-i="3"] img{object-position:center 20%}
-.proj figcaption{position:absolute;inset-inline:0;bottom:0;padding:26px 14px 12px;background:linear-gradient(transparent,rgba(13,13,12,.82));color:var(--night-ink)}
-.proj figcaption b{display:block;font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.18em;color:var(--brass-hi)}
-html[dir="rtl"] .proj figcaption b{font-family:var(--body);letter-spacing:0;font-size:12px}
-.proj figcaption span{font-family:var(--display);font-size:clamp(13px,1.6vw,19px);font-weight:500}
-@media(max-width:760px){#projects{height:auto}#projects .stage{position:relative;height:auto;padding-bottom:70px}.proj-grid{grid-template-columns:1fr}.proj{transform:none!important;opacity:1!important}}
+/* ---------- work: horizontal cinema ---------- */
+.work{position:relative;height:420vh;background:var(--night)}
+.work-stage{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+.work-head{padding:clamp(96px,13vh,130px) var(--gut) 0;display:flex;justify-content:space-between;align-items:end;gap:20px}
+.work-head h2{font-family:var(--display);font-weight:500;font-size:clamp(2rem,5vw,4.6rem);letter-spacing:-.045em;line-height:.95}
+html[dir="rtl"] .work-head h2{letter-spacing:0;line-height:1.2;font-weight:700}
+.work-count{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--night-dim);font-variant-numeric:tabular-nums}
+.work-count b{color:var(--night-ink);font-weight:400}
+.track{align-self:center;display:flex;gap:4vw;padding-inline:var(--gut);will-change:transform}
+.panel{position:relative;flex:0 0 min(70vw,1080px);aspect-ratio:16/9;max-height:62svh;border-radius:14px;overflow:hidden;background:var(--night-2)}
+.panel .pic{position:absolute;inset:-6% -12%;will-change:transform}
+.panel img{width:100%;height:100%;object-fit:cover}
+.panel[data-i="1"] img{object-position:center 50%}
+.panel[data-i="3"] img{object-position:center 18%}
+.panel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,10,0) 45%,rgba(11,11,10,.86) 100%)}
+.panel .cap{position:absolute;inset-inline:clamp(18px,2.4vw,34px);bottom:clamp(16px,2.4vw,30px);z-index:1;display:flex;justify-content:space-between;align-items:end;gap:16px}
+.panel .cap b{display:block;font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.2em;color:var(--brass-hi);text-transform:uppercase}
+html[dir="rtl"] .panel .cap b{font-family:var(--body);letter-spacing:0;font-size:14px;text-transform:none}
+.panel .cap h3{font-family:var(--display);font-weight:500;font-size:clamp(1.3rem,2.8vw,2.8rem);letter-spacing:-.035em;line-height:1;margin-top:8px}
+html[dir="rtl"] .panel .cap h3{letter-spacing:0;line-height:1.3;font-weight:700}
+.panel .cap a{flex:none;font-size:13px;color:var(--night-ink);text-underline-offset:5px;opacity:.85}
+.panel .num{position:absolute;top:clamp(14px,2vw,26px);inset-inline-start:clamp(18px,2.4vw,34px);z-index:1;font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--night-ink)}
+@media(max-width:820px){
+  .work{height:auto}
+  .work-stage{position:relative;height:auto;padding-bottom:60px}
+  .track{flex-direction:column;transform:none!important;gap:18px;margin-top:30px}
+  .panel{flex:none;width:100%;max-height:none;aspect-ratio:4/3}
+  .panel .pic{inset:0;transform:none!important}
+  .panel .cap{flex-direction:column;align-items:start}
+}
 
 /* ---------- close ---------- */
-.close{background:var(--night);color:var(--night-ink);padding:clamp(80px,14vh,140px) clamp(18px,4vw,44px) 40px;text-align:center}
-.close h2{font-family:var(--display);font-weight:500;font-size:clamp(2.2rem,6vw,5rem);letter-spacing:-.035em;line-height:1}
-html[dir="rtl"] .close h2{letter-spacing:0;font-weight:700;line-height:1.25}
-.close p{margin:18px auto 0;max-width:46ch;color:var(--night-dim)}
-.close .row{margin-top:30px;display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
-.close .pill{color:var(--night-ink)}
-.close .direct{margin-top:26px;font-size:14px;color:var(--night-dim)}
-.close .direct a{text-underline-offset:5px}
-.foot{margin-top:70px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--night-dim);text-transform:uppercase}
+.close{position:relative;background:var(--night);padding:clamp(120px,20vh,220px) var(--gut) 34px;overflow:hidden}
+.close h2{font-family:var(--display);font-weight:500;font-size:clamp(3.2rem,11vw,11rem);letter-spacing:-.06em;line-height:.86}
+html[dir="rtl"] .close h2{letter-spacing:0;line-height:1.15;font-weight:700}
+.close h2 em{font-style:normal;color:var(--brass-hi)}
+.close-row{margin-top:48px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px}
+.close-row p{max-width:40ch;color:var(--night-dim)}
+.close-row .acts{display:flex;flex-wrap:wrap;gap:12px}
+.direct{margin-top:26px;font-size:15px;color:var(--night-dim)}
+.direct a{text-underline-offset:5px}
+.foot{margin-top:90px;padding-top:22px;border-top:1px solid var(--night-line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--night-dim);text-transform:uppercase}
+html[dir="rtl"] .foot{font-family:var(--body);letter-spacing:0;font-size:13px;text-transform:none}
 
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .split .wd{transform:none}
-  #mark,#tree,#projects{height:auto}
-  .pinned .stage{position:relative;height:auto;min-height:100svh}
-  .tree-title,.tree-detail{opacity:1}.tree-ball{transform:translate(-50%,-50%) scale(1)}
+  .loader{display:none}
+  .mask>span,.fade-up{transform:none;opacity:1}
+  .statement .w{color:var(--night-ink)}
+  .orb{transform:translate(-50%,-50%) scale(1)}.lbl{opacity:1}
+  .grain{display:none}
 }
 </style>
 </head>
 <body>
 
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-name">7D INTERNATIONAL</div>
+  <div class="loader-count" id="loaderCount">0</div>
+  <div class="loader-line"><i id="loaderLine"></i></div>
+</div>
+<canvas class="grain" id="grain" aria-hidden="true"></canvas>
+<div class="cursor" id="cursor" aria-hidden="true"><i class="ring"></i><i class="dot"></i></div>
+
 <header class="header" id="header">
-  <div class="header-left">
-    <a href="#top" class="header-logo" aria-label="7D International"><img src="../assets/brand/logo.png" alt="" width="34" height="40"></a>
-    <div class="header-title" data-i="title">7D — global contracting &amp; consulting.</div>
-  </div>
-  <div class="header-right">
-    <button class="pill lang" id="lang" aria-label="العربية">عربي</button>
-    <a class="pill contact" href="mailto:info@7dint.net" data-i="touch">Get in touch</a>
-    <button class="sound" id="sound" aria-pressed="false" aria-label="Ambient sound"><i></i><i></i><i></i><i></i></button>
+  <a class="brand" href="#top"><img src="../assets/brand/logo.png" alt="7D International" width="30" height="36"><span data-i="brand">7D <b>— global contracting &amp; consulting.</b></span></a>
+  <div class="nav-r">
+    <button class="pill" id="lang" type="button">عربي</button>
+    <a class="pill touch" href="mailto:info@7dint.net" data-i="touch">Get in touch</a>
+    <button class="sound" id="sound" type="button" aria-pressed="false"><i></i><i></i><i></i><i></i></button>
   </div>
 </header>
 
 <main id="top">
-  <section class="banner" aria-labelledby="bannerTitle">
-    <div class="banner-copy">
-      <h1 class="banner-title split" id="bannerTitle" data-i="h1" data-html>Building across five continents, from <em>Riyadh.</em></h1>
-      <p class="banner-subtitle split" data-i="since">Since 1993</p>
-      <p class="banner-text split" data-i="sub">Originating from the Czech Republic and headquartered in Florida, 7D International delivers full-service contracting and consulting across five continents — now with a Middle East headquarters in Riyadh.</p>
-    </div>
-    <div class="sphere-wrap" aria-hidden="true">
-      <svg class="sphere" id="sphere" viewBox="0 0 440 440"></svg>
-    </div>
-    <div class="scroll-cue" aria-hidden="true" data-i="cue">SCROLL</div>
-  </section>
-
-  <section class="pinned" id="mark" aria-labelledby="markTitle">
-    <div class="stage">
-      <svg class="mark-svg" id="markSvg" viewBox="0 0 1000 1000" aria-hidden="true"></svg>
-      <div class="mark-caption">
-        <h2 id="markTitle" data-i="markH">Five hubs. One firm.</h2>
-        <div class="hubs" id="hubs"></div>
+  <section class="hero" id="hero">
+    <div class="hero-stage">
+      <div class="hero-gl" aria-hidden="true"><canvas id="heroGL"></canvas></div>
+      <div class="hero-copy">
+        <h1 id="heroTitle"></h1>
+        <div class="hero-row">
+          <p class="hero-sub fade-up" data-i="sub"></p>
+          <div class="hero-meta fade-up" id="heroMeta"></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="pinned" id="tree" aria-labelledby="treeTitle">
-    <div class="stage">
-      <h2 class="tree-name" id="treeTitle"><span data-i="treeH">Seven disciplines</span><small data-i="treeP">Strategically integrated services across global infrastructure, defence and specialised technology sectors.</small></h2>
-      <div class="tree-wrapp" id="treeWrap">
-        <svg class="tree-svg" id="treeSvg" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
-        <div class="tree-circle big"></div><div class="tree-circle small"></div>
-        <div class="tree-detail" id="treeDetail" aria-live="polite"></div>
+  <section class="statement" id="statement" aria-label="About">
+    <p id="statementText"></p>
+    <small data-i="statementSrc"></small>
+  </section>
+
+  <section class="mark" id="mark" aria-labelledby="markTitle">
+    <div class="mark-stage">
+      <div class="mark-gl" aria-hidden="true"><canvas id="markGL"></canvas></div>
+      <div class="mark-index" data-i="markIndex"></div>
+      <div class="mark-copy">
+        <h2 id="markTitle" data-i="markH"></h2>
+        <ul class="hubs" id="hubs"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="tree" id="tree" aria-labelledby="treeTitle">
+    <div class="tree-stage">
+      <div class="tree-head">
+        <h2 id="treeTitle" data-i="treeH"></h2>
+        <p data-i="treeP"></p>
+      </div>
+      <div class="tree-fig" id="treeFig">
+        <svg viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="brGrad" gradientUnits="userSpaceOnUse" x1="0" y1="560" x2="0" y2="0">
+              <stop offset="0" stop-color="#3B2C33"/><stop offset=".55" stop-color="#6B4A2E"/><stop offset="1" stop-color="#C8913A"/>
+            </linearGradient>
+          </defs>
+          <g id="treeArcs"></g><g id="treeGlow"></g><g id="treeBr"></g>
+          <path class="trunk" d="M500 560 L500 470"/>
+        </svg>
+        <div class="root"></div>
+        <div class="tree-note" id="treeNote" aria-live="polite"></div>
       </div>
       <ol class="tree-list" id="treeList"></ol>
     </div>
   </section>
 
-  <section class="pinned" id="projects" aria-labelledby="projTitle">
-    <div class="stage">
-      <h2 class="proj-head" id="projTitle" data-i="projH">Work on the ground in Riyadh</h2>
-      <div class="proj-grid" id="projGrid"></div>
+  <section class="work" id="work" aria-labelledby="workTitle">
+    <div class="work-stage">
+      <div class="work-head">
+        <h2 id="workTitle" data-i="workH"></h2>
+        <div class="work-count"><b id="workNow">01</b> / 04</div>
+      </div>
+      <div class="track" id="track"></div>
     </div>
   </section>
 
   <section class="close" aria-labelledby="closeTitle">
-    <h2 id="closeTitle" data-i="closeH">Ready to build?</h2>
-    <p data-i="closeP">Tell us the sector, the country and the scale. Start a conversation with the team.</p>
-    <div class="row"><a class="pill" href="mailto:info@7dint.net" data-i="closeBtn">Start a conversation</a><a class="pill" href="https://7dint.net/contact/" target="_blank" rel="noopener" data-i="closeSite">Contact page at 7D</a></div>
+    <h2 id="closeTitle" data-i="closeH" data-html></h2>
+    <div class="close-row">
+      <p data-i="closeP"></p>
+      <div class="acts">
+        <a class="pill" href="mailto:info@7dint.net" data-i="closeBtn"></a>
+        <a class="pill" href="https://7dint.net/contact/" target="_blank" rel="noopener" data-i="closeSite"></a>
+      </div>
+    </div>
     <p class="direct"><a href="mailto:info@7dint.net">info@7dint.net</a> · <a href="tel:+17272191592" dir="ltr">+1 (727) 219-1592</a></p>
-    <div class="foot"><span>© 7D International</span><span data-i="foot">Concept 3 · for review</span></div>
+    <div class="foot"><span>© 7D International</span><span data-i="foot"></span></div>
   </section>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-<script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}
+</script>
+<script type="module">
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TOUCH=matchMedia('(hover: none)').matches;
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const ease=t=>1-Math.pow(1-t,3);
 const NS='http://www.w3.org/2000/svg';
 
-/* ---------- copy: taken from 7D's published material, both languages ---------- */
+/* ---------- content: 7D's published material, English and Arabic ---------- */
 const HUBS=[{en:'Tampa',ar:'تامبا'},{en:'Ostrava',ar:'أوسترافا'},{en:'Riyadh',ar:'الرياض'},{en:'Seoul',ar:'سيول'},{en:'Sydney',ar:'سيدني'}];
 const DISC=[
  {en:['Architecture, Landscape & Waterscape Design','Full-range architectural consulting: urban studies, zoning plans and city planning.'],ar:['العمارة وتصميم المناظر والمسطحات المائية','استشارات معمارية متكاملة: دراسات عمرانية، مخططات تقسيم، وتخطيط مدن.']},
@@ -257,208 +355,220 @@ const DISC=[
  {en:['Environment, Sorting, Recycling & Bulk Handling','Consulting across environment, sorting and bulk-handling systems.'],ar:['البيئة والفرز وإعادة التدوير ومناولة المواد','استشارات في البيئة وأنظمة الفرز ومناولة المواد السائبة.']}
 ];
 const PROJ=[
- {img:'../assets/projects/kapf-4.jpeg',en:['Innovative water feature','King Abdullah Park Fountain'],ar:['نافورة مبتكرة','نافورة حديقة الملك عبدالله']},
- {img:'../assets/projects/kaig-main-photo.jpeg',en:['Large-scale landscape','King Abdullah International Garden'],ar:['مشروع مناظر ضخم','حديقة الملك عبدالله العالمية']},
- {img:'../assets/projects/riyadh-eye-main-photo.jpeg',en:['Iconic landmark','Riyadh Eye'],ar:['معلم أيقوني','عين الرياض']},
- {img:'../assets/projects/riyadh2020-main-photo.jpeg',en:['Comprehensive urban planning','Riyadh 2020 Urban Study'],ar:['تخطيط عمراني شامل','دراسة الرياض 2020 العمرانية']}
+ {img:'../assets/projects/kapf-4.jpeg',src:'https://7dint.net/projects/king-abdullah-park-fountain/',en:['Innovative water feature','King Abdullah Park Fountain'],ar:['نافورة مبتكرة','نافورة حديقة الملك عبدالله']},
+ {img:'../assets/projects/kaig-main-photo.jpeg',src:'https://7dint.net/projects/king-abdullah-international-garden/',en:['Large-scale landscape','King Abdullah International Garden'],ar:['مشروع مناظر ضخم','حديقة الملك عبدالله العالمية']},
+ {img:'../assets/projects/riyadh-eye-main-photo.jpeg',src:'https://7dint.net/projects/riyadh-eye/',en:['Iconic landmark','Riyadh Eye'],ar:['معلم أيقوني','عين الرياض']},
+ {img:'../assets/projects/riyadh2020-main-photo.jpeg',src:'https://7dint.net/projects/riyadh-2020/',en:['Comprehensive urban planning','Riyadh 2020 Urban Study'],ar:['تخطيط عمراني شامل','دراسة الرياض 2020 العمرانية']}
 ];
 const I={
- en:{title:'7D — global contracting & consulting.',touch:'Get in touch',h1:'Building across five continents, from <em>Riyadh.</em>',since:'Since 1993',
+ en:{brand:'7D <b>— global contracting & consulting.</b>',touch:'Get in touch',lang:'عربي',langLabel:'العربية',sound:'Ambient sound',
+   h1:[['Global'],['contracting'],['& <em>consulting.</em>']],
    sub:'Originating from the Czech Republic and headquartered in Florida, 7D International delivers full-service contracting and consulting across five continents — now with a Middle East headquarters in Riyadh.',
-   cue:'SCROLL',markH:'Five hubs. One firm.',treeH:'Seven disciplines',treeP:'Strategically integrated services across global infrastructure, defence and specialised technology sectors.',
-   projH:'Work on the ground in Riyadh',closeH:'Ready to build?',closeP:'Tell us the sector, the country and the scale. Start a conversation with the team.',
-   closeBtn:'Start a conversation',closeSite:'Contact page at 7D',foot:'Concept 3 · for review',langBtn:'عربي',langLabel:'العربية',sound:'Ambient sound'},
- ar:{title:'7D — مقاولات واستشارات عالمية.',touch:'تواصل معنا',h1:'نبني في خمس قارات، <em>من الرياض.</em>',since:'منذ 1993',
+   meta:[['1993','Founded'],['5','Continents'],['7','Disciplines']],
+   statement:'Three decades of work, from an *$80M* operations contract in Saudi Arabia to more than *1,500* base stations built across continents — and now a Middle East headquarters in *Riyadh.*',
+   statementSrc:'— From 7D International’s published history',
+   markIndex:'THE FIRM',markH:'Five hubs.<br>One standard.',
+   treeH:'Seven disciplines',treeP:'Strategically integrated services across global infrastructure, defence and specialised technology sectors.',
+   workH:'Work on the ground',link:'Project at 7D ↗',
+   closeH:'Ready to <em>build?</em>',closeP:'Tell us the sector, the country and the scale. Start a conversation with the team.',
+   closeBtn:'Start a conversation',closeSite:'Contact page at 7D',foot:'Concept 3 · for review',hint:'Select a discipline'},
+ ar:{brand:'7D <b>— مقاولات واستشارات عالمية.</b>',touch:'تواصل معنا',lang:'EN',langLabel:'English',sound:'صوت محيطي',
+   h1:[['مقاولات'],['واستشارات'],['<em>عالمية.</em>']],
    sub:'انطلقت 7D International من جمهورية التشيك ومقرها الرئيسي اليوم في فلوريدا، وتقدّم خدمات المقاولات والاستشارات المتكاملة عبر خمس قارات — واليوم بمقر إقليمي للشرق الأوسط في الرياض.',
-   cue:'مرّر',markH:'خمسة مراكز. شركة واحدة.',treeH:'سبعة تخصصات',treeP:'خدمات متكاملة استراتيجيًا عبر البنية التحتية العالمية والدفاع وقطاعات التقنية المتخصصة.',
-   projH:'أعمال على أرض الرياض',closeH:'جاهزون للبناء؟',closeP:'أخبرونا بالقطاع والدولة وحجم المشروع لبدء المحادثة مع الفريق.',
-   closeBtn:'ابدأ المحادثة',closeSite:'صفحة التواصل لدى 7D',foot:'المفهوم 3 · للمراجعة',langBtn:'EN',langLabel:'English',sound:'صوت محيطي'}
+   meta:[['1993','التأسيس'],['5','قارات'],['7','تخصصات']],
+   statement:'ثلاثة عقود من العمل، من عقد تشغيل وصيانة بقيمة *80* مليون دولار في السعودية إلى أكثر من *1,500* محطة اتصالات حول العالم — واليوم مقر إقليمي في *الرياض.*',
+   statementSrc:'— من التاريخ المنشور لـ 7D International',
+   markIndex:'الشركة',markH:'خمسة مراكز.<br>معيار واحد.',
+   treeH:'سبعة تخصصات',treeP:'خدمات متكاملة استراتيجيًا عبر البنية التحتية العالمية والدفاع وقطاعات التقنية المتخصصة.',
+   workH:'أعمال على أرض الواقع',link:'المشروع لدى 7D ↗',
+   closeH:'جاهزون <em>للبناء؟</em>',closeP:'أخبرونا بالقطاع والدولة وحجم المشروع لبدء المحادثة مع الفريق.',
+   closeBtn:'ابدأ المحادثة',closeSite:'صفحة التواصل لدى 7D',foot:'المفهوم 3 · للمراجعة',hint:'اختر تخصصًا'}
 };
 let LANG=new URLSearchParams(location.search).get('lang')||localStorage.getItem('7d_c3_lang')||'en';
 if(!I[LANG])LANG='en';
 
-/* ---------- 1. the ring sphere ----------
-   Latitude circles of a sphere seen from a tilted eye become flattened ellipses
-   stacked along one axis. Rotating the stack 45° gives the characteristic
-   diagonal shell; the breathing is each ring drifting a few pixels out of phase. */
-function buildSphere(){
-  const svg=$('#sphere');svg.innerHTML='';
-  const R=196,N=22,tilt=.3;
-  const g=document.createElementNS(NS,'g');g.setAttribute('transform','rotate(-45 220 220)');svg.appendChild(g);
-  for(let i=0;i<N;i++){
-    const t=-1+2*(i+.5)/N, rx=R*Math.sqrt(1-t*t), ry=rx*tilt, cy=220+t*R*Math.cos(Math.asin(tilt))*.98;
-    const e=document.createElementNS(NS,'ellipse');
-    e.setAttribute('cx',220);e.setAttribute('cy',cy.toFixed(2));e.setAttribute('rx',rx.toFixed(2));e.setAttribute('ry',ry.toFixed(2));
-    e.setAttribute('pathLength','1');e.style.stroke='rgba(120,114,104,.42)';
-    g.appendChild(e);
-  }
-  const rings=[...svg.querySelectorAll('ellipse')];
-  if(REDUCED){rings.forEach(r=>r.style.stroke='rgba(224,169,74,.5)');return;}
-  rings.forEach(r=>{r.style.strokeDasharray='1';r.style.strokeDashoffset='1';});
-  anime({targets:rings,strokeDashoffset:[1,0],duration:1800,delay:anime.stagger(55,{from:'center'}),easing:'easeInOutSine',
-    complete:()=>anime({targets:rings,translateX:[2,-5],translateY:[2,-5],stroke:['rgba(120,114,104,.42)','rgba(224,169,74,.95)'],
-      duration:1400,delay:anime.stagger(150,{from:'center'}),direction:'alternate',loop:true,easing:'easeInOutSine'})});
-}
+/* ---------- film grain, drawn once ---------- */
+{const c=$('#grain'),x=c.getContext('2d');c.width=c.height=220;const d=x.createImageData(220,220);
+ for(let i=0;i<d.data.length;i+=4){const v=Math.random()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}
+ x.putImageData(d,0,0);c.style.width='200%';c.style.height='200%';c.style.imageRendering='pixelated';}
 
-/* ---------- 2. split-line headline ---------- */
-function splitText(){
-  $$('.split').forEach(el=>{
-    const html=el.innerHTML;
-    // wrap words, keeping inline markup such as <em>
-    const tmp=document.createElement('div');tmp.innerHTML=html;
-    const out=document.createElement('span');out.className='ln';
-    const walk=(node,parent)=>{node.childNodes.forEach(n=>{
-      if(n.nodeType===3){n.textContent.split(/(\s+)/).forEach(w=>{if(!w)return;if(/^\s+$/.test(w)){parent.appendChild(document.createTextNode(w));return;}
-        const s=document.createElement('span');s.className='wd';s.textContent=w;parent.appendChild(s);});}
-      else{const c=n.cloneNode(false);parent.appendChild(c);walk(n,c);}
-    });};
-    walk(tmp,out);el.innerHTML='';el.appendChild(out);
-    $$('.wd').forEach(()=>{});
-    el.querySelectorAll('.wd').forEach((w,i)=>w.style.transitionDelay=(REDUCED?0:.12+i*.045)+'s');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));
-    setTimeout(()=>el.classList.add('in'),60);   // does not wait on a frame that may never come
-  });
+/* ---------- builders ---------- */
+function buildHero(){
+  const L=I[LANG];
+  $('#heroTitle').innerHTML=L.h1.map((l,i)=>`<span class="mask"><span style="transition-delay:${.15+i*.12}s">${l[0]}</span></span>`).join('');
+  $('#heroMeta').innerHTML=L.meta.map(m=>`<div><b>${m[0]}</b>${m[1]}</div>`).join('');
 }
+function buildStatement(){
+  // *word* marks a highlighted figure
+  const words=I[LANG].statement.split(/\s+/);
+  $('#statementText').innerHTML=words.map(w=>{const hl=/^\*.*\*[.,]?$/.test(w);return `<span class="w${hl?' hl':''}">${w.replace(/\*/g,'')}</span>`;}).join(' ');
+}
+function buildHubs(){$('#hubs').innerHTML=HUBS.map(h=>`<li>${h[LANG]}</li>`).join('');}
 
-/* ---------- 3. the mark: eight facets fly in as mirrored pairs ---------- */
-const FACETS=[]; // [points, from]
-function buildMark(){
-  const svg=$('#markSvg');svg.innerHTML='';FACETS.length=0;
-  const C=[500,500],T=[500,120],Rt=[880,500],B=[500,880],L=[120,500];
-  const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
-  const tris=[[T,mid(T,Rt),C],[mid(T,Rt),Rt,C],[Rt,mid(Rt,B),C],[mid(Rt,B),B,C],[B,mid(B,L),C],[mid(B,L),L,C],[L,mid(L,T),C],[mid(L,T),T,C]];
-  const fills=['#E0A94A','#C89240','#8C6A3A','#A57B3E','#E0A94A','#C89240','#8C6A3A','#A57B3E'];
-  tris.forEach((tri,i)=>{
-    const p=document.createElementNS(NS,'polygon');
-    p.setAttribute('points',tri.map(q=>q.join(',')).join(' '));
-    p.setAttribute('fill',fills[i]);p.setAttribute('fill-opacity','.9');
-    const cx=(tri[0][0]+tri[1][0]+tri[2][0])/3-500, cy=(tri[0][1]+tri[1][1]+tri[2][1])/3-500;
-    // mirrored flight: facets on the left start far left, right ones far right, like wings closing
-    const side=cx<0?-1:1;
-    FACETS.push({el:p,dx:side*(520+Math.abs(cy)*.8),dy:cy*1.6,rot:side*(40+i*6),delay:Math.abs(i-3.5)/3.5*.28});
-    svg.appendChild(p);
-  });
-  const ring=document.createElementNS(NS,'circle');ring.setAttribute('cx',500);ring.setAttribute('cy',500);ring.setAttribute('r',430);
-  ring.setAttribute('fill','none');ring.setAttribute('stroke','rgba(239,234,224,.22)');ring.setAttribute('stroke-width','1');ring.setAttribute('pathLength','1');
-  ring.style.strokeDasharray='1';ring.id='markRing';svg.appendChild(ring);
-  const hubs=$('#hubs');hubs.innerHTML=HUBS.map(h=>`<span>${h[LANG]}</span>`).join('');
-}
-function updateMark(p){
-  FACETS.forEach(f=>{
-    const k=ease(clamp((p-f.delay*.6)/.62));
-    f.el.style.transform=`translate(${f.dx*(1-k)}px,${f.dy*(1-k)}px) rotate(${f.rot*(1-k)}deg)`;
-    f.el.style.opacity=.15+k*.85;
-  });
-  const ring=$('#markRing');if(ring)ring.style.strokeDashoffset=1-ease(clamp((p-.55)/.35));
-  $$('#hubs span').forEach((s,i)=>s.classList.toggle('on',p>.6+i*.07));
-}
-
-/* ---------- 4. the tree: seven branches from one trunk ---------- */
-let BRANCH=[];
+/* The tree: seven curved branches fanning up from one trunk. Each branch leaves
+   the trunk vertically and bends toward its tip, so the fan reads as grown rather
+   than ruled. Labels sit outside their tips so no text crosses a branch. */
+let BR=[],pinned=-1;
 function buildTree(){
-  const svg=$('#treeSvg'),wrap=$('#treeWrap');svg.innerHTML='';
-  wrap.querySelectorAll('.tree-title,.tree-ball').forEach(n=>n.remove());
-  const ox=500,oy=600,len=[470,520,560,580,560,520,470];
-  const trunk=document.createElementNS(NS,'path');trunk.setAttribute('d',`M${ox} 620 L${ox} ${oy}`);svg.appendChild(trunk);
-  BRANCH=DISC.map((d,i)=>{
-    // fan across the upper half, left to right in reading order
-    const a=Math.PI*(1-(i+.5)/DISC.length), L=len[i];
-    let x=ox+Math.cos(a)*L*.95, y=oy-Math.sin(a)*L*.92;
-    if(document.documentElement.dir==='rtl')x=1000-x;
-    const path=document.createElementNS(NS,'path');
-    path.setAttribute('d',`M${ox} ${oy} L${x.toFixed(1)} ${y.toFixed(1)}`);path.setAttribute('pathLength','1');
-    path.style.strokeDasharray='1';path.style.strokeDashoffset='1';svg.appendChild(path);
-    const px=x/10+'%',py=y/6.2+'%';
-    const ball=document.createElement('span');ball.className='tree-ball';ball.style.left=px;ball.style.top=py;wrap.appendChild(ball);
-    const title=document.createElement('div');title.className='tree-title';title.style.left=px;title.style.top=py;
-    title.innerHTML=`<button type="button" aria-pressed="false" data-d="${i}"><b>0${i+1}</b><span>${d[LANG][0]}</span></button>`;
-    wrap.appendChild(title);
-    return {path,ball,title,start:i/DISC.length*.7};
+  const rtl=LANG==='ar';
+  const arcs=$('#treeArcs'),glow=$('#treeGlow'),brG=$('#treeBr');arcs.innerHTML=glow.innerHTML=brG.innerHTML='';
+  $$('#treeFig .orb,#treeFig .lbl').forEach(n=>n.remove());
+  for(let k=1;k<=4;k++){const r=k*120;const a=document.createElementNS(NS,'path');a.setAttribute('class','arc');a.setAttribute('d',`M${500-r} 560 A${r} ${r*.95} 0 0 1 ${500+r} 560`);arcs.appendChild(a);}
+  const ox=500,oy=470,fig=$('#treeFig');
+  BR=DISC.map((d,i)=>{
+    const ang=(165-i*25)*Math.PI/180;
+    let ex=ox+Math.cos(ang)*380, ey=oy-Math.sin(ang)*400;
+    if(rtl)ex=1000-ex;
+    const c1x=ox, c1y=oy-120, c2x=ox+(ex-ox)*.62, c2y=ey+(oy-ey)*.18;
+    const dPath=`M${ox} ${oy} C${c1x} ${c1y}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+    const g=document.createElementNS(NS,'path');g.setAttribute('class','br-glow');g.setAttribute('d',dPath);g.setAttribute('pathLength','1');g.style.strokeDasharray='1';g.style.strokeDashoffset='1';glow.appendChild(g);
+    const p=document.createElementNS(NS,'path');p.setAttribute('class','br');p.setAttribute('d',dPath);p.setAttribute('pathLength','1');p.style.strokeDasharray='1';p.style.strokeDashoffset='1';brG.appendChild(p);
+    const side=[ 'top','left','top','top','top','right','top' ][i];
+    const place=rtl?(side==='left'?'right':side==='right'?'left':side):side;
+    const orb=document.createElement('span');orb.className='orb';orb.style.left=ex/10+'%';orb.style.top=ey/5.6+'%';fig.appendChild(orb);
+    const lbl=document.createElement('div');lbl.className='lbl '+place;lbl.style.left=ex/10+'%';lbl.style.top=ey/5.6+'%';
+    lbl.innerHTML=`<button type="button" aria-pressed="false" data-d="${i}"><b>0${i+1}</b><span>${d[LANG][0]}</span></button>`;
+    fig.appendChild(lbl);
+    return {p,g,orb,lbl,start:.04+i*.1};
   });
+  fig.onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;pinned=pinned===+b.dataset.d?-1:+b.dataset.d;note();};
+  fig.onmouseover=e=>{const b=e.target.closest('[data-d]');BR.forEach((x,i)=>x.g.classList.toggle('hot',b?+b.dataset.d===i:i===pinned));};
   $('#treeList').innerHTML=DISC.map((d,i)=>`<li><b>0${i+1}</b><h3>${d[LANG][0]}</h3><p>${d[LANG][1]}</p></li>`).join('');
-  wrap.onclick=e=>{const b=e.target.closest('[data-d]');if(b)showDetail(+b.dataset.d,true);};
 }
-let pinnedDetail=-1;
-function showDetail(i,pin){
-  if(pin)pinnedDetail=pinnedDetail===i?-1:i;
-  const k=pinnedDetail>=0?pinnedDetail:i;
-  $$('.tree-title button').forEach((b,j)=>b.setAttribute('aria-pressed',String(j===k)));
-  const d=$('#treeDetail');
-  if(k<0){d.classList.remove('on');return;}
-  d.innerHTML=`<strong>${DISC[k][LANG][0]}</strong>${DISC[k][LANG][1]}`;d.classList.add('on');
+let lastNote=-2;
+function note(latest){
+  const k=pinned>=0?pinned:latest;
+  if(k===lastNote)return;lastNote=k;
+  $$('.lbl button').forEach((b,i)=>b.setAttribute('aria-pressed',String(i===pinned)));
+  BR.forEach((x,i)=>x.g.classList.toggle('hot',i===k));
+  const n=$('#treeNote');
+  n.innerHTML=k>=0?`<strong>${DISC[k][LANG][0]}</strong>${DISC[k][LANG][1]}`:'';
 }
-function updateTree(p){
-  BRANCH.forEach((b,i)=>{
-    const k=clamp((p-b.start)/.2);
-    b.path.style.strokeDashoffset=1-ease(k);
-    b.ball.classList.toggle('on',k>=1);b.title.classList.toggle('on',k>.85);
-  });
-  // with nothing pinned, the most recently grown branch explains itself
-  if(pinnedDetail<0){const last=BRANCH.reduce((n,b,i)=>clamp((p-b.start)/.2)>=1?i:n,-1);showDetail(last,false);}
+function buildWork(){
+  $('#track').innerHTML=PROJ.map((p,i)=>`<article class="panel" data-i="${i}">
+    <div class="pic"><img src="${p.img}" alt="${p[LANG][1]}" loading="${i?'lazy':'eager'}" decoding="async"></div>
+    <div class="num">0${i+1}</div>
+    <div class="cap"><div><b>${p[LANG][0]}</b><h3>${p[LANG][1]}</h3></div><a href="${p.src}" target="_blank" rel="noopener">${I[LANG].link}</a></div>
+  </article>`).join('');
 }
-
-/* ---------- 5. projects: four pieces converge like the wings ---------- */
-function buildProjects(){
-  $('#projGrid').innerHTML=PROJ.map((p,i)=>`<figure class="proj" data-i="${i}"><img src="${p.img}" alt="${p[LANG][1]}" loading="lazy" decoding="async"><figcaption><b>${p[LANG][0]}</b><span>${p[LANG][1]}</span></figcaption></figure>`).join('');
-}
-function updateProjects(p){
-  if(innerWidth<=760)return;
-  const dirs=[[-1,-1],[1,-1],[-1,1],[1,1]];
-  $$('.proj').forEach((el,i)=>{
-    const k=ease(clamp((p-i*.06)/.6)), [sx,sy]=dirs[i], flip=document.documentElement.dir==='rtl'?-1:1;
-    el.style.transform=`translate(${sx*flip*38*(1-k)}vw,${sy*30*(1-k)}vh) rotate(${sx*sy*14*(1-k)}deg) scale(${.7+.3*k})`;
-    el.style.opacity=.2+.8*k;
-  });
-}
-
-/* ---------- scroll orchestration ---------- */
-const progress=el=>{const r=el.getBoundingClientRect(),span=el.offsetHeight-innerHeight;return span>0?clamp(-r.top/span):1;};
-function onScroll(){
-  const y=scrollY;
-  $('#header').classList.toggle('light',y>innerHeight*.9&&$('.close').getBoundingClientRect().top>70);
-  if(REDUCED){updateMark(1);updateTree(1);updateProjects(1);return;}
-  updateMark(progress($('#mark')));updateTree(progress($('#tree')));updateProjects(progress($('#projects')));
-}
-let ticking=false;
-addEventListener('scroll',()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{ticking=false;onScroll();});},{passive:true});
-addEventListener('resize',onScroll);
-
-/* ---------- 6. ambient sound, generated rather than licensed ----------
-   Two slightly detuned low oscillators through a lowpass whose cutoff drifts
-   slowly: a quiet desert-night pad. It only starts from a click. */
-let audio=null;
-function toggleSound(){
-  const btn=$('#sound');
-  if(!audio){
-    const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
-    const ctx=new Ctx(),out=ctx.createGain();out.gain.value=0;out.connect(ctx.destination);
-    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=520;lp.Q.value=.6;lp.connect(out);
-    [110,110.7,164.8,220.4].forEach((f,i)=>{const o=ctx.createOscillator();o.type=i<2?'sawtooth':'sine';o.frequency.value=f;
-      const g=ctx.createGain();g.gain.value=i<2?.05:.035;o.connect(g).connect(lp);o.start();});
-    const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=.05;lg.gain.value=260;lfo.connect(lg).connect(lp.frequency);lfo.start();
-    audio={ctx,out,on:false};
-  }
-  audio.on=!audio.on;
-  if(audio.ctx.state==='suspended')audio.ctx.resume();
-  audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
-  audio.out.gain.setTargetAtTime(audio.on?.55:0,audio.ctx.currentTime,.6);
-  btn.classList.toggle('on',audio.on);btn.setAttribute('aria-pressed',String(audio.on));
-}
-$('#sound').addEventListener('click',toggleSound);
-
-/* ---------- language ---------- */
-function applyLang(){
+function applyLang(boot){
   const L=I[LANG];
   document.documentElement.lang=LANG;document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
-  $$('[data-i]').forEach(el=>{const v=L[el.dataset.i];if(v==null)return;if(el.hasAttribute('data-html'))el.innerHTML=v;else el.textContent=v;});
-  $('#lang').textContent=L.langBtn;$('#lang').setAttribute('aria-label',L.langLabel);$('#sound').setAttribute('aria-label',L.sound);
+  $$('[data-i]').forEach(el=>{const v=L[el.dataset.i];if(v==null)return;el.innerHTML=v;});
+  $('#lang').textContent=L.lang;$('#lang').setAttribute('aria-label',L.langLabel);$('#sound').setAttribute('aria-label',L.sound);
   document.title=LANG==='ar'?'7D International — المفهوم 3':'7D International — Concept 3';
-  $$('.split').forEach(el=>el.classList.remove('in'));splitText();
-  buildMark();buildTree();buildProjects();pinnedDetail=-1;onScroll();
+  buildHero();buildStatement();buildHubs();buildTree();buildWork();pinned=-1;lastNote=-2;
+  // on a language switch the headline re-rises; a timer, not a frame, so a hidden tab cannot strand it
+  if(!boot)setTimeout(()=>document.body.classList.add('ready'),40);
 }
-$('#lang').addEventListener('click',()=>{LANG=LANG==='ar'?'en':'ar';localStorage.setItem('7d_c3_lang',LANG);applyLang();});
+$('#lang').addEventListener('click',()=>{LANG=LANG==='ar'?'en':'ar';localStorage.setItem('7d_c3_lang',LANG);document.body.classList.remove('ready');applyLang();update(true);});
 
-buildSphere();applyLang();
+/* ---------- smooth scroll ---------- */
+let lenis=null;
+if(!REDUCED&&window.Lenis){lenis=new Lenis({lerp:.085,smoothWheel:true,wheelMultiplier:.9});}
+
+/* ---------- WebGL, loaded after first paint and never blocking the page ---------- */
+let hero=null,mark=null;
+const glReady=import('./c3-scene.js').then(m=>{
+  try{hero=m.initHero($('#heroGL'));}catch(e){console.warn('hero gl',e);}
+  try{mark=m.initMark($('#markGL'));}catch(e){console.warn('mark gl',e);}
+  addEventListener('resize',()=>{hero?.resize();mark?.resize();});
+}).catch(e=>console.warn('3D unavailable',e));
+
+/* ---------- per-frame orchestration ---------- */
+const prog=el=>{const r=el.getBoundingClientRect(),span=el.offsetHeight-innerHeight;return span>0?clamp(-r.top/span):(r.top<innerHeight?1:0);};
+const inView=el=>{const r=el.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight;};
+let lastY=0;
+function update(force){
+  const y=scrollY;
+  // header: hides on the way down, returns on the way up, turns dark over limestone
+  const hdr=$('#header'),tr=$('#tree').getBoundingClientRect();
+  hdr.classList.toggle('on-stone',tr.top<60&&tr.bottom>60);
+  if(!force)hdr.classList.toggle('hide',y>lastY+2&&y>innerHeight*.6);
+  if(y<lastY-2)hdr.classList.remove('hide');
+  lastY=y;
+
+  // statement words fill in reading order
+  const st=$('#statement'),sr=st.getBoundingClientRect(),sp=clamp((innerHeight*.78-sr.top)/(sr.height*.8));
+  const ws=$$('#statementText .w');ws.forEach((w,i)=>w.classList.toggle('on',REDUCED||sp>=(i+1)/ws.length));
+
+  // mark hubs
+  const mp=REDUCED?1:prog($('#mark'));
+  $$('#hubs li').forEach((li,i)=>li.classList.toggle('on',mp>.68+i*.05));
+
+  // tree
+  if(innerWidth>820){
+    const tp=REDUCED?1:prog($('#tree'));let latest=-1;
+    BR.forEach((b,i)=>{const k=ease(clamp((tp-b.start)/.14));b.p.style.strokeDashoffset=1-k;b.g.style.strokeDashoffset=1-k;
+      const done=k>.98;b.orb.classList.toggle('on',done);b.lbl.classList.toggle('on',k>.8);if(done)latest=i;});
+    note(latest);
+  }
+
+  // work: the track slides, each photo drifts against it, the counter follows
+  if(innerWidth>820){
+    const wp=REDUCED?0:prog($('#work')),track=$('#track');
+    const max=track.scrollWidth-innerWidth;const dir=LANG==='ar'?1:-1;
+    track.style.transform=`translate3d(${dir*max*wp}px,0,0)`;
+    const panels=$$('.panel');let best=0,bestD=1e9;
+    panels.forEach((p,i)=>{const r=p.getBoundingClientRect(),c=r.left+r.width/2,d=(c-innerWidth/2)/innerWidth;
+      p.querySelector('.pic').style.transform=`translate3d(${-d*9}%,0,0) scale(1.06)`;
+      if(Math.abs(d)<bestD){bestD=Math.abs(d);best=i;}});
+    $('#workNow').textContent='0'+(best+1);
+  }
+}
+
+let t0=performance.now();
+function frame(now){
+  lenis?.raf(now);
+  update();
+  const t=(now-t0)/1000;
+  if(hero&&inView($('#hero')))hero.render(t,REDUCED?0:prog($('#hero')));
+  if(mark&&inView($('#mark')))mark.render(t,REDUCED?1:prog($('#mark')));
+  requestAnimationFrame(frame);
+}
+
+/* ---------- cursor ---------- */
+if(!TOUCH&&!REDUCED){
+  const cur=$('#cursor'),ring=cur.querySelector('.ring'),dot=cur.querySelector('.dot');let mx=-100,my=-100,rx=-100,ry=-100;
+  addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;},{passive:true});
+  addEventListener('pointerover',e=>cur.classList.toggle('hover',!!e.target.closest('a,button')));
+  (function loop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;dot.style.transform=`translate(${mx}px,${my}px)`;ring.style.transform=`translate(${rx}px,${ry}px)`;requestAnimationFrame(loop);})();
+}
+
+/* ---------- ambient pad: synthesised, starts only on click ---------- */
+let pad=null;
+$('#sound').addEventListener('click',()=>{
+  const btn=$('#sound');
+  if(!pad){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const ctx=new C(),out=ctx.createGain();out.gain.value=0;
+    const verb=ctx.createConvolver();{const len=ctx.sampleRate*3.2,buf=ctx.createBuffer(2,len,ctx.sampleRate);for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.4);}verb.buffer=buf;}
+    const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=700;lp.connect(verb);lp.connect(out);verb.connect(out);out.connect(ctx.destination);
+    [[98,.05,'sawtooth'],[98.6,.05,'sawtooth'],[146.8,.03,'triangle'],[196.2,.02,'sine'],[293.7,.012,'sine']].forEach(([f,g,t])=>{const o=ctx.createOscillator(),gg=ctx.createGain();o.type=t;o.frequency.value=f;gg.gain.value=g;o.connect(gg).connect(lp);o.start();});
+    const l=ctx.createOscillator(),lg=ctx.createGain();l.frequency.value=.06;lg.gain.value=320;l.connect(lg).connect(lp.frequency);l.start();
+    pad={ctx,out,on:false};}
+  pad.on=!pad.on;if(pad.ctx.state==='suspended')pad.ctx.resume();
+  pad.out.gain.setTargetAtTime(pad.on?.5:0,pad.ctx.currentTime,.8);
+  btn.classList.toggle('on',pad.on);btn.setAttribute('aria-pressed',String(pad.on));
+});
+
+/* ---------- preloader: counts real readiness, never traps the page ---------- */
+applyLang(true);
+const steps=[document.fonts?.ready||Promise.resolve(),glReady,new Promise(r=>{const im=new Image();im.onload=im.onerror=r;im.src=PROJ[0].img;})];
+let done=0,shown=0;const target=()=>Math.round(done/steps.length*100);
+steps.forEach(s=>s.then(()=>{done++;}));
+const loader=$('#loader');
+function finish(){if(loader.classList.contains('done'))return;$('#loaderCount').textContent='100';$('#loaderLine').style.width='100%';
+  loader.classList.add('done');setTimeout(()=>{document.body.classList.add('ready');},250);setTimeout(()=>loader.remove(),1400);}
+if(REDUCED){loader.remove();document.body.classList.add('ready');}
+else{
+  const began=performance.now();
+  (function count(){shown+=(target()-shown)*.12+.15;shown=Math.min(shown,target()||shown);const v=Math.min(100,Math.round(shown));
+    $('#loaderCount').textContent=v;$('#loaderLine').style.width=v+'%';
+    if(done===steps.length&&performance.now()-began>1200&&v>=99)finish();else if(!loader.classList.contains('done'))requestAnimationFrame(count);})();
+  setTimeout(finish,5000);            // whatever happens, the site is reachable within five seconds
+}
+/* inspection handle for QA scripts */
+window.c3={get hero(){return hero},get mark(){return mark},update,prog};
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>
