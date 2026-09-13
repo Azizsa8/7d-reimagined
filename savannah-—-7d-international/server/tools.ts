@@ -71,7 +71,7 @@ export const TOOL_DECLARATIONS = [
   {
     name: 'capture_enquiry',
     description:
-      'Fill the on-screen enquiry card with what the visitor has said so far. Call after each answer while collecting an enquiry. The visitor sends it; you never do.',
+      'ONLY when the visitor has explicitly said they want to leave a message, be contacted, or talk to the team about a project: fill the on-screen enquiry card with details the visitor actually said (name, organisation, country, topic, email, phone). Never call it for ordinary questions, contact requests you answer yourself, or before the visitor asks to be contacted. The visitor sends the card; you never do.',
     parameters: {
       type: 'OBJECT',
       properties: {

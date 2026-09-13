@@ -70,6 +70,8 @@ export default function App() {
     if (import.meta.env.DEV) {
       (window as any).__savannah = {
         stage,
+        bus,
+        session: () => sessionRef.current,
         scene: (world: WorldName, params: Record<string, unknown> = {}) => bus.emit('scene', { world, params, at: performance.now() }),
         cue: (entityId: string, category: string) => bus.emit('cue', { entityId, category }),
         state: (st: PresenceState) => bus.emit('state', st),

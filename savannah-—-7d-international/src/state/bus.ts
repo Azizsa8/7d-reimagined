@@ -63,6 +63,7 @@ export interface BusEvents {
   transcriptTurn: { role: 'user' | 'model'; text: string };
   toast: { text: string; kind?: 'info' | 'warn' };
   ptt: boolean;
+  tool: { name: string; args: Record<string, unknown>; at: number };
   overlay: { world: WorldName; data: any };
   worldActive: WorldName;
   tier: string;

@@ -5,6 +5,11 @@ import { track } from '../analytics';
 
 type Lang = 'en' | 'ar';
 
+let enquiryDraft: Record<string, string | undefined> = {};
+export function resetEnquiry() {
+  enquiryDraft = {};
+}
+
 export interface ToolContext {
   lang: Lang;
   /** ids of questions already answered (chip de-duplication) */
@@ -21,6 +26,14 @@ const VALID: Record<string, WorldName> = {
   show_figure: 'figure',
   show_contact: 'contact',
 };
+
+/** Exact id, else the best fuzzy match of the right type (the model sometimes says 'riyadh-fountain'). */
+function resolve(kb: Awaited<ReturnType<typeof fetchKB>>, id: string, type: string) {
+  const exact = getRecord(kb, id);
+  if (exact && exact.type === type) return exact;
+  const hit = search(kb, id.replace(/[-_]/g, ' '), 5).find((h) => h.rec.type === type);
+  return hit ? hit.rec : undefined;
+}
 
 function unknown(validIds: string[]) {
   return { shown: false, reason: 'UNKNOWN_ID', valid_ids: validIds };
@@ -64,36 +77,47 @@ export async function executeTool(name: string, args: Record<string, any>, ctx: 
         return { records: [], note: 'NOT_IN_KB' };
       }
       hits.slice(0, 3).forEach((h) => track('topic', { id: h!.id }));
-      return { records: hits.slice(0, 3).map((h) => localizeRecord(h!, lang)) };
+      const top = hits[0]!;
+      const showFor: Partial<Record<string, string>> = { project: 'show_project', hub: 'show_hubs', person: 'show_person', timeline: 'show_timeline', discipline: 'show_disciplines', figure: 'show_figure', contact: 'show_contact', company: 'show_hubs' };
+      const showTool = showFor[top.type];
+      const showArgs = top.type === 'hub' ? { focus: top.id } : top.type === 'contact' || top.type === 'company' ? {} : { id: top.id };
+      return {
+        records: hits.slice(0, 3).map((h) => localizeRecord(h!, lang)),
+        next_steps: [
+          showTool ? `Call ${showTool}(${JSON.stringify(showArgs)}) NOW, before you speak.` : 'Speak from the records only.',
+          'Then answer in 2-4 sentences from these records only, following every voice_rules line.',
+          'Then call suggest_questions with 2 or 3 short follow-ups.',
+        ],
+      };
     }
 
     case 'show_project': {
-      const rec = getRecord(kb, String(args.id || ''));
-      if (!rec || rec.type !== 'project') return unknown(kb.projects.map((p) => p.id));
+      const rec = resolve(kb, String(args.id || ''), 'project');
+      if (!rec) return unknown(kb.projects.map((p) => p.id));
       emitScene('project', { id: rec.id });
       chipsFor(kb, 'after_project', ctx);
       return { shown: true, title: rec.name[lang] };
     }
 
     case 'show_hubs': {
-      const focus = args.focus ? getRecord(kb, String(args.focus)) : null;
-      if (args.focus && (!focus || focus.type !== 'hub')) return unknown(kb.hubs.map((h) => h.id));
+      const focus = args.focus ? resolve(kb, String(args.focus), 'hub') : null;
+      if (args.focus && !focus) return unknown(kb.hubs.map((h) => h.id));
       emitScene('globe', { focus: focus?.id });
       chipsFor(kb, 'after_hubs', ctx);
       return { shown: true, title: focus ? focus.name[lang] : lang === 'ar' ? 'المراكز الخمسة' : 'Five hubs' };
     }
 
     case 'show_timeline': {
-      const m = args.id ? getRecord(kb, String(args.id)) : null;
-      if (args.id && (!m || m.type !== 'timeline')) return unknown(kb.timeline.map((t) => t.id));
+      const m = args.id ? resolve(kb, String(args.id), 'timeline') : null;
+      if (args.id && !m) return unknown(kb.timeline.map((t) => t.id));
       emitScene('timeline', { id: m?.id });
       chipsFor(kb, 'after_timeline', ctx);
       return { shown: true, title: m ? `${m.record.year} — ${m.name[lang]}` : lang === 'ar' ? 'قصتنا' : 'Our story' };
     }
 
     case 'show_person': {
-      const p = getRecord(kb, String(args.id || ''));
-      if (!p || p.type !== 'person') return unknown(kb.people.map((x) => x.id));
+      const p = resolve(kb, String(args.id || ''), 'person');
+      if (!p) return unknown(kb.people.map((x) => x.id));
       emitScene('people', { id: p.id });
       chipsFor(kb, 'after_people', ctx);
       return { shown: true, title: p.name[lang] };
@@ -106,15 +130,15 @@ export async function executeTool(name: string, args: Record<string, any>, ctx: 
     }
 
     case 'show_disciplines': {
-      const d = args.id ? getRecord(kb, String(args.id)) : null;
-      if (args.id && (!d || d.type !== 'discipline')) return unknown(kb.disciplines.map((x) => x.id));
+      const d = args.id ? resolve(kb, String(args.id), 'discipline') : null;
+      if (args.id && !d) return unknown(kb.disciplines.map((x) => x.id));
       emitScene('disciplines', { id: d?.id });
       return { shown: true, title: d ? d.name[lang] : lang === 'ar' ? 'سبعة تخصصات' : 'Seven disciplines' };
     }
 
     case 'show_figure': {
-      const f = getRecord(kb, String(args.id || ''));
-      if (!f || f.type !== 'figure') return unknown(kb.figures.map((x) => x.id));
+      const f = resolve(kb, String(args.id || ''), 'figure');
+      if (!f) return unknown(kb.figures.map((x) => x.id));
       emitScene('figure', { id: f.id });
       return { shown: true, title: `${f.record.value} — ${f.name[lang]}` };
     }
@@ -142,12 +166,14 @@ export async function executeTool(name: string, args: Record<string, any>, ctx: 
       const action = String(args.action || 'start');
       const protocol =
         lang === 'ar'
-          ? 'تكلمي عن هذا الفصل في حوالي عشرين ثانية من نقاط الحديث فقط، بصوتك أنتِ. لما تخلصين، استدعي story بالإجراء next. إذا قاطعك الزائر بسؤال، جاوبي عليه ثم اسألي "أكمل لك القصة؟" وإذا وافق استدعي story بالإجراء resume.'
-          : 'Tell this chapter in about twenty seconds from the talking points only, in your own voice. When you finish, call story with action next. If the visitor interrupts with a question, answer it, then ask "Shall I carry on with the story?" and on yes call story with action resume.';
+          ? 'تكلمي عن هذا الفصل في حوالي عشرين ثانية من نقاط الحديث فقط، بصوتك أنتِ، وبعدين اسكتي: الفصل الجاي يجي لحاله بدون ما تسألين. إذا قاطعك الزائر بسؤال، جاوبي عليه ثم اسألي "أكمل لك القصة؟" وإذا وافق استدعي story بالإجراء resume.'
+          : 'Tell this chapter in about twenty seconds from the talking points only, in your own voice, then stop: the next chapter follows on its own, do not ask whether to continue and do not call next. Only if the visitor interrupts with a question: answer it, then ask "Shall I carry on with the story?" and on yes call story with action resume.';
       let ch = null;
       if (action === 'start') ch = story.start();
-      else if (action === 'next') ch = story.next();
-      else if (action === 'resume') ch = story.resume();
+      else if (action === 'next') {
+        // The client turns the page when the chapter's audio has finished; the model only speaks.
+        return { status: story.state, note: lang === 'ar' ? 'الفصول تنتقل لحالها بعد ما تخلصين الكلام. ما تحتاجين تستدعين next.' : 'Chapters advance on their own once you finish speaking. You do not need to call next.' };
+      } else if (action === 'resume') ch = story.resume();
       else if (action === 'stop') {
         story.stop();
         return { status: 'stopped' };
@@ -162,15 +188,25 @@ export async function executeTool(name: string, args: Record<string, any>, ctx: 
     }
 
     case 'capture_enquiry': {
+      // Merge with what earlier calls captured: the model often omits fields it already gave.
+      for (const k of ['name', 'organisation', 'country', 'topic', 'email', 'phone']) {
+        const v = str(args[k]);
+        if (v) enquiryDraft[k] = v;
+      }
       const draft = {
-        name: str(args.name),
-        organisation: str(args.organisation),
-        country: str(args.country),
-        topic: str(args.topic),
-        email: str(args.email),
-        phone: str(args.phone),
+        name: enquiryDraft.name,
+        organisation: enquiryDraft.organisation,
+        country: enquiryDraft.country,
+        topic: enquiryDraft.topic,
+        email: enquiryDraft.email,
+        phone: enquiryDraft.phone,
         language: (args.language === 'ar' ? 'ar' : lang) as Lang,
       };
+      const substantive = !!(draft.name || draft.organisation || draft.email || draft.phone);
+      if (!substantive) {
+        return { card_state: 'not_started', note: lang === 'ar' ? 'ما تستخدمين هذه الأداة إلا إذا طلب الزائر صراحة يترك رسالة أو يتواصل معه الفريق. جاوبي على سؤاله عادي.' : 'Use this only after the visitor explicitly asks to leave a message or be contacted. Answer their question normally.' };
+      }
+      if (story.state !== 'idle') story.stop();
       bus.emit('enquiry', draft);
       const missing = ['name', 'topic'].filter((k) => !(draft as any)[k]);
       if (!draft.email && !draft.phone) missing.push('email_or_phone');

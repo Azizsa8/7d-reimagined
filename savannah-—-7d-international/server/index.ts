@@ -21,8 +21,8 @@ export const DEFAULT_VOICE: VoiceName = 'Aoede';
 export const COST = {
   tokenNewSessionSeconds: 60, // "1 min to start"
   tokenExpireMinutes: 15, // covers a 12 min session plus reconnects
-  mintPerIpPer10Min: 6,
-  mintPerIpPerDay: 60,
+  mintPerIpPer10Min: Number(process.env.MINT_PER_IP_10MIN || 6),
+  mintPerIpPerDay: Number(process.env.MINT_PER_IP_DAY || 60),
   dailySessionCap: Number(process.env.DAILY_SESSION_CAP || 500),
   enquiryPerIpPerHour: 3,
   nonceTtlMs: 10 * 60 * 1000,
@@ -309,7 +309,6 @@ export async function createApp() {
               },
             },
           },
-          lockAdditionalFields: ['temperature', 'topP', 'topK', 'maxOutputTokens'],
         },
       });
       if (!token?.name) throw new Error('empty token');

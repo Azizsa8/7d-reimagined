@@ -6,7 +6,9 @@ import { MicCapture } from './MicCapture';
 import { CaptionManager } from './captions';
 import { executeTool, type ToolContext } from './tools';
 import { CueDirector } from '../stage/cue/CueDirector';
-import { story } from '../story/story';
+import { story, chapterPayload } from '../story/story';
+import { fetchKB } from '../kb/client';
+import { executeTool as runTool, resetEnquiry } from './tools';
 import { t } from '../i18n/strings';
 import { track } from '../analytics';
 
@@ -54,6 +56,11 @@ export class LiveSession {
   private hidden = false;
   private hiddenAt = 0;
   private lastUserHeardAt = 0;
+  /** After a tap-interrupt the model may still stream the rest of its turn; drop it. */
+  private suppressTurn = false;
+  /** True while the current model turn is a Story chapter; the client advances when its audio ends. */
+  private storyChapterTurn = false;
+  private storyAdvanceWhenEnded = false;
 
   constructor(lang: SupportedLang, voice: PrebuiltVoice) {
     this.lang = lang;
@@ -72,6 +79,11 @@ export class LiveSession {
     this.playback.onEnded = () => {
       if (this.destroyed) return;
       bus.emit('state', 'listening');
+      if (this.storyAdvanceWhenEnded && story.state === 'playing') {
+        this.storyAdvanceWhenEnded = false;
+        window.setTimeout(() => this.advanceStory(), 700);
+        return;
+      }
       this.armSilenceChips();
     };
 
@@ -91,6 +103,7 @@ export class LiveSession {
   /* ---------------- lifecycle ---------------- */
 
   async start(): Promise<void> {
+    resetEnquiry();
     this.startedAt = performance.now();
     this.lastActivity = Date.now();
     bus.emit('lang', this.lang);
@@ -295,6 +308,8 @@ export class LiveSession {
     if (!sc) return;
 
     if (sc.interrupted) {
+      this.storyChapterTurn = false;
+      this.storyAdvanceWhenEnded = false;
       this.playback.interrupt();
       this.captions.interrupt();
       this.cues.reset();
@@ -306,6 +321,7 @@ export class LiveSession {
     }
 
     if (sc.inputTranscription?.text) {
+      this.suppressTurn = false;
       const text = sc.inputTranscription.text;
       this.currentUser += text;
       this.lastUserHeardAt = performance.now();
@@ -314,20 +330,26 @@ export class LiveSession {
       if (!this.turnStartedAt) this.turnStartedAt = performance.now();
     }
 
-    if (sc.outputTranscription?.text) {
+    if (sc.outputTranscription?.text && !this.suppressTurn) {
       const text = sc.outputTranscription.text;
       const at = this.playback.queuedUntil();
       this.captions.onModelText(text);
       this.cues.feed(text, at);
     }
 
-    if (sc.modelTurn?.parts) {
+    if (sc.modelTurn?.parts && !this.suppressTurn) {
       for (const part of sc.modelTurn.parts) {
         if (part.inlineData?.data) this.playback.enqueueBase64(part.inlineData.data);
       }
     }
 
     if (sc.turnComplete) {
+      this.suppressTurn = false;
+      if (this.storyChapterTurn && story.state === 'playing') {
+        this.storyChapterTurn = false;
+        if (this.playback.isPlaying()) this.storyAdvanceWhenEnded = true;
+        else window.setTimeout(() => this.advanceStory(), 700);
+      }
       if (this.currentUser.trim()) {
         this.pushHistory('user', this.currentUser.trim());
         this.currentUser = '';
@@ -355,6 +377,7 @@ export class LiveSession {
     const responses = [];
     for (const call of calls) {
       const name = call.name || '';
+      bus.emit('tool', { name, args: call.args || {}, at: performance.now() });
       let response: Record<string, unknown>;
       try {
         response = await executeTool(name, call.args || {}, this.toolCtx);
@@ -362,6 +385,7 @@ export class LiveSession {
         response = { error: e?.message || 'tool failed' };
       }
       responses.push({ id: call.id, name, response });
+      if (name === 'story' && ['start', 'resume'].includes(String(call.args?.action))) this.storyChapterTurn = (response as any).status === 'playing';
     }
     try {
       this.session?.sendToolResponse({ functionResponses: responses });
@@ -392,12 +416,37 @@ export class LiveSession {
       this.firstAudioReported = false;
     }
     this.touch();
+    this.suppressTurn = false;
     bus.emit('state', 'thinking');
     try {
       this.session.sendClientContent({ turns: [{ role: 'user', parts: [{ text }] }], turnComplete: true });
     } catch (e) {
       console.error('[live] sendText failed', e);
     }
+  }
+
+  /**
+   * Story mode: the client turns the page. When a chapter's audio has finished and the
+   * visitor has not interrupted, show the next chapter's scene and hand the model its
+   * talking points as a silent turn, so the seven chapters run on their own (~20 s each).
+   */
+  private async advanceStory() {
+    if (this.destroyed || story.state !== 'playing') return;
+    const next = story.next();
+    const kb = await fetchKB();
+    if (!next) {
+      bus.emit('scene', { world: 'presence', at: performance.now() });
+      this.sendText(this.lang === 'ar' ? 'انتهت القصة. اختمي بجملة وحدة، واستدعي suggest_questions بثلاثة أسئلة، وارجعي للزائر.' : 'The story is finished. Close in one sentence, call suggest_questions with three follow-ups, and hand back to the visitor.', { silent: true });
+      return;
+    }
+    await runTool(next.show.name, next.show.args, this.toolCtx);
+    const p = chapterPayload(kb, next, this.lang);
+    const text =
+      this.lang === 'ar'
+        ? `القصة، الفصل ${p.chapter} من ${p.of}: «${p.title}». تكلمي عن هذا الفصل الحين في حوالي عشرين ثانية، من هذه النقاط فقط وبصوتك: ${p.talking_points.join(' ')} ${p.voice_rules.length ? 'قواعد: ' + p.voice_rules.join(' ') : ''} لا تسألين إذا أكمل؛ الفصل الجاي يجي لحاله.`
+        : `Story, chapter ${p.chapter} of ${p.of}: "${p.title}". Tell this chapter now, in about twenty seconds, from these points only and in your own voice: ${p.talking_points.join(' ')} ${p.voice_rules.length ? 'Rules: ' + p.voice_rules.join(' ') : ''} Do not ask whether to continue; the next chapter follows on its own.`;
+    this.storyChapterTurn = true;
+    this.sendText(text, { silent: true });
   }
 
   /** Tell the model the enquiry outcome (Phase 4 §2.1 step 6). */
@@ -408,6 +457,7 @@ export class LiveSession {
   /** Visitor tapped the stage while she speaks: interrupt locally and tell the model. */
   interruptNow() {
     if (!this.playback.isPlaying()) return;
+    this.suppressTurn = true;
     this.playback.interrupt();
     this.captions.interrupt();
     this.cues.reset();
