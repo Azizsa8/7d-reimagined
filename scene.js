@@ -9,6 +9,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {SMAAPass} from 'three/addons/postprocessing/SMAAPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {textureSets} from './assets/tex/manifest.js';
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouch = matchMedia('(hover:none)').matches;
@@ -27,9 +28,40 @@ const C={
 
 /* ---------- shared factories ---------- */
 let R=null;                                        // active renderer, for anisotropy
+
+/* Optional scanned materials. Only files listed in the shipped manifest are requested.
+   Every stone or sand material made through MAT registers itself and is dressed when the
+   maps arrive. Colours keep multiplying the map, so the tints written into each site survive. */
+const TEX_SETS={stone:{repeat:1.6},sand:{repeat:2.4},paving:{repeat:1.2}};
+const TEX={}; const textureLoads={}; const dressed={stone:[],sand:[],paving:[]};
+function loadTextureSet(name){
+  if(textureLoads[name])return textureLoads[name];
+  const files=textureSets[name];
+  if(!files?.basecolor)return textureLoads[name]=Promise.resolve(null);
+  const L=new THREE.TextureLoader();
+  const one=(map,srgb)=>!files[map]?Promise.resolve(null):new Promise(res=>L.load(files[map],t=>{
+    t.wrapS=t.wrapT=THREE.MirroredRepeatWrapping;           // hides the seam a generated tile still has
+    t.repeat.set(TEX_SETS[name].repeat,TEX_SETS[name].repeat);
+    if(srgb)t.colorSpace=THREE.SRGBColorSpace;
+    if(R)t.anisotropy=R.capabilities.getMaxAnisotropy();
+    res(t);},undefined,()=>res(null)));
+  return textureLoads[name]=Promise.all([one('basecolor',true),one('normal',false),one('roughness',false)]).then(([map,normalMap,roughnessMap])=>{
+    if(!map){normalMap?.dispose();roughnessMap?.dispose();return null;}
+    TEX[name]={map,normalMap,roughnessMap};
+    dressed[name].forEach(m=>dress(m,TEX[name]));
+    return TEX[name];
+  });
+}
+function dress(m,t){
+  m.map=t.map; if(t.normalMap){m.normalMap=t.normalMap;m.normalScale.set(.6,.6);} if(t.roughnessMap)m.roughnessMap=t.roughnessMap;
+  m.needsUpdate=true;
+}
+const register=(name,m)=>{dressed[name].push(m);if(TEX[name])dress(m,TEX[name]);else loadTextureSet(name);return m;};
+
 const MAT={
-  stone:(c=C.stone,rough=.82)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:.04,envMapIntensity:.8}),
-  sand:(c=C.sand)=>new THREE.MeshStandardMaterial({color:c,roughness:.95,metalness:0,envMapIntensity:.5}),
+  stone:(c=C.stone,rough=.82)=>register('stone',new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:.04,envMapIntensity:.8})),
+  sand:(c=C.sand)=>register('sand',new THREE.MeshStandardMaterial({color:c,roughness:.95,metalness:0,envMapIntensity:.5})),
+  paving:(c=0x8A8680)=>register('paving',new THREE.MeshStandardMaterial({color:c,roughness:.7,metalness:.02,envMapIntensity:.7})),
   metal:(c=C.steel,rough=.24)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:.95,envMapIntensity:1.5}),
   paint:(c=0xF4F6F4)=>new THREE.MeshStandardMaterial({color:c,roughness:.42,metalness:.06,envMapIntensity:1}),
   glass:(c=0x9FC4D8,op=.42)=>new THREE.MeshPhysicalMaterial({color:c,roughness:.06,metalness:.1,transmission:.9,ior:1.5,thickness:.6,clearcoat:1,clearcoatRoughness:.04,transparent:true,opacity:op,envMapIntensity:2.4,side:THREE.DoubleSide}),
@@ -301,7 +333,14 @@ export function initFlight(){
   const bounce=new THREE.PointLight(C.horizon,18,30,2); scene.add(bounce);
 
   /* ground: dark desert plain with a faint survey grid that fades out */
-  const ground=mesh(new THREE.PlaneGeometry(700,700),new THREE.MeshStandardMaterial({color:0x0B0E12,roughness:.95,metalness:.05,envMapIntensity:.35}),0,0,0,false,true);
+  const groundMat=new THREE.MeshStandardMaterial({color:0x141210,roughness:.95,metalness:.05,envMapIntensity:.35});
+  const ground=mesh(new THREE.PlaneGeometry(700,700),groundMat,0,0,0,false,true);
+  // The ground has its own tiling; complete once, including when no sand maps ship.
+  loadTextureSet('sand').then(t=>{
+    if(!t)return;
+    const cl=k=>{const c=t[k]?.clone();if(c){c.repeat.set(140,140);c.needsUpdate=true;}return c;};
+    dress(groundMat,{map:cl('map'),normalMap:cl('normalMap'),roughnessMap:cl('roughnessMap')});
+  });
   ground.rotation.x=-Math.PI/2; scene.add(ground);
   {const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
     x.strokeStyle='rgba(224,169,74,.20)';x.lineWidth=1.5;x.strokeRect(.75,.75,510.5,510.5);
@@ -648,7 +687,9 @@ export function initFlight(){
     const dust=new THREE.Points(bg,new THREE.PointsMaterial({color:0xE8C79A,size:.07,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false,map:sprTex}));
     scene.add(dust);anims.push(t=>{dust.position.y=Math.sin(t*.22)*.4;});}
 
-  /* camera: one long approach per site, lifted so the tall scenes fit */
+  /* camera: one long approach per site, lifted so the tall scenes fit.
+     Waypoints alternate site, lift, site, so sampling the curve by segment (getPoint) puts
+     the camera on EYE[i] exactly when the flight progress selects project i. */
   const EYE=[[-3,7.5,20],[-6,13,30],[-3,12,26],[-4,14,32],[-5,13,34],[-6,19,44]];
   const LOOK=[[0,1.6,0],[0,5.0,0],[0,7.5,0],[0,4.6,0],[0,4.0,0],[0,9.0,0]];
   const wps=[];
@@ -666,7 +707,7 @@ export function updateFlight(p){
   if(!flight)return;
   const {cam,curve,X,LOOK,anims,composer,key,bounce}=flight;
   flight.t=REDUCED?p:lerp(flight.t,p,.11);
-  cam.position.copy(curve.getPointAt(clamp(flight.t,0,1)));
+  cam.position.copy(curve.getPoint(clamp(flight.t,0,1)));   // by segment, not arc length: site i sits at t=i/(n-1), the same t that picks its card
   const fi=clamp(flight.t,0,1)*(X.length-1),i0=Math.floor(fi),i1=Math.min(X.length-1,i0+1),f=fi-i0;
   const lx=lerp(X[i0],X[i1],f);
   cam.lookAt(new THREE.Vector3(lx+lerp(LOOK[i0][0],LOOK[i1][0],f),lerp(LOOK[i0][1],LOOK[i1][1],f),lerp(LOOK[i0][2],LOOK[i1][2],f)));

@@ -1,6 +1,8 @@
 node_modules
 .DS_Store
 
-.claude/
+.claude/settings.local.json
+.claude/skills/
+.claude/launch.json
 
 ref/
