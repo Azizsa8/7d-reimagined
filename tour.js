@@ -19,7 +19,7 @@ const easeInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 let TOUR = null, manifest = null;
 const state = {
-  lang: 'en', running: false, paused: false, i: 0,
+  lang: 'en', running: false, paused: false, i: 0, run: 0,
   audio: null, raf: 0, beatRaf: 0, scrollFrom: 0, scrollTo: 0, scrollT0: 0, scrollDur: 0, waiting: null
 };
 
@@ -30,23 +30,20 @@ function mount() {
   gate.innerHTML = `
     <div class="gate-bg"></div>
     <div class="gate-in">
-      <svg class="gate-mark" viewBox="0 0 120 120" aria-hidden="true">
-        <path d="M60 8 L112 60 L60 112 L8 60 Z" fill="none" stroke="currentColor" stroke-width="3"/>
-        <path d="M60 30 L90 60 L60 90 L30 60 Z" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".55"/>
-      </svg>
+      <img class="gate-mark" src="assets/brand/logo.png" alt="7D International" style="object-fit:contain">
       <p class="gate-kicker">Global Contracting &amp; Consulting · Riyadh</p>
       <h1 class="gate-title"><span>7D</span> <em>International</em></h1>
       <p class="gate-sub">Choose a language and Noorah will show you the firm.<br><span dir="rtl">اختر لغتك وتعرض لك نورة الشركة.</span></p>
       <div class="gate-choice">
-        <button class="gate-btn" data-lang="ar" dir="rtl"><b>العربية</b><small>بصوت نورة</small></button>
+        <button class="gate-btn" data-lang="ar" dir="rtl"><b>العربية</b><small>جولة إرشادية</small></button>
         <button class="gate-btn" data-lang="en"><b>English</b><small>narrated by Noorah</small></button>
       </div>
-      <button class="gate-skip" data-lang="skip">Skip the introduction</button>
+      <button class="gate-skip" data-lang="skip">Skip the introduction · تخطّي المقدمة</button>
     </div>`;
   document.body.appendChild(gate);
 
   const hud = document.createElement('div');
-  hud.className = 'tour'; hud.id = 'tourHud';
+  hud.className = 'tour'; hud.id = 'tourHud';hud.inert=true;
   hud.innerHTML = `
     <div class="tour-bar"><i id="tourFill"></i></div>
     <div class="tour-body">
@@ -60,7 +57,7 @@ function mount() {
   document.body.appendChild(hud);
 
   const veil = document.createElement('div');
-  veil.className = 'tour-veil'; veil.id = 'tourVeil';
+  veil.className = 'tour-veil'; veil.id = 'tourVeil';veil.inert=true;
   veil.innerHTML = `<button class="tour-resume" id="tourResume"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg><span></span></button>`;
   document.body.appendChild(veil);
 }
@@ -69,11 +66,13 @@ function mount() {
 /* Resolves when the line has finished. `ready` resolves earlier, with the clip length
    in ms once the browser knows it (0 when it never will: synthesis or a missing file). */
 function speak(id, text) {
+  const run=state.run;
   let readyResolve; const ready = new Promise(r => { readyResolve = r; });
   const done = new Promise(resolve => {
     const src = manifest?.lines?.[state.lang]?.[id];
-    const finish = () => { state.audio = null; resolve(); };
-    const fallback = () => { state.audio = null; readyResolve(0); synth(text).then(resolve); };
+    let settled=false;
+    const finish = () => { if(settled)return;settled=true;state.audio = null; resolve(); };
+    const fallback = () => { if(settled)return;settled=true;if(run!==state.run){readyResolve(0);resolve();return;}state.audio?.pause?.();state.audio = null; readyResolve(0); synth(text).then(resolve); };
     if (src) {
       const a = new Audio(src);
       a.preload = 'auto';
@@ -92,7 +91,7 @@ function speak(id, text) {
 }
 function synth(text) {
   return new Promise(resolve => {
-    if (!('speechSynthesis' in window)) { setTimeout(resolve, Math.max(2500, text.length * 55)); return; }
+    if (!('speechSynthesis' in window) || !speechSynthesis.getVoices().some(v=>v.lang.startsWith(state.lang))) { captionClock(text,resolve); return; }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = state.lang === 'ar' ? 'ar-SA' : 'en-GB';
@@ -102,7 +101,7 @@ function synth(text) {
               || vs.find(v => v.lang === u.lang)
               || vs.find(v => v.lang.startsWith(state.lang));
     if (pick) u.voice = pick;
-    u.onend = resolve; u.onerror = resolve;
+    u.onend = resolve; u.onerror = () => captionClock(text,resolve);
     speechSynthesis.speak(u);
     state.audio = {pause: () => speechSynthesis.pause(), play: () => speechSynthesis.resume(), _synth: true};
   });
@@ -181,6 +180,7 @@ function runBeats(plan, dur) {
 }
 async function runChapter() {
   if (!state.running) return;
+  const run=state.run;
   const ch = TOUR.chapters[state.i];
   if (!ch) return endTour(true);
   setCaption(ch);
@@ -188,34 +188,43 @@ async function runChapter() {
 
   const {done, ready} = speak(ch.id, ch[state.lang]);
   const dur = await ready;
-  if (!state.running) return;
+  if (!state.running||state.run!==run) return;
   if (ch.beats?.length) runBeats(planBeats(ch, dur || 5200 * 2), dur);
   else if (!REDUCED) driveScroll(targetY(ch), (dur || 5200) * .92);
   else scrollTo(0, targetY(ch));
 
   await done;
+  if(!state.running||state.run!==run)return;
   $('#tourOrb').classList.remove('talking');
   if (!state.running) return;
   await wait((ch.hold ?? .45) * 1000);
-  if (!state.running) return;
+  if (!state.running||state.run!==run) return;
   cancelAnimationFrame(state.beatRaf);
   state.i++;
   runChapter();
 }
 function wait(ms) {
-  return new Promise(resolve => {
-    if (state.paused) { state.waiting = () => wait(ms).then(resolve); return; }
-    const t = setTimeout(resolve, ms);
-    state.waiting = null;
-    state._clearWait = () => clearTimeout(t);
+  const run=state.run;
+  return new Promise(resolve=>{
+    let remaining=ms,last=performance.now();
+    const step=()=>{const now=performance.now();if(!state.paused)remaining-=now-last;last=now;
+      if(!state.running||state.run!==run||remaining<=0){resolve();return;}setTimeout(step,50);};step();
   });
+}
+function captionClock(text,resolve){
+  const run=state.run,duration=Math.max(3500,text.length*55)/1000;
+  let elapsed=0,last=performance.now();
+  state.audio={duration,get currentTime(){return elapsed},pause(){},play(){}};
+  const step=()=>{const now=performance.now();if(!state.paused)elapsed+=(now-last)/1000;last=now;
+    if(state.run!==run||elapsed>=duration){resolve();return;}setTimeout(step,50);};step();
 }
 export function startTour() {
   if (state.running) return;
-  state.running = true; state.paused = false; state.i = 0;
+  state.run++;state.running = true; state.paused = false; state.i = 0;
+  updateControls();
   document.body.classList.add('touring');
   $('#tourName').textContent = TOUR.persona.name[state.lang];
-  $('#tourHud').classList.add('on');
+  $('#tourHud').inert=false;$('#tourHud').classList.add('on');
   runChapter();
 }
 function pauseTour() {
@@ -225,16 +234,16 @@ function pauseTour() {
   state._clearWait?.();
   if (state.audio) { try { state.audio.pause(); } catch {} }
   $('#tourOrb').classList.remove('talking');
-  document.body.classList.add('tour-paused');
+  document.body.classList.add('tour-paused');$('#tourVeil').inert=false;
   const r = $('#tourResume span');
   r.textContent = TOUR.ui.resume[state.lang];
-  $('#tourToggle').querySelector('span').textContent = state.lang === 'ar' ? 'متابعة' : 'Resume';
+  updateControls();
 }
 function resumeTour() {
   if (!state.running || !state.paused) return;
   state.paused = false;
-  document.body.classList.remove('tour-paused');
-  $('#tourToggle').querySelector('span').textContent = state.lang === 'ar' ? 'إيقاف' : 'Pause';
+  document.body.classList.remove('tour-paused');$('#tourVeil').inert=true;
+  updateControls();
   if (state.audio) { try { state.audio.play(); $('#tourOrb').classList.add('talking'); } catch {} }
   // resume the scroll from wherever the visitor left it
   const elapsed = clamp((performance.now() - state.scrollT0) / state.scrollDur, 0, 1);
@@ -243,13 +252,13 @@ function resumeTour() {
 }
 export function endTour(finished) {
   if (!state.running) return;
-  state.running = false; state.paused = false;
+  state.run++;state.running = false; state.paused = false;
   cancelAnimationFrame(state.raf); cancelAnimationFrame(state.beatRaf);
   state._clearWait?.();
   if (state.audio) { try { state.audio.pause(); } catch {} }
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   document.body.classList.remove('touring', 'tour-paused');
-  $('#tourHud').classList.remove('on');
+  $('#tourHud').classList.remove('on');$('#tourHud').inert=true;$('#tourVeil').inert=true;
   if (finished) {
     $('#fab')?.classList.add('nudge');
     setTimeout(() => $('#fab')?.classList.remove('nudge'), 6000);
@@ -262,13 +271,17 @@ function openGate() {
   const seen = sessionStorage.getItem('7d_gate') === '1';
   if (seen) { g.remove(); return; }
   document.body.classList.add('gated');
+  g.setAttribute('role','dialog');g.setAttribute('aria-modal','true');g.setAttribute('aria-label','Choose a language · اختر اللغة');
+  const background=[...document.body.children].filter(el=>el!==g).map(el=>[el,el.inert]);background.forEach(([el])=>el.inert=true);
+  g.querySelector('[data-lang]').focus();
+  g.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const buttons=[...g.querySelectorAll('button')];const i=buttons.indexOf(document.activeElement);e.preventDefault();buttons[(i+(e.shiftKey?-1:1)+buttons.length)%buttons.length].focus();});
   requestAnimationFrame(() => g.classList.add('on'));
   g.addEventListener('click', e => {
     const btn = e.target.closest('[data-lang]'); if (!btn) return;
     const choice = btn.dataset.lang;
     sessionStorage.setItem('7d_gate', '1');
     g.classList.add('out');
-    document.body.classList.remove('gated');
+    document.body.classList.remove('gated');background.forEach(([el,inert])=>el.inert=inert);g.inert=true;document.querySelector('#lang')?.focus();
     setTimeout(() => g.remove(), 900);
     if (choice === 'skip') return;
     state.lang = choice;
@@ -297,6 +310,11 @@ function offerTour() {
 }
 
 /* ---------- wiring ---------- */
+function updateControls(){
+  const ar=state.lang==='ar';const label=state.paused?(ar?'متابعة':'Resume'):(ar?'إيقاف مؤقت':'Pause');
+  $('#tourToggle span').textContent=label;$('#tourToggle').setAttribute('aria-label',label);
+  $('#tourEnd').textContent=ar?'إنهاء الجولة':'End tour';$('#tourResume').setAttribute('aria-label',ar?'متابعة الجولة':'Resume tour');
+}
 function wire() {
   // a touch anywhere pauses; the visible control or a second touch continues
   addEventListener('pointerdown', e => {
@@ -305,7 +323,7 @@ function wire() {
     state.paused ? resumeTour() : pauseTour();
   }, {passive: true});
   addEventListener('keydown', e => {
-    if (!state.running) return;
+    if (!state.running || e.target.closest('input,textarea,select,button,[contenteditable]')) return;
     if (e.code === 'Space') { e.preventDefault(); state.paused ? resumeTour() : pauseTour(); }
     if (e.code === 'Escape') endTour(false);
   });
@@ -313,7 +331,7 @@ function wire() {
   $('#tourToggle').addEventListener('click', e => { e.stopPropagation(); state.paused ? resumeTour() : pauseTour(); });
   $('#tourEnd').addEventListener('click', e => { e.stopPropagation(); endTour(false); });
   $('#tourResume').addEventListener('click', e => { e.stopPropagation(); resumeTour(); });
-  addEventListener('7d-lang', e => { state.lang = e.detail; });
+  addEventListener('7d-lang', e => { if(state.running)endTour(false);state.lang = e.detail;updateControls(); });
 }
 
 (async function boot() {
@@ -323,9 +341,9 @@ function wire() {
       fetch('audio/manifest.json').then(r => r.json()).catch(() => null)
     ]);
   } catch { return; }
-  const stored = localStorage.getItem('7d_lang');
+  const stored = window.LANG || localStorage.getItem('7d_lang');
   state.lang = stored === 'ar' || stored === 'en' ? stored : ((navigator.language || 'en').slice(0, 2) === 'ar' ? 'ar' : 'en');
-  mount(); wire(); openGate();
+  mount(); wire(); updateControls();openGate();
   Object.assign(window, {startTour, endTour, tourPersona: TOUR.persona});
   dispatchEvent(new Event('tour-ready'));
 })();

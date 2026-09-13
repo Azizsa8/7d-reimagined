@@ -1,6 +1,6 @@
 // Minimal offline shell: caches the page so the "capabilities" experience opens without network.
-const C = '7d-v8';
-const CORE = ['/', '/index.html', '/manifest.json', '/icon.svg'];
+const C = '7d-v9';
+const CORE = ['/', '/index.html', '/manifest.json', '/assets/brand/logo.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(C).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {
@@ -8,5 +8,5 @@ self.addEventListener('fetch', e => {
   e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
     if (res.ok && new URL(e.request.url).origin === location.origin) { const cp = res.clone(); caches.open(C).then(c => c.put(e.request, cp)); }
     return res;
-  }).catch(() => caches.match('/index.html'))));
+  }).catch(() => e.request.mode === 'navigate' ? caches.match('/index.html') : Response.error())));
 });

@@ -10,8 +10,8 @@ directly by the browser.
 1. A gate: title card, choose Arabic or English. That click is the audio user gesture.
 2. Noorah, the guide, offers a two-minute voice tour. If accepted, the tour scrolls the page
    itself while pre-rendered MP3 narration plays. Touch or wheel pauses it.
-3. Sections in order: hero, footprint (3D globe with five hubs), projects (a 600vh
-   scroll-driven 3D flight past six Riyadh projects), solutions deck, history, news,
+3. Sections in order: hero, footprint (3D globe with five hubs), projects (a 480vh
+   scroll-driven photographic presentation of four published Riyadh projects), solutions deck, history, news,
    quote, contact.
 4. A text/voice assistant (FAB, bottom right) answers scripted questions and can jump to
    sections or projects.
@@ -22,7 +22,8 @@ directly by the browser.
 |---|---|
 | `index.html` | All markup, all CSS, and the page script: i18n strings `I`, content arrays `PROJECTS`, `SOLUTIONS`, `TIMELINE`, `NEWS`, `HUBS`, render functions, scroll driving, the assistant. |
 | `tour.js` | Gate, tour HUD, narration playback, scroll driving during the tour. Reads `data/tour.json` and `audio/manifest.json`. |
-| `scene.js` | three.js r165. `initGlobe`/`updateGlobe` (footprint) and `initFlight`/`updateFlight` (projects). Exposes them on `window` and fires `scene-ready`. |
+| `scene.js` | Lazy-loaded three.js r165 globe. Icosphere land grid, surface hubs, HTML labels, great-circle routes. |
+| `projects.js` | Published project JPEGs, proximity loading, scroll progress and accessible scene controls. |
 | `viz.js` | 2D canvas illustrations for the seven discipline cards. |
 | `data/tour.json` | The narration script per chapter, both languages, plus per-chapter scroll targets. |
 | `data/land-110m.json` | TopoJSON land outlines for the globe. Ships with the site, never fetched from a CDN. |
@@ -36,12 +37,11 @@ directly by the browser.
 
 - `index.html` owns `LANG` and `window.setLang`. Changing language dispatches a `7d-lang`
   event; `tour.js` listens for it.
-- `scene.js` loads as a module, then fires `scene-ready`. The page script replaces its stub
-  `initGlobe`/`initFlight` with the real ones on that event.
-- Scroll progress through a pinned section is `pinProgress(el)` in `index.html`, a 0..1
-  value. `updateFlight(p)` and `updateGlobe(p)` take that value. The flight maps `p` to
-  a camera position along a spline and to the active project index
-  `round(p * (n-1))`.
+- `projects.js` boots independently of WebGL and publishes `initFlight`/`updateFlight`.
+  `scene.js` is dynamically imported only near the footprint; failures leave the hub clocks
+  and statistics readable. Buildings are no longer rendered in WebGL.
+- Both interfaces use normalized 0–1 scroll progress. Project index is
+  `round(p * (n-1))`; numbered controls and narration beats use the same mapping.
 - The tour computes its scroll target from a chapter's `target` selector and `scroll`
   fraction in `tour.json`, so "scroll: 0.55 of #projects" means 55% through the flight.
   Chapter audio ids match `tour.json` chapter ids and the MP3 filenames.
@@ -89,17 +89,21 @@ Playwright with the pre-installed Chromium can drive this for screenshots.
 Company site: https://7dint.net. Current design is Riyadh at dusk: near-black `#0A0C10`,
 panels `#12171D`, warm ivory `#F4F1EA`, brass `#E0A94A`, sand `#C8AA7C`, and horizon
 `#E9B27A`. Teal `#2FA98B` is a secondary accent, not a verified corporate logo colour.
-Legacy `--mint` tokens currently alias brass. The current mark in `icon.svg` and the nav is a
-placeholder diamond; the real 7D logo has not been added yet. Do not present the
-diamond as the company logo.
+Legacy `--mint` tokens currently alias brass. The published PNG in `assets/brand/logo.png` replaces the placeholder diamond.
+The vector logo is still pending; do not trace or invent one.
 
 ## Recovery status
 
-The procedural building scenes are legacy placeholders slated for replacement under
-`ACTION_PLAN_ASTRA.md`; do not extend or polish that geometry. The cinematic asset route,
-offline tooling, and source material await owner decisions. The runtime remains build-free.
-Repository-wide third-party plugin activation has been removed pending the owner's choice.
-Arabic narration remains a placeholder pending approved voice regeneration and client review.
+The free photo fallback is implemented; the procedural buildings have been deleted.
+`DESIGN.md` defines the visual system; `SOURCES.md` records content and asset provenance.
+Only four projects with published imagery appear. The globe is the only real-time 3D.
+The runtime remains build-free; offline asset tools are allowed per the owner's instruction
+to follow the recovery plan. No paid production budget has been approved.
+Repository-wide third-party plugin activation is removed. The real published raster logo
+is used while the vector awaits delivery. Arabic requires a named client reviewer.
+The closing narration text has changed; stale English and Arabic closing clips are excluded
+from the audio manifest and must be regenerated after cost approval. Remaining Arabic clips
+still use a placeholder voice. See `RECOVERY_STATUS.md` for acceptance gates and evidence.
 
 ## Paid generation (Magnific, ElevenLabs, any credit-billed service)
 

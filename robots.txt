@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://7d-reimagined.vercel.app/sitemap.xml

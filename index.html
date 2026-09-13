@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>7D International — Global Contracting &amp; Consulting</title>
 <meta name="description" content="7D International: global contracting and consulting since 1993. Middle East HQ in Riyadh. Architecture, defense, finance, technology, energy and environment across five continents.">
+<link rel="canonical" href="https://7d-reimagined.vercel.app/">
+<link rel="alternate" hreflang="en" href="https://7d-reimagined.vercel.app/?lang=en">
+<link rel="alternate" hreflang="ar-SA" href="https://7d-reimagined.vercel.app/?lang=ar">
+<link rel="alternate" hreflang="x-default" href="https://7d-reimagined.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="7D International — Global Contracting &amp; Consulting">
+<meta property="og:description" content="Explore the projects, disciplines and international offices of 7D International.">
+<meta property="og:url" content="https://7d-reimagined.vercel.app/">
+<meta property="og:image" content="https://7d-reimagined.vercel.app/assets/projects/kapf-4.jpeg">
+<meta property="og:image:alt" content="King Abdullah Park Fountain, photographed at night">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/brand/logo.png" type="image/png">
 <meta name="theme-color" content="#0A0C10">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +25,7 @@
 <style>
 :root{
   /* Riyadh at dusk: desert-night ink, warm limestone light, brushed brass.
-     Brass carries the page; the teal is 7D own mark colour, kept for the brand. */
+     Brass carries the page; teal is a secondary accent. */
   --bg:#0A0C10; --bg-2:#0D1116; --bg2:#0D111600; --panel:#12171D; --panel-2:#171D24; --ink:#F4F1EA; --dim:#AFA898; --faint:#8C8474;
   --line:rgba(244,241,234,.14); --line-soft:rgba(244,241,234,.07);
   --brass:#E0A94A; --brass-deep:#A8752A; --sand:#C8AA7C; --horizon:#E9B27A; --teal:#2FA98B;
@@ -132,7 +144,7 @@ html[dir="rtl"] .stat b{font-family:var(--body);font-weight:800}
 .clock.lit{border-color:var(--mint)}
 .globe-cap{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:12px}
 
-/* ---- projects 3D flight ---- */
+/* ---- published project imagery ---- */
 #projects{padding:0;border-top:1px solid var(--line-soft)}
 .flight{position:relative;height:600vh}
 .flight .pin{padding:0;display:block}
@@ -188,7 +200,7 @@ html[dir="rtl"] .stat b{font-family:var(--body);font-weight:800}
 .tl-item{opacity:.35;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .tl-item.on{opacity:1;transform:none}
 .tl-item b{font-family:var(--mono);font-size:12px;color:var(--mint);letter-spacing:.1em}
-.tl-item h4{font-weight:500;margin-top:4px;font-size:15px}
+.tl-item h3{font-weight:500;margin-top:4px;font-size:15px}
 .tl-item p{color:var(--dim);font-size:13.5px;margin-top:4px}
 
 /* ---- news rail ---- */
@@ -395,14 +407,68 @@ body.tour-paused .tour-veil{opacity:1;pointer-events:auto}
   .sec-h h2{clip-path:none;transform:none;opacity:1}.sec-h p{opacity:1;transform:none}
 }
 
+
+.scene-view .fab{visibility:hidden}
+.contact-direct{font-size:14px!important;margin-block:20px!important}.contact-direct a{text-underline-offset:5px}
+/* Recovery composition: geography, copy and controls each have their own space. */
+:root{--faint:#ADA594}
+:focus-visible{outline:2px solid var(--brass);outline-offset:5px}
+.brand-logo{width:30px;height:36px;object-fit:contain}
+#globeWrap .pin{display:block;padding-top:120px}
+#globeWrap .pin>.wrap:nth-child(2){position:absolute;inset-inline-start:4%;top:18%;width:40%;padding:0}
+#globeWrap .pin>.wrap:last-child{position:absolute;inset-inline-start:4%;bottom:8%;width:44%;padding:0}
+#globeStage{inset:12% 3% 14% 49%;mask-image:none;-webkit-mask-image:none}
+html[dir=rtl] #globeStage{inset:12% 49% 14% 3%}
+.hub-label{position:absolute;transform:translate(12px,-50%);font-size:12px;line-height:1.4;padding:3px 7px;background:#0A0C10e8;border:1px solid var(--line);border-radius:4px;white-space:nowrap;pointer-events:none;color:var(--ink)}
+#globeWrap h2{font-size:clamp(1.5rem,3.4vw,2.8rem)!important}
+.stat b{font-size:clamp(1.3rem,3vw,2.2rem)}
+.flight{height:480vh}
+.flight-stage{overflow:hidden;mask-image:none;-webkit-mask-image:none;background:var(--bg)}
+.project-image{position:absolute;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .55s ease;will-change:transform}
+.project-image.on{opacity:1}
+.project-image[data-id=garden]{object-view-box:inset(33.33% 0 33.33% 0)}
+.project-image[data-id=urban]{object-view-box:inset(0 0 50% 0)}
+.project-image[data-id=eye]{object-position:center 65%}
+.flight-stage::after{background:linear-gradient(180deg,rgba(10,12,16,.55),transparent 28%,transparent 48%,rgba(10,12,16,.85))}
+.scene-card{bottom:86px;max-width:540px;background:#0A0C10dc;border-radius:4px;border-inline-start:2px solid var(--brass)}
+.scene-card h3{font-size:clamp(1.25rem,2.5vw,2rem)}
+.project-source{display:inline-block;color:var(--brass);font-size:12px;margin-top:10px;text-underline-offset:4px}
+.project-nav{position:absolute;bottom:26px;inset-inline-start:40px;display:flex;gap:8px;z-index:2}
+.project-nav button{width:44px;height:40px;color:var(--ink);background:#0A0C10cc;border:1px solid var(--line);font:12px var(--mono);cursor:pointer}
+.project-nav button[aria-pressed=true]{background:var(--brass);color:var(--bg);border-color:var(--brass)}
+html[dir=rtl] .project-nav{direction:rtl}
+.touring .scene-card{bottom:200px}
+.touring .project-nav{bottom:155px}
+@media(max-width:700px){
+ #globeWrap .pin>.wrap:nth-child(2){top:90px;inset-inline:22px;width:auto}
+ #globeWrap h2{max-width:20ch!important;margin-top:0!important;font-size:1.5rem!important}
+ #globeStage,html[dir=rtl] #globeStage{inset:180px 12px 240px}
+ #globeWrap .pin>.wrap:last-child{bottom:70px;inset-inline:22px;width:auto}
+ .stats{max-width:none}.stat{padding:10px}.stat b{font-size:1.4rem}.stat span{font-size:9px;letter-spacing:.08em}
+ .clocks{gap:5px}.clock{padding:4px 7px;font-size:9px}.globe-cap{font-size:9px;letter-spacing:.05em}
+ .scene-card{bottom:128px;inset-inline:16px;max-width:none;padding:14px}
+ .scene-card p{font-size:13px;line-height:1.5}.scene-card .row{margin-top:10px}.scene-card .btn{font-size:10px;padding:10px 12px}
+ .scene-card .eyebrow{font-size:9px;letter-spacing:.08em}.scene-card h3{font-size:1.2rem}
+ .project-nav{bottom:77px;inset-inline-start:16px}.flight-hud{bottom:87px;font-size:10px}
+ .flight-label{top:90px;inset-inline-start:16px}.flight-label .eyebrow{font-size:9px;letter-spacing:.1em}
+ .touring .scene-card{bottom:260px}.touring .project-nav{bottom:211px}
+ .touring #globeWrap .pin>.wrap:last-child{bottom:225px}.touring #globeStage{bottom:390px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+ .scene-card:not(.on){opacity:0!important;visibility:hidden}.sec-h h2,.sec-h p{opacity:1!important;transform:none!important;clip-path:none!important}
+ .cur{display:none!important}.project-image{transform:none!important}.rail-wrap{height:auto!important}.rail-pin{position:relative;height:auto;padding-block:60px}.rail{flex-wrap:wrap;transform:none!important}.news{max-width:100%}
+}
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "7D International", "url": "https://7dint.net/", "logo": "https://7d-reimagined.vercel.app/assets/brand/logo.png", "foundingDate": "1993", "email": "info@7dint.net", "telephone": "+1-727-219-1592"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Project", "name": "King Abdullah Park Fountain", "url": "https://7dint.net/projects/king-abdullah-park-fountain/", "image": "https://7d-reimagined.vercel.app/assets/projects/kapf-4.jpeg"}, {"@type": "Project", "name": "King Abdullah International Garden", "url": "https://7dint.net/projects/king-abdullah-international-garden/", "image": "https://7d-reimagined.vercel.app/assets/projects/kaig-main-photo.jpeg"}, {"@type": "Project", "name": "Riyadh Eye", "url": "https://7dint.net/projects/riyadh-eye/", "image": "https://7d-reimagined.vercel.app/assets/projects/riyadh-eye-main-photo.jpeg"}, {"@type": "Project", "name": "Riyadh 2020 Urban Study", "url": "https://7dint.net/projects/riyadh-2020/", "image": "https://7d-reimagined.vercel.app/assets/projects/riyadh2020-main-photo.jpeg"}]}</script>
 </head>
 <body>
 
 <div class="cur" id="cur"><span data-i="view">VIEW</span></div>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#hero"><i></i>7D</a>
+  <a class="brand" href="#hero"><img class="brand-logo" src="assets/brand/logo.png" alt="7D International" width="32" height="38">7D</a>
   <nav class="links">
     <a href="#footprint" data-i="nav.footprint">Footprint</a>
     <a href="#projects" data-i="nav.projects">Projects</a>
@@ -455,9 +521,9 @@ body.tour-paused .tour-veil{opacity:1;pointer-events:auto}
       <div></div>
       <div class="wrap">
         <div class="stats">
-          <div class="stat"><b data-count="5">0</b><span data-i="fp.s1">Continents</span></div>
-          <div class="stat"><b data-count="7">0</b><span data-i="fp.s2">Countries</span></div>
-          <div class="stat"><b data-count="24" data-suffix="/7">0</b><span data-i="fp.s3">Support</span></div>
+          <div class="stat"><b data-count="5">5</b><span data-i="fp.s1">Continents</span></div>
+          <div class="stat"><b data-count="5">5</b><span data-i="fp.s2">Hubs</span></div>
+          <div class="stat"><b data-count="1993">1993</b><span data-i="fp.s3">Established</span></div>
         </div>
         <div class="clocks" id="clocks" style="margin-top:14px"></div>
         <div class="globe-cap" id="globeCap" data-i="fp.cap">Scroll to light the network</div>
@@ -467,14 +533,14 @@ body.tour-paused .tour-veil{opacity:1;pointer-events:auto}
 </section>
 
 <div class="seam" data-seam="projects"></div>
-<!-- PROJECTS 3D FLIGHT -->
+<!-- PUBLISHED PROJECT IMAGERY -->
 <section id="projects">
   <div class="flight" id="flight">
     <div class="pin">
       <div class="flight-stage" id="flightStage"></div>
       <div class="flight-label"><div class="eyebrow" data-i="pj.eyebrow">Featured projects · Riyadh</div></div>
-      <div class="flight-hud"><b id="hudIdx">01</b> / 06<br><span data-i="pj.hud">scroll to fly</span></div>
-      <div class="scene-cards" id="sceneCards"></div>
+      <div class="flight-hud"><b id="hudIdx">01</b> / 04<br><span data-i="pj.hud">scroll to explore</span></div>
+      <div class="scene-cards" id="sceneCards"></div><nav class="project-nav" id="projectNav" aria-label="Projects"></nav>
     </div>
   </div>
 </section>
@@ -488,7 +554,7 @@ body.tour-paused .tour-veil{opacity:1;pointer-events:auto}
       <h2 data-i="so.h">Seven disciplines. One standard.</h2>
       <p data-i="so.p">Strategically integrated services across global infrastructure, defence and specialised technology sectors.</p>
     </div>
-    <div class="deck" id="deck">
+    <div class="deck" id="deck" tabindex="0" role="region" aria-label="Disciplines">
       <div class="deck-num"><span id="deckNum">01</span></div>
     </div>
   </div>
@@ -538,8 +604,9 @@ body.tour-paused .tour-veil{opacity:1;pointer-events:auto}
   <div class="wrap">
     
     <h2 style="margin-top:14px" data-i="ct.h">Ready to build?</h2>
-    <p data-i="ct.p">Tell us the sector, the country and the scale. Our Riyadh team answers within one business day.</p>
-    <span class="magnet" id="magnet"><a class="btn solid" href="https://wa.me/17272191592" target="_blank" rel="noopener" data-i="ct.btn">Start a conversation <span class="arrow">→</span></a></span>
+    <p data-i="ct.p">Tell us the sector, the country and the scale. Start a conversation with the team.</p>
+    <p class="contact-direct"><a href="mailto:info@7dint.net">info@7dint.net</a> · <a href="tel:+17272191592" dir="ltr">+1 (727) 219-1592</a></p>
+    <span class="magnet" id="magnet"><a class="btn solid" href="https://7dint.net/contact/" target="_blank" rel="noopener" data-i="ct.btn">Start a conversation <span class="arrow">→</span></a></span>
   </div>
 </section>
 
@@ -554,7 +621,7 @@ body.tour-paused .tour-veil{opacity:1;pointer-events:auto}
 <!-- MOBILE BAR -->
 <nav class="bar" aria-label="Quick actions">
   <a href="tel:+17272191592"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span data-i="bar.call">Call</span></a>
-  <a class="wa" href="https://wa.me/17272191592" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M9 9.5c.3 2.3 2.2 4.2 4.5 4.5l1.2-1.2 2 .8v1.8c-4.6.4-8.9-3.9-8.5-8.5H10l.8 2z"/></svg><span>WhatsApp</span></a>
+  <a class="wa" href="https://7dint.net/contact/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M9 9.5c.3 2.3 2.2 4.2 4.5 4.5l1.2-1.2 2 .8v1.8c-4.6.4-8.9-3.9-8.5-8.5H10l.8 2z"/></svg><span data-i="bar.email">Contact</span></a>
   <button id="barVoice"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span data-i="bar.voice">Voice</span></button>
   <a href="#cta"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3z"/></svg><span data-i="bar.inq">Inquire</span></a>
 </nav>
@@ -606,14 +673,14 @@ const I = {
   'hero.h':['Global','Contracting','&','Consulting'],
   'hero.sub':'Originating from the Czech Republic and headquartered in Florida, 7D International delivers full-service contracting and consulting across five continents — now with a Middle East headquarters in Riyadh.',
   'hero.cta1':'View projects <span class="arrow">→</span>','hero.cta2':'Start a project','hub.riyadh':'Riyadh',cue:'SCROLL',
-  'fp.eyebrow':'Global reach','fp.h':'A footprint without borders','fp.s1':'Continents','fp.s2':'Countries','fp.s3':'Support','fp.cap':'Scroll to light the network',
-  'pj.eyebrow':'Featured projects · Riyadh','pj.hud':'scroll to fly',
+  'fp.eyebrow':'Global reach','fp.h':'A footprint without borders','fp.s1':'Continents','fp.s2':'Hubs','fp.s3':'Established','fp.cap':'Scroll to light the network',
+  'pj.eyebrow':'Featured projects · Riyadh','pj.hud':'scroll to explore',
   'so.eyebrow':'Core solutions','so.h':'Seven disciplines. One standard.','so.p':'Strategically integrated services across global infrastructure, defence and specialised technology sectors.',
   'hi.eyebrow':'Chronology','hi.h':'Three decades, five continents','ne.eyebrow':'Latest intel',
   'qt.eyebrow':"Chairman's message",'qt.who':'Dr. Wael El-Mougy','qt.role':'Chairman & Founder',
-  'ct.eyebrow':'Engage the architects','ct.h':'Ready to build?','ct.p':'Tell us the sector, the country and the scale. Our Riyadh team answers within one business day.','ct.btn':'Start a conversation <span class="arrow">→</span>',
+  'ct.eyebrow':'Engage the architects','ct.h':'Ready to build?','ct.p':'Tell us the sector, the country and the scale. Start a conversation with the team.','ct.btn':'Start a conversation <span class="arrow">→</span>',
   'ft.tag':'GLOBAL CONTRACTING & CONSULTING','ft.note':'Concept build by AISERS Systems · Riyadh',
-  'bar.call':'Call','bar.voice':'Voice','bar.inq':'Inquire',
+  'bar.email':'Contact','bar.call':'Call','bar.voice':'Voice','bar.inq':'Inquire',
   'as.name':'7D Assistant','as.status':'Saudi Arabic · English','as.voice':'VOICE ON',
   'cs.h':'Use your microphone?','cs.p':'The assistant listens only while the mic button is red. Audio is processed by your browser; a recording indicator stays visible. You can type instead at any time.','cs.no':'Type instead','cs.yes':'Allow mic',
   ph:'Type or speak…',
@@ -624,35 +691,34 @@ const I = {
   'hero.h':['مقاولات','واستشارات','عالمية'],
   'hero.sub':'انطلقت 7D International من جمهورية التشيك ومقرها الرئيسي اليوم في فلوريدا، وتقدّم خدمات المقاولات والاستشارات المتكاملة عبر خمس قارات — واليوم بمقر إقليمي للشرق الأوسط في الرياض.',
   'hero.cta1':'استعرض المشاريع <span class="arrow">→</span>','hero.cta2':'ابدأ مشروعك','hub.riyadh':'الرياض',cue:'مرّر',
-  'fp.eyebrow':'انتشار عالمي','fp.h':'حضورٌ بلا حدود','fp.s1':'قارات','fp.s2':'دول','fp.s3':'دعم','fp.cap':'مرّر لإضاءة الشبكة',
-  'pj.eyebrow':'مشاريع مختارة · الرياض','pj.hud':'مرّر للتحليق',
+  'fp.eyebrow':'انتشار عالمي','fp.h':'حضورٌ بلا حدود','fp.s1':'قارات','fp.s2':'مراكز','fp.s3':'التأسيس','fp.cap':'مرّر لإضاءة الشبكة',
+  'pj.eyebrow':'مشاريع مختارة · الرياض','pj.hud':'مرّر للاستكشاف',
   'so.eyebrow':'الحلول الأساسية','so.h':'سبعة تخصصات. معيارٌ واحد.','so.p':'خدمات متكاملة استراتيجيًا عبر البنية التحتية العالمية والدفاع وقطاعات التقنية المتخصصة.',
   'hi.eyebrow':'المسيرة','hi.h':'ثلاثة عقود، خمس قارات','ne.eyebrow':'آخر الأخبار',
   'qt.eyebrow':'كلمة رئيس المجلس','qt.who':'د. وائل المُوجي','qt.role':'رئيس مجلس الإدارة والمؤسس',
-  'ct.eyebrow':'تواصل مع الفريق','ct.h':'جاهزون للبناء؟','ct.p':'أخبرونا بالقطاع والدولة وحجم المشروع، وفريق الرياض يردّ خلال يوم عمل.','ct.btn':'ابدأ المحادثة <span class="arrow">→</span>',
+  'ct.eyebrow':'تواصل مع الفريق','ct.h':'جاهزون للبناء؟','ct.p':'أخبرونا بالقطاع والدولة وحجم المشروع لبدء المحادثة مع الفريق.','ct.btn':'ابدأ المحادثة <span class="arrow">→</span>',
   'ft.tag':'مقاولات واستشارات عالمية','ft.note':'بناء تصوّري من أيسرز سيستمز · الرياض',
-  'bar.call':'اتصال','bar.voice':'صوت','bar.inq':'استفسار',
+  'bar.email':'تواصل','bar.call':'اتصال','bar.voice':'صوت','bar.inq':'استفسار',
   'as.name':'مساعد 7D','as.status':'عربي سعودي · English','as.voice':'الصوت مفعّل',
   'cs.h':'نستخدم المايكروفون؟','cs.p':'المساعد يسمعك فقط وقت ما يكون زر المايك أحمر. الصوت يُعالَج داخل متصفحك ومؤشر التسجيل يظل ظاهر. وتقدر تكتب بدل الكلام في أي وقت.','cs.no':'أكتب بدلًا','cs.yes':'اسمح بالمايك',
   ph:'اكتب أو تكلّم…',
  }
 };
-let LANG = localStorage.getItem('7d_lang') || 'en';
+let LANG = new URLSearchParams(location.search).get('lang') || localStorage.getItem('7d_lang') || 'en';
+if(!['en','ar'].includes(LANG))LANG='en';
+window.LANG=LANG;
 
 /* ---------------- content ---------------- */
 const PROJECTS = [
- {id:'fountain', kind:'fountain', en:{k:'Innovative water feature',t:'King Abdullah Park Fountain',d:'A landmark water feature marrying traditional Saudi aesthetics with precision engineering — landscape architecture and waterscape design at monumental scale.'},
+ {id:'fountain', image:'assets/projects/kapf-4.jpeg', source:'https://7dint.net/projects/king-abdullah-park-fountain/', kind:'fountain', en:{k:'Innovative water feature',t:'King Abdullah Park Fountain',d:'A landmark water feature marrying traditional Saudi aesthetics with precision engineering — landscape architecture and waterscape design at monumental scale.'},
    ar:{k:'نافورة مبتكرة',t:'نافورة حديقة الملك عبدالله',d:'معلمٌ مائي يجمع بين الجماليات السعودية الأصيلة والهندسة الدقيقة — عمارة مناظر وتصميم مسطحات مائية بمقياس ضخم.'}},
- {id:'garden', kind:'domes', en:{k:'Large-scale landscape',t:'King Abdullah International Garden',d:'Climate-controlled biome domes and a vast landscaped realm — one of the largest garden projects in the region.'},
-   ar:{k:'مشروع مناظر ضخم',t:'حديقة الملك عبدالله العالمية',d:'قباب بيئية مُكيَّفة ومساحات خضراء شاسعة — من أكبر مشاريع الحدائق في المنطقة.'}},
- {id:'eye', kind:'wheel', en:{k:'Iconic landmark',t:'Riyadh Eye',d:'An iconic observation wheel concept for the Riyadh skyline — structure, experience and city identity in one gesture.'},
+ {id:'garden', image:'assets/projects/kaig-main-photo.jpeg', source:'https://7dint.net/projects/king-abdullah-international-garden/', kind:'domes', en:{k:'Large-scale landscape',t:'King Abdullah International Garden',d:'A landscape project exploring climate-responsive design, native planting and irrigation.'},
+   ar:{k:'مشروع مناظر ضخم',t:'حديقة الملك عبدالله العالمية',d:'مشروع مناظر طبيعية يجمع التصميم المتجاوب مع المناخ والنباتات المحلية وأنظمة الري.'}},
+ {id:'eye', image:'assets/projects/riyadh-eye-main-photo.jpeg', source:'https://7dint.net/projects/riyadh-eye/', kind:'wheel', en:{k:'Iconic landmark',t:'Riyadh Eye',d:'An iconic observation wheel concept for the Riyadh skyline — structure, experience and city identity in one gesture.'},
    ar:{k:'معلم أيقوني',t:'عين الرياض',d:'عجلة مشاهدة أيقونية لأفق الرياض — هيكل وتجربة وهوية للمدينة في لفتة واحدة.'}},
- {id:'urban', kind:'city', en:{k:'Comprehensive urban planning',t:'Riyadh 2020 Urban Study',d:'Zoning, growth corridors and infrastructure phasing for the capital — the consultancy behind the city plan.'},
-   ar:{k:'تخطيط عمراني شامل',t:'دراسة الرياض 2020 العمرانية',d:'تقسيم المناطق ومحاور النمو ومراحل البنية التحتية للعاصمة — الاستشارة التي تقف خلف مخطط المدينة.'}},
- {id:'dss', kind:'civic', en:{k:'Government facility',t:'Department of Social Services',d:'A public-sector facility designed for dignity, throughput and longevity — civic architecture done properly.'},
-   ar:{k:'منشأة حكومية',t:'إدارة الخدمات الاجتماعية',d:'منشأة قطاع عام صُمّمت للكرامة والكفاءة وطول العمر — عمارة مدنية بمعناها الصحيح.'}},
- {id:'hq', kind:'tower', en:{k:'Dec 2025 · With Takween Alrajhi',t:'Middle East HQ · Riyadh',d:'A strategic partnership establishing 7D’s Middle East headquarters in Riyadh and expanding delivery capacity across the Kingdom.'},
-   ar:{k:'ديسمبر 2025 · مع تكوين الراجحي',t:'المقر الإقليمي · الرياض',d:'شراكة استراتيجية تؤسس المقر الإقليمي لـ 7D في الرياض وتوسّع القدرة التنفيذية في المملكة.'}},
+ {id:'urban', image:'assets/projects/riyadh2020-main-photo.jpeg', source:'https://7dint.net/projects/riyadh-2020/', kind:'city', en:{k:'Comprehensive urban planning',t:'Riyadh 2020 Urban Study',d:'An urban planning consultation for Riyadh, with a focus on sustainable growth and smart city principles.'},
+   ar:{k:'تخطيط عمراني شامل',t:'دراسة الرياض 2020 العمرانية',d:'استشارة تخطيط عمراني للرياض، تركّز على النمو المستدام ومبادئ المدن الذكية.'}},
+
 ];
 const SOLUTIONS = [
  {n:'01',en:{t:'Architecture, Landscape & Waterscape Design',d:'Full-range architectural consulting: urban studies, zoning plans and city planning.',tags:['Urban studies','Zoning','Waterscape']},ar:{t:'العمارة وتصميم المناظر والمسطحات المائية',d:'استشارات معمارية متكاملة: دراسات عمرانية، مخططات تقسيم، وتخطيط مدن.',tags:['دراسات عمرانية','تقسيم','مسطحات مائية']}},
@@ -707,7 +773,7 @@ function renderTimeline(){
   const path=$('#tlPath'); const len=path.getTotalLength();
   TIMELINE.forEach((m,i)=>{
     const L=m[LANG]; const el=document.createElement('div'); el.className='tl-item';
-    el.innerHTML=`<b>${m.y}</b><h4>${L.t}</h4><p>${L.d}</p>`; it.appendChild(el);
+    el.innerHTML=`<b>${m.y}</b><h3>${L.t}</h3><p>${L.d}</p>`; it.appendChild(el);
     const p=path.getPointAtLength(len*(0.03+i*(0.94/(TIMELINE.length-1))));
     const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
     c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',5);c.setAttribute('fill','var(--bg)');c.setAttribute('stroke','var(--mint)');c.setAttribute('stroke-width','2');c.style.opacity=REDUCED?1:0;dots.appendChild(c);
@@ -725,11 +791,13 @@ function renderQuote(){
 function renderSceneCards(){
   const sc=$('#sceneCards'); sc.innerHTML='';
   PROJECTS.forEach((p,i)=>{const L=p[LANG]; const c=document.createElement('div'); c.className='scene-card'; c.dataset.i=i;
-    c.innerHTML=`<div class="eyebrow">${L.k}</div><h3>${L.t}</h3><p>${L.d}</p><div class="row"><button class="btn" data-share="${i}">${LANG==='ar'?'مشاركة':'Share'}</button><a class="btn solid" href="#cta">${LANG==='ar'?'ابدأ مشروعًا مشابهًا':'Start a similar project'} <span class="arrow">→</span></a></div>`;
+    c.innerHTML=`<div class="eyebrow">${L.k}</div><h3>${L.t}</h3><p>${L.d}</p><a class="project-source" href="${p.source}" target="_blank" rel="noopener">${LANG==='ar'?'تفاصيل المشروع لدى 7D ↗':'Project details at 7D ↗'}</a><div class="row"><button class="btn" data-share="${i}">${LANG==='ar'?'مشاركة':'Share'}</button><a class="btn solid" href="#cta">${LANG==='ar'?'ابدأ مشروعًا مشابهًا':'Start a similar project'} <span class="arrow">→</span></a></div>`;
     sc.appendChild(c);});
-  sc.addEventListener('click',e=>{const b=e.target.closest('[data-share]'); if(!b)return; const p=PROJECTS[+b.dataset.share][LANG];
+  sc.onclick=e=>{const b=e.target.closest('[data-share]'); if(!b)return; const p=PROJECTS[+b.dataset.share][LANG];
     if(navigator.share){navigator.share({title:p.t,text:p.d,url:location.href+'#projects'}).catch(()=>{});} else {navigator.clipboard?.writeText(location.href+'#projects');}
-    if(navigator.vibrate)navigator.vibrate(8);});
+    if(navigator.vibrate&&!REDUCED)navigator.vibrate(8);};
+  const pn=$('#projectNav');pn.setAttribute('aria-label',LANG==='ar'?'المشاريع':'Projects');pn.innerHTML=PROJECTS.map((p,i)=>`<button data-project-go="${i}" aria-label="${String(i+1).padStart(2,'0')} — ${p[LANG].t}">${String(i+1).padStart(2,'0')}</button>`).join('');pn.onclick=e=>{const b=e.target.closest('[data-project-go]');if(b)openProject(+b.dataset.projectGo);};
+  updateFlight(window.flight?.progress||0);
 }
 function renderClocks(){
   const c=$('#clocks'); c.innerHTML='';
@@ -748,46 +816,47 @@ setInterval(tickClocks,30000);
 function applyLang(){
   document.documentElement.lang=LANG; document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
   $$('[data-i]').forEach(el=>{const k=el.dataset.i; const v=I[LANG][k]; if(v!==undefined && typeof v==='string') el.innerHTML=v;});
-  $('#lang').textContent=LANG==='ar'?'EN':'عربي';
-  $('#asstIn').placeholder=I[LANG].ph;
+  $('#lang').textContent=LANG==='ar'?'EN':'عربي';$('#lang').setAttribute('aria-label',LANG==='ar'?'EN — English':'عربي — العربية');
+  $('#asstIn').placeholder=I[LANG].ph;$('#deck').setAttribute('aria-label',LANG==='ar'?'التخصصات':'Disciplines');
+  document.querySelector('meta[name=description]').content=LANG==='ar'?'7D International — مقاولات واستشارات عالمية. استعرض مشاريع الشركة وتخصصاتها ومراكزها الدولية.':'Explore 7D International’s published projects, disciplines and international offices.';
   document.title=LANG==='ar'?'7D International — مقاولات واستشارات عالمية':'7D International — Global Contracting & Consulting';
+  document.querySelector('meta[property="og:title"]').content=document.title;document.querySelector('meta[property="og:description"]').content=document.querySelector('meta[name=description]').content;
   renderHero(); renderCards(); renderTimeline(); renderNews(); renderQuote(); renderSceneCards(); renderClocks(); seedChips();
 }
 window.setLang=l=>{if(l!=='ar'&&l!=='en')return;LANG=l;localStorage.setItem('7d_lang',LANG);applyLang();window.LANG=LANG;dispatchEvent(new CustomEvent('7d-lang',{detail:LANG}));requestAnimationFrame(()=>onScroll(true));};
-$('#lang').addEventListener('click',()=>{LANG=LANG==='ar'?'en':'ar'; localStorage.setItem('7d_lang',LANG); applyLang(); requestAnimationFrame(()=>onScroll(true));});
+$('#lang').addEventListener('click',()=>window.setLang(LANG==='ar'?'en':'ar'));
 
 /* ---------------- nav / sheet / cursor ---------------- */
 const nav=$('#nav'), sheet=$('#sheet');
-$('#burger').addEventListener('click',()=>sheet.classList.toggle('open'));
-$$('#sheet a').forEach(a=>a.addEventListener('click',()=>sheet.classList.remove('open')));
+sheet.inert=true;$('#burger').setAttribute('aria-expanded','false');
+$('#burger').addEventListener('click',()=>{const open=sheet.classList.toggle('open');sheet.inert=!open;$('#burger').setAttribute('aria-expanded',String(open));});
+$$('#sheet a').forEach(a=>a.addEventListener('click',()=>{sheet.classList.remove('open');sheet.inert=true;$('#burger').setAttribute('aria-expanded','false');}));
 const cur=$('#cur'); let cx=0,cy=0,tx=0,ty=0;
 addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY;});
 addEventListener('pointerover',e=>{cur.classList.toggle('view',!!e.target.closest('.scene-card, .card, .news'));});
-(function curLoop(){cx=lerp(cx,tx,.22);cy=lerp(cy,ty,.22);cur.style.transform=`translate(${cx}px,${cy}px) translate(-50%,-50%)`;requestAnimationFrame(curLoop);})();
+if(!REDUCED&&!isTouch)(function curLoop(){cx=lerp(cx,tx,.22);cy=lerp(cy,ty,.22);cur.style.transform=`translate(${cx}px,${cy}px) translate(-50%,-50%)`;requestAnimationFrame(curLoop);})();
 
 /* magnetic button */
 const mag=$('#magnet');
 if(!isTouch&&!REDUCED){ mag.addEventListener('pointermove',e=>{const r=mag.getBoundingClientRect();const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);mag.style.transform=`translate(${dx*.25}px,${dy*.35}px)`;});
   mag.addEventListener('pointerleave',()=>{mag.style.transform='';}); }
 
-/* ---------------- 3D scenes ----------------
-   The globe and the project flight live in scene.js as an ES module so they can
-   use modern three.js with a real post-processing chain. It overwrites these
-   stubs and fires `scene-ready` once the module has loaded. */
+/* Scene interfaces: projects boot independently; the globe loads by proximity. */
 function initGlobe(){} function updateGlobe(){} function initFlight(){} function updateFlight(){}
-Object.assign(window,{HUBS,PROJECTS,I,anime});
-addEventListener('scene-ready',()=>{ window.LANG=LANG; initGlobe(); initFlight(); requestAnimationFrame(()=>onScroll(true)); });
+Object.assign(window,{HUBS,PROJECTS,I,anime:window.anime});
+const globeLoader=new IntersectionObserver(async entries=>{if(!entries.some(e=>e.isIntersecting))return;globeLoader.disconnect();try{const scene=await import('./scene.js');Object.assign(window,scene);scene.initGlobe();onScroll(true);}catch{document.querySelector('#globeCap').textContent=LANG==='ar'?'مراكزنا العالمية':'Our global hubs';}},{rootMargin:'0px 0px -20% 0px'});globeLoader.observe(document.querySelector('#globeWrap'));
 
 /* ---------------- scroll orchestration ---------------- */
 const heroBg=$('#heroBg');
 function pinProgress(el){const r=el.getBoundingClientRect();const total=el.offsetHeight-innerHeight;return clamp(-r.top/total,0,1);}
 let lastY=0,ticking=false,visG=false,visF=false;
-const ioVis=new IntersectionObserver(es=>es.forEach(e=>{if(e.target.id==='globeWrap')visG=e.isIntersecting;if(e.target.id==='flight')visF=e.isIntersecting;}),{threshold:0});
+const ioVis=new IntersectionObserver(es=>es.forEach(e=>{if(e.target.id==='globeWrap')visG=e.isIntersecting&&e.intersectionRect.height>1;if(e.target.id==='flight')visF=e.isIntersecting&&e.intersectionRect.height>1;}),{threshold:0});
 ioVis.observe($('#globeWrap'));ioVis.observe($('#flight'));
 function onScroll(force){
   const y=scrollY; nav.classList.toggle('solid',y>80);
+  const fr=$('#footprint').getBoundingClientRect(),pr=$('#projects').getBoundingClientRect();document.body.classList.toggle('scene-view',(fr.top<innerHeight*.5&&fr.bottom>innerHeight*.5)||(pr.top<innerHeight*.5&&pr.bottom>innerHeight*.5));
   if(!REDUCED){heroBg.style.transform=`scale(${1+clamp(y/innerHeight,0,1)*.12}) translateY(${clamp(y,0,innerHeight)*.18}px)`;$('.cue').style.opacity=clamp(1-y/120,0,1);}
-  updateGlobe(pinProgress($('#globeWrap')));
+  if(visG||force)updateGlobe(pinProgress($('#globeWrap')));
   updateFlight(pinProgress($('#flight')));
   // solutions deck
   const num=$('#deckNum');const cards=$$('.card');let cur='01';cards.forEach(c=>{const r=c.getBoundingClientRect();if(r.top<=140)cur=c.dataset.n;if(!REDUCED&&innerWidth>700){const over=clamp((140-r.top)/300,0,1);c.style.transform=`scale(${1-over*.06})`;c.style.filter=`blur(${over*2}px)`;}});
@@ -795,11 +864,11 @@ function onScroll(force){
   // timeline draw
   const tl=$('#tl');const tr=tl.getBoundingClientRect();const tp=clamp((innerHeight*.85-tr.top)/(tr.height+innerHeight*.3),0,1);
   if(!REDUCED){const draw=$('#tlDraw');const len=+draw.style.strokeDasharray||1;draw.style.strokeDashoffset=len*(1-tp);}
-  $$('#tlDots circle').forEach((c,i)=>{const th=0.03+i*(0.94/(TIMELINE.length-1));const on=tp>=th;c.style.opacity=on?1:0;$$('.tl-item')[i]?.classList.toggle('on',on);});
+  $$('#tlDots circle').forEach((c,i)=>{const th=0.03+i*(0.94/(TIMELINE.length-1));const on=REDUCED||tp>=th;c.style.opacity=on?1:0;$$('.tl-item')[i]?.classList.toggle('on',on);});
   // news rail
-  const rw=$('#railWrap');const rp=pinProgress(rw);const rail=$('#rail');const max=Math.max(0,rail.scrollWidth-innerWidth+40);const dir=document.documentElement.dir==='rtl'?1:-1;rail.style.transform=`translateX(${dir*rp*max}px)`;
+  const rw=$('#railWrap');const rp=pinProgress(rw);const rail=$('#rail');const max=Math.max(0,rail.scrollWidth-innerWidth+40);const dir=document.documentElement.dir==='rtl'?1:-1;rail.style.transform=REDUCED?'none':`translateX(${dir*rp*max}px)`;
   // quote
-  const qr=$('#quote').getBoundingClientRect();const qp=clamp((innerHeight*.8-qr.top)/(qr.height*.9),0,1);$$('#quote .q').forEach(q=>q.classList.toggle('on',qp>0.02));const wds=$$('#quote .wd');wds.forEach((w,i)=>w.classList.toggle('on',qp>=i/wds.length));
+  const qr=$('#quote').getBoundingClientRect();const qp=clamp((innerHeight*.8-qr.top)/(qr.height*.9),0,1);$$('#quote .q').forEach(q=>q.classList.toggle('on',qp>0.02));const wds=$$('#quote .wd');wds.forEach((w,i)=>w.classList.toggle('on',REDUCED||qp>=i/wds.length));
   // cta glow
   const cr=$('#cta').getBoundingClientRect();$('#cta').style.setProperty('--cta-glow',clamp((innerHeight-cr.top)/innerHeight,0,1));
   lastY=y;
@@ -809,10 +878,8 @@ addEventListener('resize',()=>onScroll(true));
 /* one-shot reveals for the seams and the section headings */
 {const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);}}),{threshold:.2,rootMargin:'0px 0px -12% 0px'});
  $$('.seam, .sec-h').forEach(el=>io.observe(el));}
-// keep the 3D scenes animating while pinned even without scroll
-// window.flight / window.globe are set by scene.js once each scene exists; reading bare
-// identifiers here threw before that and killed this loop on its first frame.
-(function raf(){if(visF&&window.flight)updateFlight(pinProgress($('#flight')));if(visG&&window.globe)updateGlobe(pinProgress($('#globeWrap')));requestAnimationFrame(raf);})();
+// Animate only the visible globe. Reduced motion and hidden tabs do not render continuously.
+let globeFrame=0;(function raf(now=0){if(now-globeFrame>33&&!document.hidden&&!document.body.classList.contains('gated')&&!REDUCED&&visG&&window.globe){globeFrame=now;updateGlobe(pinProgress($('#globeWrap')));}requestAnimationFrame(raf);})();
 
 /* gyroscope parallax (mobile) */
 function enableGyro(){
@@ -864,10 +931,10 @@ function reply(q){
 }
 function leadFlow(q,ar){
   if(lead.step===1){lead.sector=q;lead.step=2;return ar?'تمام. وفي أي دولة أو مدينة المشروع؟':'Got it. Which country or city is the project in?';}
-  if(lead.step===2){lead.where=q;lead.step=3;return ar?'ممتاز. عطني اسمك ورقم الواتساب عشان فريق الرياض يتواصل معك خلال يوم عمل.':'Great. Your name and WhatsApp number, and the Riyadh team will reach you within one business day.';}
-  if(lead.step===3){lead.contact=q;lead.step=0;const summary=ar?`سجّلت طلبك: القطاع «${lead.sector}»، الموقع «${lead.where}»، التواصل «${lead.contact}». تقدر تفتح واتساب الفريق مباشرة من الزر تحت. شكرًا لثقتك بـ 7D.`:`Logged: sector “${lead.sector}”, location “${lead.where}”, contact “${lead.contact}”. You can open the team’s WhatsApp from the button below. Thank you for trusting 7D.`;
+  if(lead.step===2){lead.where=q;lead.step=3;return ar?'ممتاز. عطني اسمك ووسيلة التواصل عشان الفريق يتواصل معك.':'Great. Your name and contact details, so the team can contact you.';}
+  if(lead.step===3){lead.contact=q;lead.step=0;const summary=ar?`مسودة طلبك: القطاع «${lead.sector}»، الموقع «${lead.where}»، التواصل «${lead.contact}». تقدر تفتح مسودة البريد من الزر تحت وترسلها بنفسك.`:`Draft: sector “${lead.sector}”, location “${lead.where}”, contact “${lead.contact}”. Open the email draft below and send it from your mail app.`;
     try{const L=JSON.parse(localStorage.getItem('7d_leads')||'[]');L.push({...lead,at:new Date().toISOString()});localStorage.setItem('7d_leads',JSON.stringify(L));}catch{}
-    setTimeout(()=>{const a=document.createElement('a');a.className='btn solid';a.style.alignSelf='flex-start';a.href='https://wa.me/17272191592?text='+encodeURIComponent((ar?'طلب عرض — ':'Proposal request — ')+lead.sector+' / '+lead.where+' / '+lead.contact);a.target='_blank';a.rel='noopener';a.textContent=ar?'فتح واتساب الفريق ↗':'Open team WhatsApp ↗';msgs.appendChild(a);msgs.scrollTop=msgs.scrollHeight;},300);
+    setTimeout(()=>{const a=document.createElement('a');a.className='btn solid';a.style.alignSelf='flex-start';a.href='mailto:info@7dint.net?subject='+encodeURIComponent(ar?'طلب مشروع':'Project enquiry')+'&body='+encodeURIComponent(lead.sector+' / '+lead.where+' / '+lead.contact);a.target='_blank';a.rel='noopener';a.textContent=ar?'فتح مسودة بريد للفريق ↗':'Open email draft ↗';msgs.appendChild(a);msgs.scrollTop=msgs.scrollHeight;},300);
     return summary;}
   return '';
 }
@@ -893,7 +960,7 @@ if('serviceWorker' in navigator && location.protocol==='https:'){navigator.servi
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"}}
 </script>
-<script type="module" src="scene.js"></script>
+<script type="module" src="projects.js"></script>
 <script type="module" src="viz.js"></script>
 <script type="module" src="tour.js"></script>
 </body>

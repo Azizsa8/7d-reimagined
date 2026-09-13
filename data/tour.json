@@ -1,10 +1,24 @@
 {
   "persona": {
-    "name": { "en": "Noorah", "ar": "نورة" },
-    "role": { "en": "7D guide", "ar": "مرشدة 7D" },
+    "name": {
+      "en": "Noorah",
+      "ar": "نورة"
+    },
+    "role": {
+      "en": "7D guide",
+      "ar": "مرشدة 7D"
+    },
     "voice": {
-      "ar": { "id": "ckaeRWMtCV0u0pUT3wX1", "label": "Noorah — Saudi female (shared library, needs a paid plan)", "fallback": "EXAVITQu4vr4xnSDxMaL" },
-      "en": { "id": "EXAVITQu4vr4xnSDxMaL", "label": "Sarah — mature, reassuring (premade, free tier)", "fallback": "EXAVITQu4vr4xnSDxMaL" }
+      "ar": {
+        "id": "ckaeRWMtCV0u0pUT3wX1",
+        "label": "Noorah — Saudi female (shared library, needs a paid plan)",
+        "fallback": "EXAVITQu4vr4xnSDxMaL"
+      },
+      "en": {
+        "id": "EXAVITQu4vr4xnSDxMaL",
+        "label": "Sarah — mature, reassuring (premade, free tier)",
+        "fallback": "EXAVITQu4vr4xnSDxMaL"
+      }
     },
     "model": "eleven_multilingual_v2"
   },
@@ -36,11 +50,38 @@
       "scroll": 0.55,
       "hold": 2.2,
       "beats": [
-        { "cue": { "en": "King Abdullah Park Fountain", "ar": "نافورة حديقة الملك عبدالله" }, "project": 0 },
-        { "cue": { "en": "International Gardens", "ar": "الحديقة العالمية" }, "project": 1 },
-        { "cue": { "en": "Riyadh Eye", "ar": "عين الرياض" }, "project": 2 },
-        { "cue": { "en": "twenty twenty urban study", "ar": "دراسة الرياض العمرانية" }, "project": 3 },
-        { "cue": "end", "project": 5 }
+        {
+          "cue": {
+            "en": "King Abdullah Park Fountain",
+            "ar": "نافورة حديقة الملك عبدالله"
+          },
+          "project": 0
+        },
+        {
+          "cue": {
+            "en": "International Gardens",
+            "ar": "الحديقة العالمية"
+          },
+          "project": 1
+        },
+        {
+          "cue": {
+            "en": "Riyadh Eye",
+            "ar": "عين الرياض"
+          },
+          "project": 2
+        },
+        {
+          "cue": {
+            "en": "twenty twenty urban study",
+            "ar": "دراسة الرياض العمرانية"
+          },
+          "project": 3
+        },
+        {
+          "cue": "end",
+          "project": 3
+        }
       ],
       "en": "In the Kingdom the record is on the ground. The King Abdullah Park Fountain. The International Gardens. The Riyadh Eye. The twenty twenty urban study for the capital.",
       "ar": "في المملكة، السجل موجود على أرض الواقع: نافورة حديقة الملك عبدالله، والحديقة العالمية، وعين الرياض، ودراسة الرياض العمرانية لعام ألفين وعشرين."
@@ -70,8 +111,8 @@
       "id": "close",
       "target": "#cta",
       "scroll": 0.5,
-      "en": "That is the firm. Tell us the sector, the country and the scale, and the Riyadh team will answer within one business day.",
-      "ar": "هذي هي الشركة. أخبرنا بالقطاع والدولة وحجم المشروع، وفريق الرياض يرد عليك خلال يوم عمل واحد."
+      "en": "That is the firm. Tell us the sector, the country and the scale, and start a conversation with the team.",
+      "ar": "هذي هي الشركة. أخبرنا بالقطاع والدولة وحجم المشروع لبدء المحادثة مع الفريق."
     }
   ],
   "ui": {

@@ -1,0 +1,133 @@
+[
+  {
+    "width": 1440,
+    "lang": "en",
+    "errors": [],
+    "failed": [],
+    "initial": {
+      "bytes": 207338,
+      "projectImageRequests": 0,
+      "globeLoaded": false,
+      "networkBytes": 290513
+    },
+    "controls": {
+      "active": 2,
+      "hiddenCardsInert": true
+    },
+    "paused": true,
+    "resumed": true,
+    "scrollTasks": [
+      165,
+      703,
+      56,
+      117,
+      86,
+      62,
+      54,
+      113,
+      52
+    ],
+    "reduced": {
+      "before": 4,
+      "after": 4,
+      "staticImage": true
+    },
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "lang": "ar",
+    "errors": [],
+    "failed": [],
+    "initial": {
+      "bytes": 207338,
+      "projectImageRequests": 0,
+      "globeLoaded": false,
+      "networkBytes": 367732
+    },
+    "controls": {
+      "active": 2,
+      "hiddenCardsInert": true
+    },
+    "paused": true,
+    "resumed": true,
+    "scrollTasks": [
+      263,
+      341,
+      72,
+      69,
+      52,
+      110
+    ],
+    "reduced": {
+      "before": 4,
+      "after": 4,
+      "staticImage": true
+    },
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "lang": "en",
+    "errors": [],
+    "failed": [],
+    "initial": {
+      "bytes": 190457,
+      "projectImageRequests": 0,
+      "globeLoaded": false,
+      "networkBytes": 290514
+    },
+    "controls": {
+      "active": 2,
+      "hiddenCardsInert": true
+    },
+    "paused": true,
+    "resumed": true,
+    "scrollTasks": [
+      142,
+      332,
+      51,
+      74,
+      110
+    ],
+    "reduced": {
+      "before": 4,
+      "after": 4,
+      "staticImage": true
+    },
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "lang": "ar",
+    "errors": [],
+    "failed": [],
+    "initial": {
+      "bytes": 190457,
+      "projectImageRequests": 0,
+      "globeLoaded": false,
+      "networkBytes": 367721
+    },
+    "controls": {
+      "active": 2,
+      "hiddenCardsInert": true
+    },
+    "paused": true,
+    "resumed": true,
+    "scrollTasks": [
+      119,
+      207,
+      84,
+      75,
+      64,
+      80,
+      82
+    ],
+    "reduced": {
+      "before": 4,
+      "after": 4,
+      "staticImage": true
+    },
+    "overflow": false
+  }
+]
